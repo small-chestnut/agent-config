@@ -1,4 +1,13 @@
 {
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
+  },
+  "skipWorkflowUsageWarning": true,
   "permissions": {
     "deny": [
       "Bash(rm -r*)",
@@ -59,7 +68,11 @@
       "Bash(trash *)",
       "Bash(trash-put *)",
       "Bash(trash-list*)",
-      "Bash(trash-restore*)"
+      "Bash(trash-restore*)",
+      "mcp__tts__voicevox_speak",
+      "mcp__tts__voicevox_ping",
+      "mcp__tts__voicevox_get_speakers",
+      "mcp__tts__voicevox_stop_speaker"
     ]
   }
 }

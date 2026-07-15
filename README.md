@@ -80,6 +80,13 @@ force push などサンドボックスを捨てても取り消せない操作は
   (`git push origin +main`)は文字列パターンでは表現できない。これらは ask
   (`git push*` は全 push を確認)が受け止める。完璧を求める場合は PreToolUse
   フックを追加する(hooks/ ディレクトリを作って同梱する)
+- 私用テンプレートのため、安全ルール以外の個人設定も user-settings.json に同居させている:
+  - `extraKnownMarketplaces`: 公式プラグインカタログの登録。**マーケットプレイス登録を
+    消すと、そこから入れたプラグインもアンインストールされる**仕様なので、テンプレートで
+    常に維持する(削除しないこと)
+  - `skipWorkflowUsageWarning`: Workflow 初回警告の抑止
+  - VOICEVOX ツールの allow: `tts` MCP サーバーを設定していないマシンでは
+    何にもマッチしないだけで無害
 
 ## Codex CLI テンプレートの意図
 
