@@ -1,0 +1,88 @@
+# agent-config
+
+AI コーディングエージェント(Claude Code / Codex CLI)の安全設定テンプレート。
+エージェントによる意図しない破壊的操作を、設定レベルで機械的にブロックする。
+
+## 構成
+
+```
+agent-config/
+├── claude/
+│   ├── user-settings.json     # → ~/.claude/settings.json(マシン保護層)
+│   └── project-settings.json  # → 各リポジトリの .claude/settings.json にコピーしてコミット
+├── codex/
+│   ├── safety-snippet.toml    # ~/.codex/config.toml に手動マージする安全設定(自動配置しない)
+│   └── readonly.config.toml   # → ~/.codex/readonly.config.toml(調査専用プロファイル)
+├── install.ps1                # Windows 用配置スクリプト
+└── install.sh                 # WSL2 / Linux / macOS 用(Codespaces dotfiles でも自動実行される)
+```
+
+## 使い方
+
+```
+git clone <このリポジトリ> && cd agent-config
+# Windows
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+# WSL2 / Linux / macOS
+./install.sh
+```
+
+- 既存ファイルと差分がある場合は diff を表示して確認してから上書きする
+- 設定は**次のエージェントセッション起動時から**有効
+
+## 運用ルール
+
+1. **ルールの編集はこのリポジトリ側で行う**。`~/.claude/settings.json` を直接編集しない
+   (マシンごとに差分が生まれ、テンプレートの意味がなくなる)
+2. ただし Claude Code は許可プロンプトで「常に許可」を選ぶと `~/.claude/settings.json` に
+   allow ルールを書き込むため、自然にドリフトする。install 時の diff で気づいたら、
+   残したい変更はリポジトリに取り込み、不要なら上書きする
+3. **秘密情報(API キー等)は絶対にコミットしない**。`env` セクションは使わない
+4. 危険なコマンドがルールをすり抜けたのに気づいたら、その場でルールを追加してコミットする
+
+## 3層の守り(このリポジトリがカバーする範囲)
+
+| 層 | 手段 | 守るもの |
+|---|---|---|
+| マシン保護層 | `~/.claude/settings.json` ほか(このリポジトリ) | ローカルマシン |
+| ポータブル層 | 各リポジトリにコミットする `.claude/settings.json` | clone 先のあらゆる環境 |
+| サーバー側 | GitHub branch protection・トークン最小権限(**このリポジトリ外**) | リモートの共有状態 |
+
+force push などサンドボックスを捨てても取り消せない操作は、サーバー側の層でも必ず塞ぐこと。
+
+## Claude Code テンプレートの意図
+
+- `deny`: rm -rf 系 / force push / `git reset --hard` / `git clean` / `git checkout --` /
+  `git stash drop・clear` / `terraform destroy` / PowerShell の `Remove-Item -Recurse` 系。
+  deny は allow やモードより常に優先される
+- `ask`: `git push` と `git restore` は毎回確認
+- 注意: パターンは**前方一致**。変則的な書き方は理論上すり抜け得るので、
+  完璧を求める場合は PreToolUse フックを追加する(hooks/ ディレクトリを作って同梱する)
+
+## Codex CLI テンプレートの意図
+
+Codex は Claude Code のようなコマンド単位の deny リストではなく、
+**サンドボックス境界 + 承認ポリシー**で守る設計。
+
+**最重要の注意: `~/.codex/config.toml` は Codex 本体が状態を書き込むアプリ管理ファイル**
+(プラグイン・信頼済みプロジェクト・MCP サーバー・デスクトップ設定などが入る)。
+テンプレートで丸ごと上書きしてはいけない。そのため install スクリプトは config.toml に
+触らず、安全設定は `safety-snippet.toml` を見ながら**手動でマージ**する。
+
+- `approval_policy`: `"untrusted"`(毎回確認)が最も安全。`"on-request"` は緩め
+- `sandbox_mode = "workspace-write"` + `network_access = false`: 作業ディレクトリのみ
+  書き込み可・ネットワーク遮断。なお新方式の `default_permissions` /
+  `[permissions.<name>]` プロファイルもあるが、旧方式とは併用不可
+- `writable_roots` にネットワーク共有を足すと被害範囲がマシン外に広がるので慎重に
+- 調査だけさせたいときは `codex --profile readonly`(一切書き込ませない)
+- `shell_environment_policy` でサブプロセスに渡す環境変数を最小化
+  (KEY/SECRET/TOKEN を含む変数は Codex のデフォルトでも除外される)
+- `danger-full-access` + `approval_policy = "never"` は使い捨てコンテナ内以外で使わない
+- プロジェクト側の対応物: `AGENTS.md`(モデルへの指示。強制力はない)と
+  `.codex/config.toml`(プロジェクトを trust した場合のみ読み込まれる)
+
+## サンドボックス環境への自動配布
+
+- **GitHub Codespaces**: Settings → Codespaces → dotfiles にこのリポジトリを指定すると、
+  コンテナ作成時に `install.sh` が自動実行される
+- **自前 Docker イメージ**: ビルド時にこのリポジトリを clone して `install.sh` を実行する

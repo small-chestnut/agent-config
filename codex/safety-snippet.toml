@@ -1,0 +1,23 @@
+# Codex CLI 安全設定スニペット(手動マージ用 — install スクリプトはこのファイルを配置しない)
+#
+# 重要: ~/.codex/config.toml は Codex 本体がプラグイン・信頼済みプロジェクト・
+# MCP サーバーなどの状態を書き込む「アプリ管理ファイル」。丸ごと上書きすると
+# それらが消えるので、以下のキーが入っているかを確認し、無いものだけ追記する。
+
+# --- 承認ポリシー ---
+# "untrusted"  = 信頼済み以外のコマンドは毎回確認(最も安全)
+# "on-request" = エージェントが必要と判断したときに確認(緩め)
+# approval_policy = "untrusted"
+
+# --- サンドボックス(旧方式の書式。新方式 default_permissions とは併用不可) ---
+# sandbox_mode = "workspace-write"
+# [sandbox_workspace_write]
+# network_access = false
+# writable_roots = []
+#   ※ writable_roots にネットワーク共有(\\server\share)を足すと、
+#     エージェントの書き込み・削除がそのまま共有先に及ぶ。本当に必要か都度検討する。
+
+# --- サブプロセスに渡す環境変数の最小化(未設定なら追記推奨) ---
+[shell_environment_policy]
+inherit = "core"
+exclude = ["*KEY*", "*TOKEN*", "*SECRET*", "*PASSWORD*", "*CREDENTIAL*", "AWS_*"]

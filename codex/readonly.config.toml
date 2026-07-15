@@ -1,0 +1,6 @@
+# Codex CLI 調査・コードリーディング専用プロファイル(一切書き込ませない)
+# 配置先: ~/.codex/readonly.config.toml
+# 使い方: codex --profile readonly
+
+approval_policy = "untrusted"
+sandbox_mode = "read-only"
