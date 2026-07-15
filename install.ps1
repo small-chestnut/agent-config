@@ -16,6 +16,12 @@ function Install-ConfigFile {
             Write-Host "  unchanged: $Dest"
             return
         }
+        # Mirror install.sh's `[ ! -t 0 ]` check: with redirected stdin Read-Host
+        # blocks forever instead of throwing, so detect it up front.
+        if ([Console]::IsInputRedirected -or -not [Environment]::UserInteractive) {
+            Write-Host "  non-interactive, keeping existing: $Dest"
+            return
+        }
         Write-Host ""
         Write-Host "--- existing file differs: $Dest ---"
         Compare-Object -ReferenceObject (Get-Content $Dest) -DifferenceObject (Get-Content $Source) |
