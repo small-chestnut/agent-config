@@ -38,11 +38,13 @@ function Install-ConfigFile {
 
 Write-Host "Installing Claude Code settings..."
 Install-ConfigFile "$repo\claude\user-settings.json" "$env:USERPROFILE\.claude\settings.json"
+Install-ConfigFile "$repo\claude\CLAUDE.md" "$env:USERPROFILE\.claude\CLAUDE.md"
 
 # NOTE: ~/.codex/config.toml is managed by the Codex app itself (plugins, trusted
 # projects, MCP servers). Never copy over it. Apply codex\safety-snippet.toml by hand.
 Write-Host "Installing Codex CLI profile (config.toml is NOT touched)..."
 Install-ConfigFile "$repo\codex\readonly.config.toml" "$env:USERPROFILE\.codex\readonly.config.toml"
+Install-ConfigFile "$repo\codex\AGENTS.md" "$env:USERPROFILE\.codex\AGENTS.md"
 
 Write-Host ""
 Write-Host "Done. Restart agent sessions for changes to take effect."

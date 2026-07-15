@@ -9,10 +9,12 @@ AI コーディングエージェント(Claude Code / Codex CLI)の安全設定�
 agent-config/
 ├── claude/
 │   ├── user-settings.json     # → ~/.claude/settings.json(マシン保護層)
-│   └── project-settings.json  # → 各リポジトリの .claude/settings.json にコピーしてコミット
+│   ├── project-settings.json  # → 各リポジトリの .claude/settings.json にコピーしてコミット
+│   └── CLAUDE.md              # → ~/.claude/CLAUDE.md(プロンプト層・全プロジェクト共通)
 ├── codex/
 │   ├── safety-snippet.toml    # ~/.codex/config.toml に手動マージする安全設定(自動配置しない)
-│   └── readonly.config.toml   # → ~/.codex/readonly.config.toml(調査専用プロファイル)
+│   ├── readonly.config.toml   # → ~/.codex/readonly.config.toml(調査専用プロファイル)
+│   └── AGENTS.md              # → ~/.codex/AGENTS.md(プロンプト層・全プロジェクト共通)
 ├── install.ps1                # Windows 用配置スクリプト
 └── install.sh                 # WSL2 / Linux / macOS 用(Codespaces dotfiles でも自動実行される)
 ```
@@ -82,6 +84,19 @@ Codex は Claude Code のようなコマンド単位の deny リストではな�
 - `danger-full-access` + `approval_policy = "never"` は使い捨てコンテナ内以外で使わない
 - プロジェクト側の対応物: `AGENTS.md`(モデルへの指示。強制力はない)と
   `.codex/config.toml`(プロジェクトを trust した場合のみ読み込まれる)
+
+## プロンプト層(CLAUDE.md / AGENTS.md)の意図
+
+deny ルールやサンドボックスが「実行を機械的に止める層」なのに対し、CLAUDE.md /
+AGENTS.md は「モデルの振る舞いを指示で誘導する層」。
+
+- **プロンプト層は「お願い」であって「強制」ではない**。文脈次第の逸脱や
+  プロンプトインジェクションで破られ得るため、enforcement をここに移さないこと。
+  役割は、deny に到達する前に安全な行動(ブランチ運用・削除前の説明・with-lease)を
+  選ばせること
+- **短く保つ**。項目が増えるほど1項目あたりの効きが薄まる。安全規律は10行前後を維持する
+- プロジェクト単位で効かせたい場合は、各リポジトリ直下に `CLAUDE.md` / `AGENTS.md` を
+  コミットする(project-settings.json と同じ配布モデル)
 
 ## サンドボックス環境への自動配布
 
