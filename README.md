@@ -41,6 +41,9 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
    残したい変更はリポジトリに取り込み、不要なら上書きする
 3. **秘密情報(API キー等)は絶対にコミットしない**。`env` セクションは使わない
 4. 危険なコマンドがルールをすり抜けたのに気づいたら、その場でルールを追加してコミットする
+5. **ゴミ箱を空にするのは人間だけ**。エージェントの削除は trash(ゴミ箱)経由なので
+   間違いに気づいたら `trash-restore` で戻せる。ディスクが逼迫したら自分で
+   `trash-empty` を実行する(エージェントには deny 済みで実行させない)
 
 ## 3層の守り(このリポジトリがカバーする範囲)
 
@@ -54,14 +57,29 @@ force push などサンドボックスを捨てても取り消せない操作は
 
 ## Claude Code テンプレートの意図
 
-- `deny`: rm -rf 系 / 素の force push(`--force` / `-f`)/ `git reset --hard` / `git clean` /
+3色の信号として設計している:
+**復元できる操作は allow(青)、共有状態に触れる操作は ask(黄)、復元できない操作は deny(赤)**。
+
+- `allow`: `trash` 系(ゴミ箱への削除)。復元可能な削除は摩擦なしで通す。
+  これにより「削除して」という正当な依頼はゴミ箱経由で満たされ、エージェントが
+  deny を迂回して `find -delete` 等の見慣れない手段に流れる誘因もなくなる
+- `deny`: rm の再帰削除(`-r` / `-R` / `-fr` / `--recursive`、フラグ後置形も含む)/
+  force push(`--force` / `-f`、フラグ後置形も含む)/ `git reset --hard` / `git clean` /
   `git checkout --` / `git stash drop・clear` / `terraform destroy` /
-  PowerShell の `Remove-Item -Recurse` 系。deny は allow やモードより常に優先される
+  ゴミ箱を完全消去する `trash-empty`・`trash-rm` /
+  設定ファイル自体の編集(`Edit(~/.claude/settings.json)` 等。エージェントが自分の
+  ルールブックを書き換えて deny を外す経路を塞ぐ)/
+  PowerShell の `Remove-Item -Recurse` 系。deny は allow やモードより常に優先され、
+  ユーザーが会話で許可しても解除されない(ルール変更はこのリポジトリ経由で行う)
 - `ask`: `git push`・`git restore`・`git push --force-with-lease` は毎回確認。
   履歴書き換えを依頼するときは `--force-with-lease` を使い、プロンプトで承認して通す
   (素の `--force` は塞いだまま。安全版の with-lease で用が足りるため)
-- 注意: パターンは**前方一致**。変則的な書き方は理論上すり抜け得るので、
-  完璧を求める場合は PreToolUse フックを追加する(hooks/ ディレクトリを作って同梱する)
+- パターンの仕様: ワイルドカード `*` は任意の位置に置ける。` *`(空白あり)は
+  空白区切りを要求し、`*`(空白なし)は要求しない(`:*` は末尾 ` *` の別記法)
+- 限界: 組み合わせ短フラグ(`rm -vrf` 等)や refspec 先頭の `+` による強制 push
+  (`git push origin +main`)は文字列パターンでは表現できない。これらは ask
+  (`git push*` は全 push を確認)が受け止める。完璧を求める場合は PreToolUse
+  フックを追加する(hooks/ ディレクトリを作って同梱する)
 
 ## Codex CLI テンプレートの意図
 

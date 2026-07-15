@@ -39,4 +39,12 @@ echo "Installing Codex CLI profile (config.toml is NOT touched)..."
 install_file "$repo/codex/readonly.config.toml" "$HOME/.codex/readonly.config.toml"
 install_file "$repo/codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
 
+echo "Checking for a trash command (agents use it instead of rm; see claude/CLAUDE.md)..."
+if command -v trash >/dev/null 2>&1 || command -v trash-put >/dev/null 2>&1; then
+  echo "  trash: found"
+else
+  echo "  trash: NOT found. Recommended: 'sudo apt install trash-cli' (Linux) or 'brew install trash' (macOS)."
+  echo "  Until installed, agents fall back to moving files into ~/.agent-trash/."
+fi
+
 echo "Done. Restart agent sessions for changes to take effect."

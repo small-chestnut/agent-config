@@ -47,4 +47,13 @@ Install-ConfigFile "$repo\codex\readonly.config.toml" "$env:USERPROFILE\.codex\r
 Install-ConfigFile "$repo\codex\AGENTS.md" "$env:USERPROFILE\.codex\AGENTS.md"
 
 Write-Host ""
+Write-Host "Checking for a trash command (agents use it instead of rm; see claude\CLAUDE.md)..."
+if (Get-Command trash -ErrorAction SilentlyContinue) {
+    Write-Host "  trash: found"
+} else {
+    Write-Host "  trash: NOT found. Recommended: 'npm install -g trash-cli' (moves files to the Recycle Bin)."
+    Write-Host "  Until installed, agents fall back to moving files into ~\.agent-trash\."
+}
+
+Write-Host ""
 Write-Host "Done. Restart agent sessions for changes to take effect."
