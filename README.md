@@ -52,10 +52,12 @@ force push などサンドボックスを捨てても取り消せない操作は
 
 ## Claude Code テンプレートの意図
 
-- `deny`: rm -rf 系 / force push / `git reset --hard` / `git clean` / `git checkout --` /
-  `git stash drop・clear` / `terraform destroy` / PowerShell の `Remove-Item -Recurse` 系。
-  deny は allow やモードより常に優先される
-- `ask`: `git push` と `git restore` は毎回確認
+- `deny`: rm -rf 系 / 素の force push(`--force` / `-f`)/ `git reset --hard` / `git clean` /
+  `git checkout --` / `git stash drop・clear` / `terraform destroy` /
+  PowerShell の `Remove-Item -Recurse` 系。deny は allow やモードより常に優先される
+- `ask`: `git push`・`git restore`・`git push --force-with-lease` は毎回確認。
+  履歴書き換えを依頼するときは `--force-with-lease` を使い、プロンプトで承認して通す
+  (素の `--force` は塞いだまま。安全版の with-lease で用が足りるため)
 - 注意: パターンは**前方一致**。変則的な書き方は理論上すり抜け得るので、
   完璧を求める場合は PreToolUse フックを追加する(hooks/ ディレクトリを作って同梱する)
 
