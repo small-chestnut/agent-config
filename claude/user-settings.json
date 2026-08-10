@@ -72,7 +72,28 @@
       "mcp__tts__voicevox_speak",
       "mcp__tts__voicevox_ping",
       "mcp__tts__voicevox_get_speakers",
-      "mcp__tts__voicevox_stop_speaker"
+      "mcp__tts__voicevox_stop_speaker",
+      "mcp__comfyui__download_model",
+      "mcp__comfyui__generate_image",
+      "mcp__comfyui__enqueue_workflow",
+      "mcp__comfyui__create_workflow",
+      "mcp__comfyui__save_workflow",
+      "mcp__comfyui__get_workflow",
+      "mcp__comfyui__visualize_workflow",
+      "mcp__comfyui__get_history",
+      "mcp__comfyui__get_image",
+      "mcp__comfyui__upload_image",
+      "mcp__comfyui__queue",
+      "mcp__comfyui__get_system_stats",
+      "mcp__comfyui__get_defaults",
+      "mcp__comfyui__model_metadata",
+      "mcp__comfyui__clear_vram",
+      "mcp__comfyui__list_tools",
+      "mcp__comfyui__describe_tool",
+      "mcp__comfyui__list_api_nodes",
+      "mcp__comfyui__list_packs",
+      "mcp__comfyui__search_custom_nodes",
+      "mcp__comfyui__calculate"
     ]
   }
 }
