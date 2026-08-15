@@ -24,8 +24,16 @@ function Install-ConfigFile {
         }
         Write-Host ""
         Write-Host "--- existing file differs: $Dest ---"
-        Compare-Object -ReferenceObject (Get-Content $Dest) -DifferenceObject (Get-Content $Source) |
-            Format-Table -AutoSize | Out-String | Write-Host
+        # Get-Content defaults to the OEM code page here (cp932 on Japanese Windows),
+        # which renders UTF-8 config files as mojibake. Read both sides as UTF-8.
+        # Print line by line as well: Format-Table truncated the long lines.
+        $existingLines = Get-Content $Dest   -Encoding UTF8
+        $incomingLines = Get-Content $Source -Encoding UTF8
+        Compare-Object -ReferenceObject $existingLines -DifferenceObject $incomingLines |
+            ForEach-Object {
+                $tag = if ($_.SideIndicator -eq "=>") { "new     " } else { "existing" }
+                Write-Host ("  [$tag] " + $_.InputObject)
+            }
         try {
             $answer = Read-Host "  overwrite? (y/N)"
         } catch {
