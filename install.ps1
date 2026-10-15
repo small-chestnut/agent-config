@@ -54,6 +54,13 @@ Write-Host "Installing Claude Code settings..."
 Install-ConfigFile "$repo\claude\user-settings.json" "$env:USERPROFILE\.claude\settings.json"
 Install-ConfigFile "$repo\claude\CLAUDE.md" "$env:USERPROFILE\.claude\CLAUDE.md"
 
+# Skills: one folder per skill, SKILL.md inside. The body is loaded only when the
+# skill is invoked, so procedures live here instead of bloating CLAUDE.md.
+Write-Host "Installing Claude Code skills..."
+Get-ChildItem "$repo\claude\skills" -Directory | ForEach-Object {
+    Install-ConfigFile "$($_.FullName)\SKILL.md" "$env:USERPROFILE\.claude\skills\$($_.Name)\SKILL.md"
+}
+
 # NOTE: ~/.codex/config.toml is managed by the Codex app itself (plugins, trusted
 # projects, MCP servers). Never copy over it. Apply codex\safety-snippet.toml by hand.
 Write-Host "Installing Codex CLI profile (config.toml is NOT touched)..."

@@ -33,6 +33,14 @@ echo "Installing Claude Code settings..."
 install_file "$repo/claude/user-settings.json" "$HOME/.claude/settings.json"
 install_file "$repo/claude/CLAUDE.md" "$HOME/.claude/CLAUDE.md"
 
+# Skills: one folder per skill, SKILL.md inside. The body is loaded only when the
+# skill is invoked, so procedures live here instead of bloating CLAUDE.md.
+echo "Installing Claude Code skills..."
+for d in "$repo"/claude/skills/*/; do
+  [ -f "${d}SKILL.md" ] || continue
+  install_file "${d}SKILL.md" "$HOME/.claude/skills/$(basename "$d")/SKILL.md"
+done
+
 # NOTE: ~/.codex/config.toml is managed by the Codex app itself (plugins, trusted
 # projects, MCP servers). Never copy over it. Apply codex/safety-snippet.toml by hand.
 echo "Installing Codex CLI profile (config.toml is NOT touched)..."

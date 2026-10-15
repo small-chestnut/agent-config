@@ -10,7 +10,8 @@ agent-config/
 ├── claude/
 │   ├── user-settings.json     # → ~/.claude/settings.json(マシン保護層)
 │   ├── project-settings.json  # → 各リポジトリの .claude/settings.json にコピーしてコミット
-│   └── CLAUDE.md              # → ~/.claude/CLAUDE.md(プロンプト層・全プロジェクト共通)
+│   ├── CLAUDE.md              # → ~/.claude/CLAUDE.md(プロンプト層・全プロジェクト共通)
+│   └── skills/<名前>/SKILL.md  # → ~/.claude/skills/<名前>/SKILL.md(手順。呼ばれたときだけ読み込まれる)
 ├── codex/
 │   ├── safety-snippet.toml    # ~/.codex/config.toml に手動マージする安全設定(自動配置しない)
 │   ├── readonly.config.toml   # → ~/.codex/readonly.config.toml(調査専用プロファイル)
@@ -120,6 +121,9 @@ AGENTS.md は「モデルの振る舞いを指示で誘導する層」。
   役割は、deny に到達する前に安全な行動(ブランチ運用・削除前の説明・with-lease)を
   選ばせること
 - **短く保つ**。項目が増えるほど1項目あたりの効きが薄まる。安全規律は10行前後を維持する
+- **手順は skill に出す**。CLAUDE.md は毎セッション全文が読み込まれるが、
+  `claude/skills/<名前>/SKILL.md` は本文が呼ばれたときだけ読み込まれる。特定の作業でしか
+  使わない手順(既存プロジェクトの組み替えなど)は skill に置き、CLAUDE.md からは1行で指す
 - プロジェクト単位で効かせたい場合は、各リポジトリ直下に `CLAUDE.md` / `AGENTS.md` を
   コミットする(project-settings.json と同じ配布モデル)
 
