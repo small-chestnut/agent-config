@@ -8,10 +8,10 @@ AI コーディングエージェント(Claude Code / Codex CLI)の安全設定�
 ```
 agent-config/
 ├── claude/
-│   ├── user-settings.json     # → ~/.claude/settings.json(マシン保護層)
+│   ├── user-settings.json     # → 各 Claude 設定ディレクトリの settings.json(マシン保護層)
 │   ├── project-settings.json  # → 各リポジトリの .claude/settings.json にコピーしてコミット
-│   ├── CLAUDE.md              # → ~/.claude/CLAUDE.md(プロンプト層・全プロジェクト共通)
-│   └── skills/<名前>/SKILL.md  # → ~/.claude/skills/<名前>/SKILL.md(手順。呼ばれたときだけ読み込まれる)
+│   ├── CLAUDE.md              # → 各 Claude 設定ディレクトリの CLAUDE.md(プロンプト層・全プロジェクト共通)
+│   └── skills/<名前>/SKILL.md  # → 各 Claude 設定ディレクトリの skills/<名前>/SKILL.md(手順。呼ばれたときだけ読み込まれる)
 ├── codex/
 │   ├── safety-snippet.toml    # ~/.codex/config.toml に手動マージする安全設定(自動配置しない)
 │   ├── readonly.config.toml   # → ~/.codex/readonly.config.toml(調査専用プロファイル)
@@ -32,6 +32,28 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 
 - 既存ファイルと差分がある場合は diff を表示して確認してから上書きする
 - 設定は**次のエージェントセッション起動時から**有効
+
+## 複数アカウントを使い分ける場合
+
+Claude Code は `settings.json`・`CLAUDE.md`・`skills/` を、環境変数 `CLAUDE_CONFIG_DIR` が指す
+ディレクトリから読む(未設定なら `~/.claude`)。ログイン情報もそこに保存されるため、
+別ディレクトリを指定すれば別アカウントで並行して起動できる。
+
+**そのディレクトリには安全設定が何も入っていない。** install スクリプトで配置しないと、
+rm の再帰削除も force push も素通りする。
+
+install スクリプトは `~/.claude` に加えて `~/.claude-work` にも配置する。
+ただし**そのディレクトリが既に存在するときだけ**なので、他のマシンには影響しない。
+別名を使うなら install.ps1 / install.sh の `.claude-work` を書き換える。
+
+```
+# 会社アカウント側を起動する例(このウィンドウの間だけ有効)
+$env:CLAUDE_CONFIG_DIR = "$HOME\.claude-work"; claude
+```
+
+セッション記録と自動メモリも `CLAUDE_CONFIG_DIR` の下(`projects/`)に移る。
+既存の履歴を引き継ぎたいプロジェクトは、そのプロジェクトのディレクトリだけを
+ジャンクションで共有する(`mklink /J`。管理者権限は不要)。
 
 ## 運用ルール
 

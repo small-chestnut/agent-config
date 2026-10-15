@@ -51,14 +51,31 @@ function Install-ConfigFile {
 }
 
 Write-Host "Installing Claude Code settings..."
-Install-ConfigFile "$repo\claude\user-settings.json" "$env:USERPROFILE\.claude\settings.json"
-Install-ConfigFile "$repo\claude\CLAUDE.md" "$env:USERPROFILE\.claude\CLAUDE.md"
+# Claude Code reads settings.json, CLAUDE.md and skills/ from the directory named by
+# CLAUDE_CONFIG_DIR, defaulting to ~/.claude. A second account (a separate login under a
+# separate CLAUDE_CONFIG_DIR) therefore reads a different copy of both files, and gets no
+# safety settings at all unless they are installed there too.
+$claudeDirs = @("$env:USERPROFILE\.claude")
+# Extra config dirs are opt-in per machine: listed here, but only used when the directory
+# already exists. Create the directory to start managing it; machines without it are
+# unaffected.
+foreach ($extra in @("$env:USERPROFILE\.claude-work")) {
+    if (Test-Path $extra) { $claudeDirs += $extra }
+}
+foreach ($dir in $claudeDirs) {
+    Install-ConfigFile "$repo\claude\user-settings.json" "$dir\settings.json"
+    Install-ConfigFile "$repo\claude\CLAUDE.md" "$dir\CLAUDE.md"
+}
 
 # Skills: one folder per skill, SKILL.md inside. The body is loaded only when the
-# skill is invoked, so procedures live here instead of bloating CLAUDE.md.
+# skill is invoked, so procedures live here instead of bloating CLAUDE.md. Installed
+# into every config dir, like CLAUDE.md.
 Write-Host "Installing Claude Code skills..."
 Get-ChildItem "$repo\claude\skills" -Directory | ForEach-Object {
-    Install-ConfigFile "$($_.FullName)\SKILL.md" "$env:USERPROFILE\.claude\skills\$($_.Name)\SKILL.md"
+    $skill = $_
+    foreach ($dir in $claudeDirs) {
+        Install-ConfigFile "$($skill.FullName)\SKILL.md" "$dir\skills\$($skill.Name)\SKILL.md"
+    }
 }
 
 # NOTE: ~/.codex/config.toml is managed by the Codex app itself (plugins, trusted
