@@ -69,6 +69,7 @@ Claude に望む役割は2つ。下の規律はすべて、どちらかのため
 ## Notion への記録
 
 - 学んだことを Notion に残すときは、skill `notion-learning-log` に従う。
+- Notion の Todo を読む・作るときは、skill `notion-todo` に従う。
 
 # 開発のための規律
 
