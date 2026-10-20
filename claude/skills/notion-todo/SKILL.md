@@ -11,8 +11,8 @@ description: 利用者の Notion の Todo(✅ Todo)を読む・作る・直す�
 
 ### 目指す状態: 行を読む・作る・直す前に、「書き方のルール」を読んでいる
 
-- Todo(https://app.notion.com/p/676c0d1f3e6e4eccae7bb0c37dc1f035)のテンプレート「タスク」(https://app.notion.com/p/3db470fb2068809099d6f95f52dbbcc8)を開き、「書き方のルール」のタブを読んでいる。
-- 書き込む前に Todo を fetch して、列の名前を確かめている。
+- 「Todo の書き方のルール」(https://app.notion.com/p/3ff470fb20688198a84dc99737b242ad)を読んでいる。
+- 書き込む前に Todo(https://app.notion.com/p/676c0d1f3e6e4eccae7bb0c37dc1f035)を fetch して、列の名前を確かめている。
 
 ### 目指す状態: Todo を引くときに、Notion のプランの回数上限で止まらない
 
