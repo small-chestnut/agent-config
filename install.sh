@@ -59,6 +59,16 @@ for d in "$repo"/claude/skills/*/; do
   done
 done
 
+# Hooks: scripts that settings.json runs on tool events (see "hooks" in user-settings.json).
+# Installed into every config dir; the hook command finds them via CLAUDE_CONFIG_DIR.
+echo "Installing Claude Code hooks..."
+for f in "$repo"/claude/hooks/*; do
+  [ -f "$f" ] || continue
+  for dir in "${claude_dirs[@]}"; do
+    install_file "$f" "$dir/hooks/$(basename "$f")"
+  done
+done
+
 # NOTE: ~/.codex/config.toml is managed by the Codex app itself (plugins, trusted
 # projects, MCP servers). Never copy over it. Apply codex/safety-snippet.toml by hand.
 echo "Installing Codex CLI profile (config.toml is NOT touched)..."

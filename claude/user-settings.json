@@ -9,6 +9,7 @@
   },
   "skipWorkflowUsageWarning": true,
   "theme": "auto",
+  "agentPushNotifEnabled": true,
   "permissions": {
     "deny": [
       "Bash(rm -r*)",
@@ -95,6 +96,19 @@
       "mcp__comfyui__list_packs",
       "mcp__comfyui__search_custom_nodes",
       "mcp__comfyui__calculate"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "P=python3; python3 -c '' 2>/dev/null || P=python; \"$P\" \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/check_rule_length.py\""
+          }
+        ]
+      }
     ]
   }
 }

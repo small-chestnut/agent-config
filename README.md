@@ -11,11 +11,13 @@ agent-config/
 │   ├── user-settings.json     # → 各 Claude 設定ディレクトリの settings.json(マシン保護層)
 │   ├── project-settings.json  # → 各リポジトリの .claude/settings.json にコピーしてコミット
 │   ├── CLAUDE.md              # → 各 Claude 設定ディレクトリの CLAUDE.md(プロンプト層・全プロジェクト共通)
-│   └── skills/<名前>/SKILL.md  # → 各 Claude 設定ディレクトリの skills/<名前>/SKILL.md(手順。呼ばれたときだけ読み込まれる)
+│   ├── skills/<名前>/SKILL.md  # → 各 Claude 設定ディレクトリの skills/<名前>/SKILL.md(手順。呼ばれたときだけ読み込まれる)
+│   └── hooks/                 # → 各 Claude 設定ディレクトリの hooks/(settings.json の hooks が走らせるスクリプト)
 ├── codex/
 │   ├── safety-snippet.toml    # ~/.codex/config.toml に手動マージする安全設定(自動配置しない)
 │   ├── readonly.config.toml   # → ~/.codex/readonly.config.toml(調査専用プロファイル)
 │   └── AGENTS.md              # → ~/.codex/AGENTS.md(プロンプト層・全プロジェクト共通)
+├── tests/                     # hooks のテスト(python -m unittest discover -s tests)
 ├── install.ps1                # Windows 用配置スクリプト
 └── install.sh                 # WSL2 / Linux / macOS 用(Codespaces dotfiles でも自動実行される)
 ```
@@ -154,6 +156,11 @@ AGENTS.md は「モデルの振る舞いを指示で誘導する層」。
   一度に整える作業は含まない(既にあるコード・フォルダ・名前をこの形に直すのは別の変更)
 - プロジェクト単位で効かせたい場合は、各リポジトリ直下に `CLAUDE.md` / `AGENTS.md` を
   コミットする(project-settings.json と同じ配布モデル)
+- **決まりの1行の長さはフックが数える**。「短く」と書くだけではモデルの判断で長い文が通るため、
+  `hooks/check_rule_length.py` が、決まりの文書(名前が CLAUDE.md・AGENTS.md・SKILL.md の
+  ファイルと、各リポジトリの `.claude/rule-documents.txt` に1行ずつ書いた glob)を Edit / Write で
+  保存するたびに、HEAD から足された箇条書きの行を数え、60 字(`…` のコードは1字)を超えたら
+  Claude に知らせる。前からある行と git の外のファイルは数えない
 
 ## サンドボックス環境への自動配布
 

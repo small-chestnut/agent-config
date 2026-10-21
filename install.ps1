@@ -78,6 +78,16 @@ Get-ChildItem "$repo\claude\skills" -Directory | ForEach-Object {
     }
 }
 
+# Hooks: scripts that settings.json runs on tool events (see "hooks" in user-settings.json).
+# Installed into every config dir; the hook command finds them via CLAUDE_CONFIG_DIR.
+Write-Host "Installing Claude Code hooks..."
+Get-ChildItem "$repo\claude\hooks" -File | ForEach-Object {
+    $hook = $_
+    foreach ($dir in $claudeDirs) {
+        Install-ConfigFile $hook.FullName "$dir\hooks\$($hook.Name)"
+    }
+}
+
 # NOTE: ~/.codex/config.toml is managed by the Codex app itself (plugins, trusted
 # projects, MCP servers). Never copy over it. Apply codex\safety-snippet.toml by hand.
 Write-Host "Installing Codex CLI profile (config.toml is NOT touched)..."
