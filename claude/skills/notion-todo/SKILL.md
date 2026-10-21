@@ -13,6 +13,7 @@ description: 利用者の Notion の Todo(✅ Todo)を読む・作る・直す�
 
 - 「Todo の書き方のルール」(https://app.notion.com/p/3ff470fb20688198a84dc99737b242ad)を読んでいる。
 - 書き込む前に Todo(https://app.notion.com/p/676c0d1f3e6e4eccae7bb0c37dc1f035)を fetch して、列の名前を確かめている。
+- 行を作るときは、テンプレート「タスク」(template_id 3db470fb-2068-8090-99d6-f95f52dbbcc8)を当て、本文が入ったのを fetch で確かめてから、ルールのとおりに中身を書いている。
 
 ### 目指す状態: Todo を引くときに、Notion のプランの回数上限で止まらない
 
