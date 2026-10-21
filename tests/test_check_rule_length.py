@@ -87,6 +87,11 @@ class 保存したときの動き(unittest.TestCase):
         self.doc.write_text(f"{LONG}\n{SHORT}\n", encoding="utf-8")
         self.assertEqual(self.run_hook(self.doc).returncode, 0)
 
+    def test_UTF_8_でない文書でも落ちずに数える(self):
+        self.doc.write_bytes(f"{LONG}\n{LONG}\n".encode("cp932"))
+        r = self.run_hook(self.doc)
+        self.assertEqual(r.returncode, 2, r.stderr.decode("utf-8", "replace"))
+
     def test_決まりの文書でなければ数えない(self):
         other = self.root / "README.md"
         other.write_text(f"{LONG}\n", encoding="utf-8")

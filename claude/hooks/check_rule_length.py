@@ -78,7 +78,7 @@ def read_patterns(text: str) -> list[str]:
 
 def git(cwd: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(["git", "-c", "core.quotepath=false", *args], cwd=cwd,
-                          capture_output=True, text=True, encoding="utf-8")
+                          capture_output=True, text=True, encoding="utf-8", errors="replace")
 
 
 def check(path: Path) -> list[str]:
@@ -89,7 +89,7 @@ def check(path: Path) -> list[str]:
     root = Path(top.stdout.strip()).resolve()
     rel = path.resolve().relative_to(root).as_posix()
     listing = root / PROJECT_LIST
-    patterns = read_patterns(listing.read_text(encoding="utf-8")) if listing.exists() else []
+    patterns = read_patterns(listing.read_text(encoding="utf-8", errors="replace")) if listing.exists() else []
     if not is_rule_document(rel, patterns):
         return []
     new_lines = None
@@ -97,7 +97,7 @@ def check(path: Path) -> list[str]:
         diff = git(root, "diff", "-U0", "HEAD", "--", rel)
         if diff.returncode == 0:
             new_lines = added_line_numbers(diff.stdout)
-    text = path.read_text(encoding="utf-8")
+    text = path.read_text(encoding="utf-8", errors="replace")
     return [f"{rel}:{n}  {length}字  {body}" for n, length, body in too_long(text, new_lines)]
 
 
