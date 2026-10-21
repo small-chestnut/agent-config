@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 # Install agent config templates to the user's home directory (Linux / macOS / WSL2).
 # Also runs automatically when this repo is set as a Codespaces dotfiles repository.
+# Usage: ./install.sh [--yes]   (--yes overwrites differing files without asking)
 set -euo pipefail
 repo="$(cd "$(dirname "$0")" && pwd)"
+yes=0
+[ "${1:-}" = "--yes" ] && yes=1
 
 install_file() {
   local src="$1" dst="$2"
@@ -10,6 +13,11 @@ install_file() {
   if [ -f "$dst" ]; then
     if cmp -s "$src" "$dst"; then
       echo "  unchanged: $dst"
+      return
+    fi
+    if [ "$yes" = 1 ]; then
+      cp "$src" "$dst"
+      echo "  overwritten: $dst"
       return
     fi
     if [ ! -t 0 ]; then

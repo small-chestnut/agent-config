@@ -1,5 +1,7 @@
 # Install agent config templates to the user's home directory (Windows).
-# Usage: powershell -ExecutionPolicy Bypass -File .\install.ps1
+# Usage: powershell -ExecutionPolicy Bypass -File .\install.ps1 [-Yes]
+# -Yes overwrites differing files without asking.
+param([switch]$Yes)
 $ErrorActionPreference = "Stop"
 $repo = Split-Path -Parent $MyInvocation.MyCommand.Path
 
@@ -14,6 +16,11 @@ function Install-ConfigFile {
         $dstHash = (Get-FileHash $Dest).Hash
         if ($srcHash -eq $dstHash) {
             Write-Host "  unchanged: $Dest"
+            return
+        }
+        if ($Yes) {
+            Copy-Item -Path $Source -Destination $Dest -Force
+            Write-Host "  overwritten: $Dest"
             return
         }
         # Mirror install.sh's `[ ! -t 0 ]` check: with redirected stdin Read-Host
