@@ -106,6 +106,10 @@
           {
             "type": "command",
             "command": "P=python3; python3 -c '' 2>/dev/null || P=python; \"$P\" \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/check_rule_length.py\""
+          },
+          {
+            "type": "command",
+            "command": "P=python3; python3 -c '' 2>/dev/null || P=python; \"$P\" \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/ask_removable_words.py\""
           }
         ]
       }

@@ -81,23 +81,32 @@ def git(cwd: Path, *args: str) -> subprocess.CompletedProcess:
                           capture_output=True, text=True, encoding="utf-8", errors="replace")
 
 
-def check(path: Path) -> list[str]:
-    """保存されたファイルを数え、上限を超えた行の知らせ。数えないファイルなら空。"""
+def read_rule_document(path: Path) -> tuple[str, str, set[int] | None] | None:
+    """保存されたファイルが git の中の決まりの文書なら (根からのパス, 中身, 足された行の番号)。
+    足された行の番号は、git にまだ入っていない文書なら None(全部の行)。"""
     top = git(path.parent, "rev-parse", "--show-toplevel")
     if top.returncode != 0:
-        return []
+        return None
     root = Path(top.stdout.strip()).resolve()
     rel = path.resolve().relative_to(root).as_posix()
     listing = root / PROJECT_LIST
     patterns = read_patterns(listing.read_text(encoding="utf-8", errors="replace")) if listing.exists() else []
     if not is_rule_document(rel, patterns):
-        return []
+        return None
     new_lines = None
     if git(root, "ls-files", "--error-unmatch", "--", rel).returncode == 0:
         diff = git(root, "diff", "-U0", "HEAD", "--", rel)
         if diff.returncode == 0:
             new_lines = added_line_numbers(diff.stdout)
-    text = path.read_text(encoding="utf-8", errors="replace")
+    return rel, path.read_text(encoding="utf-8", errors="replace"), new_lines
+
+
+def check(path: Path) -> list[str]:
+    """保存されたファイルを数え、上限を超えた行の知らせ。数えないファイルなら空。"""
+    doc = read_rule_document(path)
+    if doc is None:
+        return []
+    rel, text, new_lines = doc
     return [f"{rel}:{n}  {length}字  {body}" for n, length, body in too_long(text, new_lines)]
 
 
