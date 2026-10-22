@@ -60,10 +60,8 @@
     ],
     "ask": [
       "Bash(git push --force-with-lease*)",
-      "Bash(git push*)",
       "Bash(git restore *)",
       "PowerShell(git push --force-with-lease*)",
-      "PowerShell(git push*)",
       "PowerShell(git restore *)"
     ],
     "allow": [
@@ -99,6 +97,17 @@
     ]
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "P=python3; python3 -c '' 2>/dev/null || P=python; \"$P\" \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/block_history_erasing_push.py\""
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write|MultiEdit",

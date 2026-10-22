@@ -96,15 +96,16 @@ force push などサンドボックスを捨てても取り消せない操作は
   ルールブックを書き換えて deny を外す経路を塞ぐ)/
   PowerShell の `Remove-Item -Recurse` 系。deny は allow やモードより常に優先され、
   ユーザーが会話で許可しても解除されない(ルール変更はこのリポジトリ経由で行う)
-- `ask`: `git push`・`git restore`・`git push --force-with-lease` は毎回確認。
+- `ask`: `git restore`・`git push --force-with-lease` は毎回確認。ふつうの `git push` は確認しない
+  (リモートの履歴を消す push は下の PreToolUse フックが止める)。
   履歴書き換えを依頼するときは `--force-with-lease` を使い、プロンプトで承認して通す
   (素の `--force` は塞いだまま。安全版の with-lease で用が足りるため)
 - パターンの仕様: ワイルドカード `*` は任意の位置に置ける。` *`(空白あり)は
   空白区切りを要求し、`*`(空白なし)は要求しない(`:*` は末尾 ` *` の別記法)
-- 限界: 組み合わせ短フラグ(`rm -vrf` 等)や refspec 先頭の `+` による強制 push
-  (`git push origin +main`)は文字列パターンでは表現できない。これらは ask
-  (`git push*` は全 push を確認)が受け止める。完璧を求める場合は PreToolUse
-  フックを追加する(hooks/ ディレクトリを作って同梱する)
+- 限界: 組み合わせ短フラグ(`rm -vrf` 等)は文字列パターンでは表現できない。push については
+  `hooks/block_history_erasing_push.py`(PreToolUse)がコマンドを読み、リモートの履歴を消す push
+  (`-fu`・`+main`・`:main`・`--delete`・`--mirror`・`--prune` 等)を止め、`--force-with-lease` は
+  どの位置にあっても確認に回す
 - 私用テンプレートのため、安全ルール以外の個人設定も user-settings.json に同居させている:
   - `extraKnownMarketplaces`: 公式プラグインカタログの登録。**マーケットプレイス登録を
     消すと、そこから入れたプラグインもアンインストールされる**仕様なので、テンプレートで
