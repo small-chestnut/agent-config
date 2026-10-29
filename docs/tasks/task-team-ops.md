@@ -1,4 +1,4 @@
-状態: 設計レビュー済み
+状態: 設計レビュー中
 
 # ゴール
 
@@ -8,7 +8,7 @@ task-team の skill(`task-team-lead`・`task-team-se`・`task-team-pg`・`task-t
 
 ## ゴール
 
-README と skill 3つ(lead・se・pg)に、コードの無いタスクの受け皿・読み替え・外部のシステムの設定を変える操作の扱いが書いてあり、`python -m unittest discover -s tests` が通る。
+README・`claude/CLAUDE.md`・skill 3つ(lead・se・pg)に、コードの無いタスクの受け皿・読み替え・外部のシステムの設定を変える操作の扱いが書いてあり、`python -m unittest discover -s tests` が通る。
 
 ## 範囲外
 
@@ -27,12 +27,14 @@ README と skill 3つ(lead・se・pg)に、コードの無いタスクの受け�
 6. どの SKILL.md の箇条書きの行も 60 字以内(`python -m unittest discover -s tests` が通る)。
 7. `task-team-qa` の SKILL.md は変わっていない。
 8. コミットメッセージの本文に、利用者の理由の文がそのままある。
+9. `claude/CLAUDE.md` 原則1の作業用のブランチの行に、記録だけのリポジトリを除く例外がある。
 
 # 設計
 
 ## 決めたこと(利用者の決定)
 
 - 記録だけのリポジトリでは、記録を main に直接コミットする。子が同じフォルダで動くため。
+- その例外は `claude/CLAUDE.md` 原則1に足す(安全の規則の変更を、利用者の依頼として扱う)。
 - PG の規則の対象は、外部のシステムの設定を変える操作すべて(元に戻せるかを PG に判断させない)。
 - QA の skill には足さない。
 - 読み替えは、SE と PG の原則1に新しい目指す状態を足し、その下に置く。文は下のとおり(利用者が合意した文)。
@@ -41,6 +43,14 @@ README と skill 3つ(lead・se・pg)に、コードの無いタスクの受け�
 ## 変えるファイル
 
 すべて既にあるファイル。新しいファイルは作らない。用語集・ADR・`docs/概要.md` はこのリポジトリに無く、作らない(README の「〜の意図」の節が決定の置き場)。
+
+### `claude/CLAUDE.md`
+
+原則1の「- 作業は、既定のブランチではなく、作業用のブランチでしている。」の行を、次の行に替える(同じ位置):
+
+```
+- 作業は、既定のブランチではなく、作業用のブランチでしている(記録だけのリポジトリは除く)。
+```
 
 ### `claude/skills/task-team-se/SKILL.md`
 
@@ -78,10 +88,10 @@ README と skill 3つ(lead・se・pg)に、コードの無いタスクの受け�
 
 ### `claude/skills/task-team-lead/SKILL.md`
 
-1. 「- SE は `use_worktree: true`、`branch_name` にタスク名。」の次の行に足す:
+1. 「- PG と QA は、SE の worktree を `cwd` にし、`use_worktree: false`。」の次の行に足す:
 
 ```
-- 記録だけのリポジトリでは、SE も `use_worktree: false` で、PL のフォルダを `cwd` にする。
+- 記録だけのリポジトリでは、子3つとも `use_worktree: false` で、PL のフォルダを `cwd` にする。
 ```
 
 2. 「- QA が実装を通したら、CLAUDE.md 原則1 のとおりマージして push、できないリポジトリでは PR。」の次の行に足す:
@@ -105,7 +115,7 @@ skill `task-team-lead`・`task-team-se`・`task-team-pg`・`task-team-qa` は、
 - **受け皿は、タスクが触るリポジトリ**。特定のリポジトリに紐づかないタスクは、記録だけを置く専用の
   git リポジトリ(例: `tasks`)を1つ作り、そこに PL セッションを開く。コードを書かないので worktree は要らず、
   子3つは `use_worktree: false` で PL と同じフォルダに起こす。子が同じフォルダで動くので、記録は main に
-  直接コミットする。子はこの決まりを読まないので、そのリポジトリの CLAUDE.md にも書いておく
+  直接コミットする。この例外は CLAUDE.md 原則1の作業用のブランチの行にある
 - **コードの無いタスクは、言葉を読み替えて同じ節と順で回す**。実装 = 手順の実行、テスト = 確認手順
   (手順を実行する前に書く)、受け入れ条件 = 確認して言い切れる文。SE は実行する手順を操作ごとに設計に書き、
   QA がそれを設計レビューで見る
@@ -116,7 +126,7 @@ skill `task-team-lead`・`task-team-se`・`task-team-pg`・`task-team-qa` は、
 
 ## コミット
 
-1コミットにする: 上の4ファイルと、この記録の「実装」の節。
+1コミットにする: 上の5ファイルと、この記録の「実装」の節。
 
 - 件名: `task-team の skill を、コードの無いタスクでも回せるようにする`
 - 本文の1段落目に、利用者の理由をそのまま書く:「この仕組み自体は応用が利く。情シス的な作業や、特定のリポジトリに紐づかないタスクも管理できると良い」
@@ -129,11 +139,12 @@ skill `task-team-lead`・`task-team-se`・`task-team-pg`・`task-team-qa` は、
 | 確かめ方 | 受け入れ条件 |
 |---|---|
 | `test_どのSKILL_mdの箇条書きの行も60字以内`(既にある。`python -m unittest discover -s tests` で走る) | 6 |
-| `git diff main -- README.md claude/skills` を読み、上の文が上の位置にそのまま入っている | 1〜5 |
+| `git diff main -- README.md claude/skills claude/CLAUDE.md` を読み、上の文が上の位置にそのまま入っている | 1〜5 |
 | `git diff main --stat -- claude/skills/task-team-qa` が空 | 7 |
 | `git log -1 --format=%B` に利用者の理由の文がある | 8 |
+| `git diff main -- claude/CLAUDE.md` が、原則1の1行の置き換えだけ | 9 |
 
-足す行の字数は `rule_length` で数えた(25〜38字。すべて 60 字以内)。lint のコマンドはこのリポジトリに無い。
+足す行の字数は `rule_length` で数えた(25〜45字。すべて 60 字以内)。`claude/CLAUDE.md` の行は SKILL.md のテストの外だが、フックが数える。lint のコマンドはこのリポジトリに無い。
 
 # レビュー(設計)
 
