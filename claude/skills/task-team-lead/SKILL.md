@@ -27,6 +27,7 @@ description: 利用者からタスクを受け取り、SE(要件定義・設計)
 - モデルと effort は、SE と QA が `claude-opus-5-5` の high、PG が `claude-sonnet-5-5` の medium。
 - SE は `use_worktree: true`、`branch_name` にタスク名。
 - PG と QA は、SE の worktree を `cwd` にし、`use_worktree: false`。
+- 記録だけのリポジトリでは、子3つとも `use_worktree: false` で、PL のフォルダを `cwd` にする。
 - 起こした後の依頼(レビュー・実装・直し)は、すべて `SendMessage` で送る。
 
 ### 目指す状態: QA の「止める」指摘は、直されてから次へ進んでいる
@@ -38,6 +39,7 @@ description: 利用者からタスクを受け取り、SE(要件定義・設計)
 ### 目指す状態: 終わったタスクは、リポジトリに残り、チームは閉じている
 
 - QA が実装を通したら、CLAUDE.md 原則1 のとおりマージして push、できないリポジトリでは PR。
+- 記録だけのリポジトリでは、記録を main に直接コミットしている。
 - 子3つを `archive_session` で閉じ、ブランチ・テスト結果・記録のパスを利用者に報告している。
 - マージ後、worktree は `git worktree remove`、作業ブランチは `git branch -d` で片付けている。
 - 報告の後、`clear_session` self で PL の会話を空にしている。
