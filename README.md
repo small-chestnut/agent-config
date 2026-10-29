@@ -17,7 +17,7 @@ agent-config/
 │   ├── safety-snippet.toml    # ~/.codex/config.toml に手動マージする安全設定(自動配置しない)
 │   ├── readonly.config.toml   # → ~/.codex/readonly.config.toml(調査専用プロファイル)
 │   └── AGENTS.md              # → ~/.codex/AGENTS.md(プロンプト層・全プロジェクト共通)
-├── tests/                     # hooks のテスト(python -m unittest discover -s tests)
+├── tests/                     # hooks と skill のテスト(python -m unittest discover -s tests)
 ├── install.ps1                # Windows 用配置スクリプト
 └── install.sh                 # WSL2 / Linux / macOS 用(Codespaces dotfiles でも自動実行される)
 ```
