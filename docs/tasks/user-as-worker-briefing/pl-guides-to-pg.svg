@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 470" font-family="'Yu Gothic UI','Meiryo',sans-serif" font-size="14">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker>
+  </defs>
+  <rect width="1040" height="470" fill="#ffffff"/>
+  <text x="20" y="30" font-size="18" font-weight="bold" fill="#222">利用者が手を動かす番の流れ(PL が PG の会話へ案内する)</text>
+
+  <!-- lane labels -->
+  <text x="20" y="80" font-weight="bold" fill="#555">PG の会話</text>
+  <text x="20" y="200" font-weight="bold" fill="#555">PL の会話</text>
+  <text x="20" y="330" font-weight="bold" fill="#555">利用者</text>
+  <line x1="110" y1="130" x2="1020" y2="130" stroke="#ddd"/>
+  <line x1="110" y1="260" x2="1020" y2="260" stroke="#ddd"/>
+
+  <!-- 1 -->
+  <rect x="120" y="55" width="230" height="64" rx="6" fill="#f2f7fd" stroke="#1a5fb4"/>
+  <circle cx="134" cy="55" r="11" fill="#1a5fb4"/><text x="134" y="60" fill="#fff" font-size="13" text-anchor="middle">1</text>
+  <text x="132" y="82" fill="#333">説明と手順を出して待つ</text>
+  <text x="132" y="104" fill="#333" font-size="12">状態: 利用者の操作待ち(DNS に…)</text>
+
+  <!-- 2 -->
+  <rect x="300" y="160" width="400" height="84" rx="6" fill="#fff7e6" stroke="#c77c02"/>
+  <circle cx="314" cy="160" r="11" fill="#c77c02"/><text x="314" y="165" fill="#fff" font-size="13" text-anchor="middle">2</text>
+  <text x="312" y="188" fill="#333">PG が、あなたの操作を待っています。</text>
+  <text x="312" y="210" fill="#333">何のため: DNS に TXT レコードを足すため</text>
+  <text x="312" y="232" fill="#1a5fb4" text-decoration="underline">PG の会話を開く</text>
+
+  <!-- 3 -->
+  <rect x="300" y="290" width="400" height="64" rx="6" fill="#f4f4f4" stroke="#888"/>
+  <circle cx="314" cy="290" r="11" fill="#555"/><text x="314" y="295" fill="#fff" font-size="13" text-anchor="middle">3</text>
+  <text x="312" y="317" fill="#333">PG の会話で説明を読み、操作して、</text>
+  <text x="312" y="339" fill="#333">返すことを PG の会話に書く</text>
+
+  <!-- 4 -->
+  <rect x="740" y="55" width="270" height="64" rx="6" fill="#f2f7fd" stroke="#1a5fb4"/>
+  <circle cx="754" cy="55" r="11" fill="#1a5fb4"/><text x="754" y="60" fill="#fff" font-size="13" text-anchor="middle">4</text>
+  <text x="752" y="82" fill="#333">状態を「実装中」に戻して続ける</text>
+  <text x="752" y="104" fill="#333">番を終えたら PL に知らせる</text>
+
+  <!-- 5 -->
+  <rect x="740" y="160" width="270" height="64" rx="6" fill="#fff7e6" stroke="#c77c02"/>
+  <circle cx="754" cy="160" r="11" fill="#c77c02"/><text x="754" y="165" fill="#fff" font-size="13" text-anchor="middle">5</text>
+  <text x="752" y="188" fill="#333">いつもどおり、QA に</text>
+  <text x="752" y="210" fill="#333">実装レビューを頼む</text>
+
+  <!-- arrows -->
+  <path d="M235,119 L235,200 L298,200" fill="none" stroke="#555" stroke-width="1.5" marker-end="url(#a)"/>
+  <path d="M500,244 L500,288" fill="none" stroke="#555" stroke-width="1.5" marker-end="url(#a)"/>
+  <path d="M700,322 L720,322 L720,87 L738,87" fill="none" stroke="#555" stroke-width="1.5" marker-end="url(#a)"/>
+  <path d="M875,119 L875,158" fill="none" stroke="#555" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <text x="20" y="400" fill="#555" font-size="13">説明の本体(ゴール・いまどこ・何を・なぜ・手順)は PG の会話にだけある。PL が出すのは、待っていることと、何のためかの1行と、開くためのリンク。</text>
+  <text x="20" y="424" fill="#555" font-size="13">4 の知らせは、3 の返事で始まった PG の番の終わりに、PG が PL へ送る(利用者が書いた番の終わりは、PL へ自動では届かないため)。</text>
+</svg>
