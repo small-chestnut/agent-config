@@ -49,7 +49,7 @@ README・`claude/CLAUDE.md`・skill 3つ(lead・se・pg)に、コードの無い
 原則1の「- 作業は、既定のブランチではなく、作業用のブランチでしている。」の行を、次の行に替える(同じ位置):
 
 ```
-- 作業は、既定のブランチではなく、作業用のブランチでしている(記録だけのリポジトリは除く)。
+- 作業は、既定のブランチではなく、作業用のブランチでしている(task-team の記録だけを置くリポジトリは除く)。
 ```
 
 ### `claude/skills/task-team-se/SKILL.md`
@@ -144,7 +144,7 @@ skill `task-team-lead`・`task-team-se`・`task-team-pg`・`task-team-qa` は、
 | `git log -1 --format=%B` に利用者の理由の文がある | 8 |
 | `git diff main -- claude/CLAUDE.md` が、原則1の1行の置き換えだけ | 9 |
 
-足す行の字数は `rule_length` で数えた(25〜45字。すべて 60 字以内)。`claude/CLAUDE.md` の行は SKILL.md のテストの外だが、フックが数える。lint のコマンドはこのリポジトリに無い。
+足す行の字数は `rule_length` で数えた(25〜58字。すべて 60 字以内)。`claude/CLAUDE.md` の行は SKILL.md のテストの外だが、フックが数える。lint のコマンドはこのリポジトリに無い。
 
 # レビュー(設計)
 
