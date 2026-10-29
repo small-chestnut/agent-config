@@ -1,4 +1,4 @@
-状態: 設計レビュー済み
+状態: 実装レビュー中
 
 # ゴール
 
@@ -127,6 +127,28 @@
 「止める」は 0 件。
 
 # 実装
+
+テスト: `tests/test_skill_md_bullet_length.py`(設計どおり。2つのテスト)。
+9行の短縮: コミット 3604e75。README の `tests/` の行も設計どおり。
+
+## 先に失敗するのを確かめた(受け入れ条件3の確かめ)
+
+9行を短くする前に `python -m unittest tests.test_skill_md_bullet_length` を走らせた。`test_どのSKILL_mdの箇条書きの行も60字以内` が subTest で4ファイル失敗し、ファイルの場所と (行番号, 字数, 本文) が出た:
+
+- `claude/skills/notion-learning-log/SKILL.md`: 14行(83字)・15行(115字)
+- `claude/skills/notion-todo/SKILL.md`: 14行(81字)・15行(93字)・16行(113字)
+- `claude/skills/prompt-structure/SKILL.md`: 14行(80字)・38行(81字)
+- `claude/skills/restructure-modules/SKILL.md`: 20行(80字)・24行(73字)
+
+## 設計から変えた点
+
+- `restructure-modules` の24行は、設計の2行ではなく、レビュー(設計)の指摘の1行(55字)にした:「型やファイルを名前空間・パッケージ名で探して登録する仕組み(DI・プラグイン・ORM)を検索して、直している。」。それ以外の8行は設計の文面のとおり。
+
+## 結果
+
+- `python -m unittest discover -s tests`: 42 件、OK。
+- lint のコマンドはこのリポジトリに無い。
+- 書き換えた行に、フックから「消しても意味が変わらない語を探して」と知らせがあった。文面は設計とレビュー済みなので、語は消していない。
 
 # レビュー(実装)
 
