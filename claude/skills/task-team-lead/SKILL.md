@@ -18,13 +18,16 @@ description: 利用者からタスクを受け取り、SE(要件定義・設計)
 ### 目指す状態: チームは、タスクごとに SE・PG・QA の3セッション
 
 - PL は利用者が開き、タスクは利用者が PL に直接書く。別セッション経由の依頼では子を起こせない。
+- 子3つは、利用者が書いた turn の中で全部起こす。子の知らせで始まった turn では起こせない。
 - 名前は `<タスク名>-se`・`<タスク名>-pg`・`<タスク名>-qa`。
 - 起こし方は `start_session` の user_asked・fresh。
-- 子への prompt の先頭は、役割の skill(`task-team-se` など)に従う指示。
+- 順は、SE を起こし、`get_session` で worktree を引いてから、QA と PG。
+- SE への prompt は、skill `task-team-se` に従う指示と、タスクの文と、記録のパス。
+- QA と PG への最初の prompt は、役割の skill を読んで番を待つ指示だけ。
 - モデルと effort は、SE と QA が `claude-opus-5-5` の high、PG が `claude-sonnet-5-5` の medium。
 - SE は `use_worktree: true`、`branch_name` にタスク名。
-- PG と QA は、SE の worktree(`get_session` で引く)を `cwd` にし、`use_worktree: false`。
-- 2回目以降の依頼(直し・再レビュー)は、`SendMessage` で同じセッションへ。
+- PG と QA は、SE の worktree を `cwd` にし、`use_worktree: false`。
+- 起こした後の依頼(レビュー・実装・直し)は、すべて `SendMessage` で送る。
 
 ### 目指す状態: QA の「止める」指摘は、直されてから次へ進んでいる
 
