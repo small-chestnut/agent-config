@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 420" font-family="'Yu Gothic UI','Meiryo',sans-serif" font-size="14">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#555"/></marker>
+  </defs>
+  <rect width="1040" height="420" fill="#ffffff"/>
+  <text x="20" y="30" font-size="18" font-weight="bold" fill="#222">PL の会話を空にする時(タスク A と B が並んで進んでいる例)</text>
+
+  <!-- 変更前 -->
+  <text x="20" y="72" font-size="16" font-weight="bold" fill="#888">変更前</text>
+  <rect x="100" y="52" width="250" height="56" rx="6" fill="#f4f4f4" stroke="#bbb"/>
+  <text x="112" y="76" fill="#333">A が終わる(B は進行中)</text>
+  <text x="112" y="98" fill="#333">報告に「読んだ、空にして」</text>
+  <path d="M350,80 L398,80" stroke="#555" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="400" y="52" width="250" height="56" rx="6" fill="#f4f4f4" stroke="#bbb"/>
+  <text x="412" y="76" fill="#333">押すと空になる</text>
+  <text x="412" y="98" fill="#a33">B のやりとりも一緒に消える</text>
+
+  <!-- 変更後 -->
+  <text x="20" y="172" font-size="16" font-weight="bold" fill="#1a5fb4">変更後</text>
+
+  <rect x="100" y="150" width="270" height="78" rx="6" fill="#f2f7fd" stroke="#1a5fb4"/>
+  <circle cx="114" cy="150" r="11" fill="#1a5fb4"/><text x="114" y="155" fill="#fff" font-size="13" text-anchor="middle">1</text>
+  <text x="112" y="178" fill="#333">A が終わる(B は進行中)</text>
+  <text x="112" y="200" fill="#333">報告だけ出す。ボタンは無く、</text>
+  <text x="112" y="220" fill="#333">空にしない</text>
+
+  <path d="M370,189 L418,189" stroke="#555" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <rect x="420" y="150" width="270" height="78" rx="6" fill="#f2f7fd" stroke="#1a5fb4"/>
+  <circle cx="434" cy="150" r="11" fill="#1a5fb4"/><text x="434" y="155" fill="#fff" font-size="13" text-anchor="middle">2</text>
+  <text x="432" y="178" fill="#333">B が終わる(進行中は無い)</text>
+  <text x="432" y="200" fill="#333">報告に「読んだ、空にして」</text>
+
+  <path d="M690,189 L738,189" stroke="#555" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <rect x="740" y="150" width="270" height="78" rx="6" fill="#f2f7fd" stroke="#1a5fb4"/>
+  <circle cx="754" cy="150" r="11" fill="#1a5fb4"/><text x="754" y="155" fill="#fff" font-size="13" text-anchor="middle">3</text>
+  <text x="752" y="178" fill="#333">押すと空になる</text>
+  <text x="752" y="200" fill="#333">消えるのは、終わった A と B</text>
+  <text x="752" y="220" fill="#333">のやりとりだけ</text>
+
+  <rect x="100" y="262" width="590" height="56" rx="6" fill="#fff7e6" stroke="#c77c02"/>
+  <circle cx="114" cy="262" r="11" fill="#c77c02"/><text x="114" y="267" fill="#fff" font-size="13" text-anchor="middle">4</text>
+  <text x="112" y="286" fill="#333">進行中のタスクがあるうちに「空にして」と書かれたら、空にせず、</text>
+  <text x="112" y="308" fill="#333">進行中のタスクの名前と、それが終わってから空にすることを返す</text>
+
+  <text x="20" y="362" fill="#555" font-size="13">進行中のタスク = 子のセッションがまだ閉じていない(archive されていない)タスク。</text>
+  <text x="20" y="386" fill="#555" font-size="13">会話の一部だけを消す機能はアプリに無いので、PL の会話は、全部を空にするか、何も消さないかのどちらか。</text>
+</svg>

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 640" font-family="'Yu Gothic UI','Meiryo',sans-serif" font-size="14">
+  <rect width="1040" height="640" fill="#ffffff"/>
+  <text x="20" y="30" font-size="18" font-weight="bold" fill="#222">PG の会話で、利用者に操作を頼むときの文(例: メールの送信元の設定)</text>
+
+  <!-- 変更前 -->
+  <text x="20" y="66" font-size="16" font-weight="bold" fill="#888">変更前</text>
+  <rect x="20" y="76" width="330" height="200" rx="8" fill="#f4f4f4" stroke="#bbb"/>
+  <text x="36" y="104" fill="#333">次の操作をしてください。</text>
+  <text x="36" y="132" fill="#333">1. DNS の管理画面にサインインする</text>
+  <text x="36" y="156" fill="#333">2. TXT レコードを1行足す</text>
+  <text x="52" y="178" fill="#333" font-family="Consolas,monospace" font-size="12">v=spf1 include:_spf.example ~all</text>
+  <text x="36" y="206" fill="#333">終わったら教えてください。</text>
+  <text x="36" y="250" fill="#a33" font-size="13">何のため? いまどこ? 間違っていない?</text>
+  <text x="36" y="268" fill="#a33" font-size="13">→ 信じるか、止まって聞き続けるか</text>
+
+  <!-- 変更後 -->
+  <text x="380" y="66" font-size="16" font-weight="bold" fill="#1a5fb4">変更後</text>
+  <rect x="380" y="76" width="640" height="550" rx="8" fill="#f2f7fd" stroke="#1a5fb4"/>
+
+  <g>
+    <circle cx="402" cy="100" r="11" fill="#1a5fb4"/><text x="402" y="105" fill="#fff" font-size="13" text-anchor="middle">1</text>
+    <text x="422" y="105" font-weight="bold" fill="#222">ゴール</text>
+    <text x="490" y="105" fill="#333">会社のメールが、相手の迷惑メールに入らないようにする</text>
+  </g>
+
+  <g>
+    <circle cx="402" cy="138" r="11" fill="#1a5fb4"/><text x="402" y="143" fill="#fff" font-size="13" text-anchor="middle">2</text>
+    <text x="422" y="143" font-weight="bold" fill="#222">いまどこ</text>
+    <text x="500" y="143" fill="#333">要件 ✓ → 設計 ✓ → 設計レビュー ✓ →</text>
+    <rect x="754" y="128" width="54" height="22" rx="4" fill="#1a5fb4"/><text x="781" y="143" fill="#fff" text-anchor="middle">実行</text>
+    <text x="814" y="143" fill="#333">→ 実装レビュー</text>
+    <text x="500" y="168" fill="#666">手順 1 送信元のドメインを確かめる …… 済(PG)</text>
+    <text x="500" y="190" fill="#1a5fb4" font-weight="bold">手順 2 DNS に TXT レコードを足す …… いま(あなた)</text>
+    <text x="500" y="212" fill="#666">手順 3 試しに送って、迷惑メールに入らないか見る …… この後(PG)</text>
+  </g>
+
+  <g>
+    <circle cx="402" cy="246" r="11" fill="#1a5fb4"/><text x="402" y="251" fill="#fff" font-size="13" text-anchor="middle">3</text>
+    <text x="422" y="251" font-weight="bold" fill="#222">何を</text>
+    <text x="490" y="251" fill="#333">DNS に、送信元を名乗る TXT レコードを1行足す</text>
+  </g>
+
+  <g>
+    <circle cx="402" cy="282" r="11" fill="#1a5fb4"/><text x="402" y="287" fill="#fff" font-size="13" text-anchor="middle">4</text>
+    <text x="422" y="287" font-weight="bold" fill="#222">なぜ</text>
+    <text x="490" y="287" fill="#333">受け取る側が、このドメインのメールを本物と判定できるようにするため</text>
+    <text x="490" y="309" fill="#333">あなたの手でするのは、DNS 管理画面へのサインインを Claude がしないため</text>
+  </g>
+
+  <g>
+    <circle cx="402" cy="344" r="11" fill="#1a5fb4"/><text x="402" y="349" fill="#fff" font-size="13" text-anchor="middle">5</text>
+    <text x="422" y="349" font-weight="bold" fill="#222">戻せるか</text>
+    <rect x="490" y="333" width="510" height="24" rx="4" fill="none" stroke="#999" stroke-dasharray="4 3"/>
+    <text x="500" y="349" fill="#777" font-size="13">元に戻せない操作のときだけ、ここに1回書く(この例は消せば戻るので無い)</text>
+  </g>
+
+  <g>
+    <circle cx="402" cy="388" r="11" fill="#1a5fb4"/><text x="402" y="393" fill="#fff" font-size="13" text-anchor="middle">6</text>
+    <text x="422" y="393" font-weight="bold" fill="#222">手順</text>
+    <text x="490" y="393" fill="#333">1. DNS の管理画面にサインインする</text>
+    <text x="490" y="415" fill="#333">2. TXT レコードを1行足す</text>
+    <text x="506" y="435" fill="#333" font-family="Consolas,monospace" font-size="12">v=spf1 include:_spf.example ~all</text>
+    <text x="490" y="459" fill="#333">失敗する条件: v=spf1 で始まる TXT が既にあると、2つとも効かなくなる</text>
+    <text x="490" y="481" fill="#333">(既にあれば、足さずにその行をそのまま返す)</text>
+  </g>
+
+  <g>
+    <circle cx="402" cy="516" r="11" fill="#1a5fb4"/><text x="402" y="521" fill="#fff" font-size="13" text-anchor="middle">7</text>
+    <text x="422" y="521" font-weight="bold" fill="#222">返すこと</text>
+    <text x="500" y="521" fill="#333">足した後の TXT レコードの一覧を、画面の文字のまま貼ってください</text>
+  </g>
+
+  <g>
+    <circle cx="402" cy="558" r="11" fill="#1a5fb4"/><text x="402" y="563" fill="#fff" font-size="13" text-anchor="middle">8</text>
+    <text x="422" y="563" font-weight="bold" fill="#222">詳しく</text>
+    <text x="490" y="563" fill="#1a5fb4" text-decoration="underline">このタスクの記録(要件と設計の全文)</text>
+  </g>
+
+  <text x="400" y="606" fill="#555" font-size="13">1〜5 を読んでから 6 に進む。3〜7 の中身は、設計レビューを通った設計の文から出る。</text>
+</svg>
