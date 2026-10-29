@@ -1,4 +1,4 @@
-状態: 設計レビュー済み
+状態: 実装レビュー中
 
 # ゴール
 
@@ -181,5 +181,9 @@ skill `task-team-lead`・`task-team-se`・`task-team-pg`・`task-team-qa` は、
 - 今のブランチで `python -m unittest discover -s tests`: 42件すべて通った。
 
 # 実装
+
+設計の文を、設計の位置にそのまま入れた(5ファイル)。フックの問い返しは、利用者が合意した文なので語を消していない。
+- `python -m unittest discover -s tests`: 42件すべて通った。lint のコマンドはこのリポジトリに無い。
+- `git diff --stat` は、README・`claude/CLAUDE.md`・lead・se・pg のみ。`task-team-qa` は変わっていない。
 
 # レビュー(実装)
