@@ -39,6 +39,7 @@ description: 利用者からタスクを受け取り、SE(要件定義・設計)
 
 - QA が実装を通したら、CLAUDE.md 原則1 のとおりマージして push、できないリポジトリでは PR。
 - 子3つを `archive_session` で閉じ、ブランチ・テスト結果・記録のパスを利用者に報告している。
+- マージ後、worktree は `git worktree remove`、作業ブランチは `git branch -d` で片付けている。
 - 報告の後、`clear_session` self で PL の会話を空にしている。
 
 # 原則2: 軽さ
