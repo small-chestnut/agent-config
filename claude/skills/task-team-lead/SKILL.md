@@ -42,7 +42,8 @@ description: 利用者からタスクを受け取り、SE(要件定義・設計)
 - 記録だけのリポジトリでは、記録を main に直接コミットしている。
 - 子3つを `archive_session` で閉じ、ブランチ・テスト結果・記録のパスを利用者に報告している。
 - マージ後、worktree は `git worktree remove`、作業ブランチは `git branch -d` で片付けている。
-- 報告の後、`clear_session` self で PL の会話を空にしている。
+- 報告は `wrap_up` に「読んだ、空にして」のボタンを付けて出し、その turn では空にしない。
+- 利用者がボタンを押すか空にしてと書いた turn で、`clear_session` self で空にしている。
 
 # 原則2: 軽さ
 
