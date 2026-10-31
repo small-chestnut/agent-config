@@ -1,4 +1,4 @@
-ステータス: 設計レビュー済み
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -113,6 +113,13 @@ lint のコマンドはこのリポジトリに無い。
 - Simon Brown「Modular Monoliths」(GOTO Berlin 2018): https://files.gotocon.com/uploads/slides/conference_12/515/original/gotoberlin2018-modular-monoliths.pdf
 
 # 実装
+
+設計の文を、設計の位置にそのまま入れた(`claude/CLAUDE.md` 2行・`module-layout` の description と見出し2つと目指す状態1節・README 1項目)。設計を変えた所は無い。問い返しのフックが出たが、設計の指示どおり文は変えていない。
+
+- `python -m unittest discover -s tests`: 42 件 OK(受け入れ条件 9)。
+- `grep -rn "ADR 0012-" claude README.md`: CLAUDE.md 2行・`module-layout` 見出し2つ・README 1項目の5か所(受け入れ条件 3・4・5・7)。
+- ADR 0012-1・0012-2 と `docs/用語集.md` の行は設計のコミットで入っており、読んで確かめた(受け入れ条件 1・2・8)。
+- lint のコマンドはこのリポジトリに無い。
 
 # レビュー
 
