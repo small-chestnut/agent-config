@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -166,6 +166,14 @@ PG はこのファイルを作らない(範囲外)。skill の行が指す形を
 lint のコマンドはこのリポジトリに無い。
 
 # 実装
+
+設計の文を、設計の位置にそのまま入れた(task-team-se・task-team-qa・task-team-pg の SKILL.md、claude/CLAUDE.md、README.md)。設計が決めていない判断は無い。フックが問い返した行は、設計の指示どおり文を変えていない。
+
+- `git diff main...HEAD -- claude README.md` で、文が設計の位置に入っていることを確かめた。
+- `grep -rn "(ADR 0010-" claude README.md` は15行。設計で番号を付けた行と同じ。
+- `docs/用語集.md` に、仕様・仕様の「ADR」の節・機能の節の行がある(SE が足した)。
+- `python -m unittest discover -s tests`: 42件、OK(`test_どのSKILL_mdの箇条書きの行も60字以内` を含む)。
+- lint のコマンドはこのリポジトリに無い。
 
 # レビュー
 
