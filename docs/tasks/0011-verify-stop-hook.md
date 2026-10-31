@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -193,6 +193,12 @@ ADR の参照: モジュールの docstring の1行目の末尾に `(ADR 0011-1)
 lint のコマンドはこのリポジトリに無い。
 
 # 実装
+
+- フック `claude/hooks/require_verify_before_stop.py`、テスト `tests/test_require_verify_before_stop.py`、`.claude/verify-commands.txt` を作り、`claude/user-settings.json` に3か所から登録した。`claude/CLAUDE.md`・`task-team-pg` の SKILL.md・README は設計の文のとおりに足した。用語集は SE が足し済み。
+- テスト一覧は設計のとおり。`test_2>&1を付けたコマンドは数える` は関数名に使えない字があるため `test_標準エラーを標準出力へ向けたコマンドは数える` にした。
+- 流したテスト: `python -m unittest discover -s tests` → 62 件 OK(中のテストも手元で流した)。lint はこのリポジトリに無い。
+- Windows の stderr は cp932 になるため、止めるときの文は UTF-8 のバイト列で書いた。
+- 画面が変わる変更は無いので、スクリーンショットは無い。
 
 # レビュー
 
