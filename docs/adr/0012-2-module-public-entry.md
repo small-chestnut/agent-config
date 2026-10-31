@@ -16,6 +16,6 @@
 
 ## 理由
 
-1. 入口が無いと、ほかのモジュールを使う作業で、そのモジュールの中まで読む。入口だけを使えば、import をたどって読むのは入口のファイルで止まる。モジュールに公開の API を置いて中を隠すのは、モジュラーモノリスの定石(Spring Modulith の「API のパッケージ以外への参照は拒む」https://docs.spring.io/spring-modulith/reference/verification.html 、Shopify の公開の entrypoint https://shopify.engineering/shopify-monolith )。
+1. 入口が無いと、ほかのモジュールを使う作業で、そのモジュールの中まで読む。入口だけを使えば、import をたどって読むのは入口のファイルで止まり、ほかのモジュールが大きくなっても読む量は増えない(ADR 0012-1 の利用者の理由の、コードが増えても見るコンテキストを増やさないこと)。モジュールに公開の API を置いて中を隠すのは、モジュラーモノリスの定石(Spring Modulith の「API のパッケージ以外への参照は拒む」https://docs.spring.io/spring-modulith/reference/verification.html 、Shopify の公開の entrypoint https://shopify.engineering/shopify-monolith )。
 2. C# の `internal` は1つのプロジェクト(アセンブリ)の中では効かず、Python と JavaScript には無い。入口のファイルなら、どの言語でも同じ形で書ける。
 3. スキーマとユーザーを分けると DB の設定が増える。入口を通す規則だけで、読む量は入口で止まる。
