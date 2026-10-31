@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -135,6 +135,19 @@ agent-config の目的(新しいシステムを開発するとき、そのリポ
 | `python -m unittest discover -s tests` が通る | 12 |
 
 # 実装
+
+main(0008 の README の変更)を取り込んでから、設計の「規則の文書を直す」の行を、そのとおりの文で入れた。フック(`ask_removable_words.py`)は足した行すべてで問い返したが、設計の指示どおり文は変えていない。
+
+確かめた結果(受け入れ条件 1〜12):
+
+- `CLAUDE.md` に足した2行がある(1)。
+- `task-team-lead` に、聞かずに回す節と報告に ADR を入れる節があり、`/compact` の行は「進行中と次に回すタスク」(2・3)。
+- 「利用者の判断待ち」は、`docs/用語集.md` と `claude/` の下で0件(3・4・10)。
+- `task-team-se` に ADR を直す行と置き換えを提案する行、`task-team-qa` に採用にする節、`claude/CLAUDE.md` の ADR の行が「QA が採用」(4〜7)。
+- `(ADR 0007-1)` は上の行と README だけに付いた。`git diff main -- docs/adr/0004-1-adr-driven.md` は空(8)。
+- README に、ADR を QA が採用にする意図とずれをタスクにする意図と利用者の理由がある(9)。
+- 原則1 と `task-team-pg` の行は触っていない(11)。
+- `python -m unittest discover -s tests`: 42件、OK(12)。lint は無い。
 
 # レビュー
 
