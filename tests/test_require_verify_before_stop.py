@@ -67,6 +67,17 @@ class 止めるかどうか(unittest.TestCase):
         self.assertEqual(verify.unpassed_heads("old", "now", {"now": ["b", "a"]}, self.HEADS), [])
 
 
+class 確かめの記録の件数(unittest.TestCase):
+    def test_書き直したターンの始めの印は新しいものとして残す(self):
+        record = {"turn_start": {}, "passed": {}}
+        verify.put_latest(record["turn_start"], "long", "1")
+        for i in range(verify.KEEP):
+            verify.put_latest(record["turn_start"], f"s{i}", "x")
+        verify.put_latest(record["turn_start"], "long", "2")
+        verify.trim(record)
+        self.assertEqual(record["turn_start"]["long"], "2")
+
+
 class 確かめの記録のロック(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

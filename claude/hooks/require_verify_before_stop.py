@@ -66,6 +66,12 @@ def load_record(path: Path) -> dict:
         return empty
 
 
+def put_latest(d: dict, key: str, value) -> None:
+    """辞書の最後に入れる。既にあるキーも最後に動かし、trim で古い方として捨てられないようにする。"""
+    d.pop(key, None)
+    d[key] = value
+
+
 def trim(record: dict) -> dict:
     for key in ("turn_start", "passed"):
         d = record[key]
@@ -151,7 +157,7 @@ def main(argv: list[str]) -> int:
 
     if mode == "turn-start":
         sig = content_sig(root)
-        update_record(record_path, lambda r: r["turn_start"].__setitem__(session, sig))
+        update_record(record_path, lambda r: put_latest(r["turn_start"], session, sig))
     elif mode == "record":
         tool_input = data.get("tool_input") or {}
         hit = counted_heads(str(tool_input.get("command", "")), bool(tool_input.get("run_in_background")), heads)
@@ -159,7 +165,8 @@ def main(argv: list[str]) -> int:
             sig = content_sig(root)
 
             def add(r):
-                have = r["passed"].setdefault(sig, [])
+                have = r["passed"].pop(sig, [])
+                r["passed"][sig] = have
                 have.extend(h for h in hit if h not in have)
 
             update_record(record_path, add)
