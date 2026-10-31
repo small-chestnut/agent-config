@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -61,5 +61,12 @@ main に README の変更が先に入っていて衝突したら、main を取�
 lint のコマンドはこのリポジトリに無い。
 
 # 実装
+
+README.md の3〜4行目を設計の文に置き換えた(改行は元のまま CRLF)。
+
+- `git diff main -- README.md`: 変わったのは「# agent-config」と「## 構成」の間だけ。設計の文がそのまま入っている(受け入れ条件 1〜3)。
+- `git diff main -- CLAUDE.md`: 空(受け入れ条件 4)。
+- `python -m unittest discover -s tests`: 42 件 OK。
+- lint のコマンドはこのリポジトリに無い。
 
 # レビュー
