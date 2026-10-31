@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -183,6 +183,18 @@ SE が1つのタスクで読む ADR の数が、タスクの数に比例して�
 lint のコマンドはこのリポジトリに無い。
 
 # 実装
+
+設計の「規則の文書を直す」の文を、そのとおりの位置に入れた(7ファイル。ADR 0004-1・0005-1 のファイルは変えていない)。ADR の参照を付けた行は 32 行。設計のコミットは f9aba07。
+
+確かめた結果:
+
+- `python -m unittest discover -s tests`: 42 件すべて OK(SKILL.md の箇条書き 60 字以内を含む)。
+- `grep -n "の行を検索している" claude/skills/task-team-se/SKILL.md`: 空。
+- `grep -n "各1〜3行" claude/skills/task-team-se/SKILL.md claude/CLAUDE.md`: 捨てた案と理由の2行だけ。
+- `git diff main --stat -- docs/adr/0004-1-adr-driven.md docs/adr/0005-1-test-criteria.md`: 空。
+- `docs/用語集.md`: ADR の参照と置き換える ADR の行があり、ADR の対象の行に「検索する」が無い。
+- lint は、このリポジトリにコマンドが無いので流していない。
+- フック(`ask_removable_words.py`)が足した行すべてを問い返したが、設計の指示どおり文は変えていない。
 
 # レビュー
 
