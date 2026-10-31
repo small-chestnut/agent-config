@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -117,6 +117,14 @@
 | 箇条書きの字数 | `python -m unittest discover -s tests` が通る | 10 |
 
 # 実装
+
+設計の手順どおりに、`claude/CLAUDE.md`・`task-team-pg`・`task-team-lead`・`README.md`・`docs/用語集.md` を直した。設計が決めていない判断は無い。
+
+確かめた結果(文書だけの変更なのでテストは作っていない):
+
+- `git diff main` を設計の文と見比べた: 一致
+- `grep -rn "対象リポジトリの CLAUDE.md に従う" claude/skills/task-team-lead claude/skills/task-team-pg`: 何も出ない(受け入れ条件4)
+- `python -m unittest discover -s tests`: 42件 OK(受け入れ条件10)
 
 # レビュー
 
