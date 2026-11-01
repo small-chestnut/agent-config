@@ -56,6 +56,10 @@ ADR: `docs/adr/0022-1-delete-finished-records.md`(状態: 採用)。
 | ADR を skill `task-team-se` の「ADR は、決まった形で1つのフォルダにある」の行と見比べる | 9 |
 | `python -m unittest discover -s tests` の結果(足した行の字数は `tests/test_skill_md_bullet_length.py` が見る) | 10 |
 
+## 設計への問い
+
+- レビューの実装の指摘(消すコミットが CI の緑の後に足され、SKILL.md 83行目「CI が全部緑になってから…マージする」を通らない)は、直し方が受け入れ条件3 の行の位置か文面を変える(例: 消す行を push の前に置く、83行目に「消すコミットのあと」と足す)。受け入れ条件を変えずに直せないので、PG は直していない。どう直すか決めてほしい。
+
 # 実装
 
 - `claude/skills/task-team-lead/SKILL.md` を設計の表のとおりに6か所直した(`git diff main --stat` は 6 行追加・3 行削除)。
