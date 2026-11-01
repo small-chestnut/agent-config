@@ -4,7 +4,7 @@
 
 agent-config の規則(`claude/CLAUDE.md` と `claude/skills/` の下の SKILL.md)から、ほかの文書と重なっている行と、効かないと分かっている行が消えている。SE・PG・QA の skill に重なって並んでいた知らせ方の規則は、共通の skill `task-team-messaging` の1か所にある。同じ規則を文書をまたいで2か所に書かない規則が、skill `prompt-structure` にある。README の「プロンプト層(CLAUDE.md)の意図」と「セッションの役割分割(PL / SE / PG / QA)の意図」の節は、規則の言い直しを持たず、どの規則かと、その理由だけを持っている。
 
-範囲外: permissions・フック・サンドボックス、README のほかの節(「Claude Code テンプレートの意図」は settings の説明で、規則の言い直しではない)、残す行の言い回しを短く書き直すこと、規則を見直して消す役・手順(利用者が今回は足さないと決めた)、テストの大きさの規則を CLAUDE.md から skill へ移すこと(ADR 0009-1 が CLAUDE.md に置くと決めている)。
+範囲外: README に残す「なぜ」を各モジュールの CLAUDE.md へ移し、「意図」の節をなくすこと(既にあるものを CLAUDE.md の規則の形に直すのは、CLAUDE.md 原則3 のとおり別の変更)、permissions・フック・サンドボックス、README のほかの節(「Claude Code テンプレートの意図」は settings の説明で、規則の言い直しではない)、残す行の言い回しを短く書き直すこと、規則を見直して消す役・手順(利用者が今回は足さないと決めた)、テストの大きさの規則を CLAUDE.md から skill へ移すこと(ADR 0009-1 が CLAUDE.md に置くと決めている)。
 
 # 受け入れ条件
 
