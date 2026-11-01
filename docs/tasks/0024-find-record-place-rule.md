@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -105,6 +105,11 @@ skill `task-team-pg`・`task-team-qa`・`task-team-messaging` について:
 | `python -m unittest discover -s tests` の結果(足した行の字数は `tests/test_skill_md_bullet_length.py` が見る) | 24 |
 
 # 実装
+
+設計の手順1〜5のとおりに、5つの SKILL.md と用語集を直した。受け入れ条件の行は文字どおり。行は設計が決めた語のままで、削れる語は無い。
+
+- `git diff --stat`: 6ファイル、25行追加・8行削除。手順の表の場所だけ。
+- `python -m unittest discover -s tests`: 64件すべて OK(足した行の字数の検査を含む)。lint は無い。
 
 # レビュー
 
