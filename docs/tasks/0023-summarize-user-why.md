@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -53,5 +53,11 @@
 | `python -m unittest discover -s tests` の結果(足した行の字数は `tests/test_skill_md_bullet_length.py` が見る) | 5 |
 
 # 実装
+
+設計どおりに、SKILL.md の2か所と CLAUDE.md の3行を直した。足した行は設計が字句まで決めているので、削れる語は無いと見て変えていない。
+
+- `git diff main -- claude/skills/task-team-lead/SKILL.md`: 42行目の置き換えと、次の行の追加だけ。
+- `git diff main -- claude/skills/task-team-lead/CLAUDE.md`: 見出し1行・空行・規則1行の追加だけ。
+- `python -m unittest discover -s tests`: 64 件、全部通った。lint のコマンドは CLAUDE.md に無い。
 
 # レビュー
