@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -57,6 +57,12 @@ ADR: `docs/adr/0022-1-delete-finished-records.md`(状態: 採用)。
 | `python -m unittest discover -s tests` の結果(足した行の字数は `tests/test_skill_md_bullet_length.py` が見る) | 10 |
 
 # 実装
+
+- `claude/skills/task-team-lead/SKILL.md` を設計の表のとおりに6か所直した(`git diff main --stat` は 6 行追加・3 行削除)。
+- `docs/tasks` の 0001〜0021 の記録21ファイルと `0003-user-as-worker-briefing/` を `git rm -r` で消した(対象と理由は設計の手順2と ADR 0022-1)。`git ls-files docs/tasks` はこの記録の1行だけ。
+- ADR `docs/adr/0022-1-delete-finished-records.md` は SE の作成済みで、変えていない。
+- テストは作らない(設計のテスト一覧)。`python -m unittest discover -s tests`: 64 件、OK。lint のコマンドはこのリポジトリの CLAUDE.md に無い。
+- 設計の変更は無い。
 
 # レビュー
 
