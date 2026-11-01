@@ -166,6 +166,18 @@ class フックを走らせる(unittest.TestCase):
         (self.repo / "new.txt").write_text("x")
         self.assertNotEqual(self.sig(), before)
 
+    def test_前に書いたのと同じ秒の中に同じ大きさで書き換えても中身の印が変わる(self):
+        t = int(time.time()) - 100
+        a = self.repo / "a.txt"
+        a.write_text("1")
+        os.utime(a, (t, t))
+        self.git("add", "-A")
+        os.utime(self.repo / ".git" / "index", (t, t))
+        before = self.sig()
+        a.write_text("2")
+        os.utime(a, (t, t))
+        self.assertNotEqual(self.sig(), before)
+
     def test_確かめを通すまでStopフックが止め通したら止めない(self):
         self.write_list("python -m unittest")
         self.run_hook("turn-start")
