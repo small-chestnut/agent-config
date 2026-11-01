@@ -8,6 +8,7 @@
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -126,7 +127,8 @@ def content_sig(root: str) -> str:
     os.close(fd)
     try:
         if index.exists():
-            Path(tmp).write_bytes(index.read_bytes())
+            # git は index の更新時刻と同じ秒に書き換えたファイルだけ中身を読み直すので、更新時刻も写す
+            shutil.copy2(index, tmp)
         else:
             os.unlink(tmp)
         env = {**os.environ, "GIT_INDEX_FILE": tmp}
