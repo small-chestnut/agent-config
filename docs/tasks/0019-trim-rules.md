@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -354,6 +354,8 @@ skill `task-team-lead`・`task-team-se`・`task-team-pg`・`task-team-qa` と、
 - `python -m unittest discover -s tests`: 64件 OK(`test_どのSKILL_mdの箇条書きの行も60字以内` を含む)。
 - `grep -rn "原則がぶつかったときは" claude`: `claude/CLAUDE.md`・`explain-to-non-experts`・`task-team-lead` の冒頭と、`prompt-structure` の規則の行だけ。
 - `git diff` を読み、消した行・足した行が手順1〜9 のとおりで、ほかは変わっていないことを確認。
+
+手順9(README の「意図」の2節の置き換え)は、設計の手順9 の文を2節に入れた。`python -m unittest discover -s tests`: 64件 OK。
 
 # レビュー
 
