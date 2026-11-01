@@ -77,12 +77,6 @@ for f in "$repo"/claude/hooks/*; do
   done
 done
 
-# NOTE: ~/.codex/config.toml is managed by the Codex app itself (plugins, trusted
-# projects, MCP servers). Never copy over it. Apply codex/safety-snippet.toml by hand.
-echo "Installing Codex CLI profile (config.toml is NOT touched)..."
-install_file "$repo/codex/readonly.config.toml" "$HOME/.codex/readonly.config.toml"
-install_file "$repo/codex/AGENTS.md" "$HOME/.codex/AGENTS.md"
-
 echo "Checking for a trash command (agents use it instead of rm; see claude/CLAUDE.md)..."
 if command -v trash >/dev/null 2>&1 || command -v trash-put >/dev/null 2>&1; then
   echo "  trash: found"

@@ -95,12 +95,6 @@ Get-ChildItem "$repo\claude\hooks" -File | ForEach-Object {
     }
 }
 
-# NOTE: ~/.codex/config.toml is managed by the Codex app itself (plugins, trusted
-# projects, MCP servers). Never copy over it. Apply codex\safety-snippet.toml by hand.
-Write-Host "Installing Codex CLI profile (config.toml is NOT touched)..."
-Install-ConfigFile "$repo\codex\readonly.config.toml" "$env:USERPROFILE\.codex\readonly.config.toml"
-Install-ConfigFile "$repo\codex\AGENTS.md" "$env:USERPROFILE\.codex\AGENTS.md"
-
 Write-Host ""
 Write-Host "Checking for a trash command (agents use it instead of rm; see claude\CLAUDE.md)..."
 if (Get-Command trash -ErrorAction SilentlyContinue) {
