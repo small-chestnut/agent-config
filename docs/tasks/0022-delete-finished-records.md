@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -60,9 +60,9 @@ ADR: `docs/adr/0022-2-delete-records-before-push.md`(状態: 採用)。実装レ
 
 # 実装
 
-- `claude/skills/task-team-lead/SKILL.md` を設計の表のとおりに6か所直した(`git diff main --stat` は 6 行追加・3 行削除)。
-- `docs/tasks` の 0001〜0021 の記録21ファイルと `0003-user-as-worker-briefing/` を `git rm -r` で消した(対象と理由は設計の手順2と ADR 0022-1)。`git ls-files docs/tasks` はこの記録の1行だけ。
-- ADR `docs/adr/0022-1-delete-finished-records.md` は SE の作成済みで、変えていない。
+- `claude/skills/task-team-lead/SKILL.md` を、設計の表のとおりに7か所直した(`git diff main` は追加の行と変えた行が表の7か所だけ)。レビューの指摘を受けた設計の直し(ADR 0022-2)に合わせて、消す行を push の前に移し、CI が赤のときに `git revert` で戻す行を足した。
+- `docs/tasks` の 0001〜0021 の記録21ファイルと `0003-user-as-worker-briefing/` を `git rm -r` で消した(対象と理由は設計の手順2と ADR 0022-2)。`git ls-files docs/tasks` はこの記録の1行だけ。
+- ADR 0022-1・0022-2 は SE の作成済みで、変えていない。
 - テストは作らない(設計のテスト一覧)。`python -m unittest discover -s tests`: 64 件、OK。lint のコマンドはこのリポジトリの CLAUDE.md に無い。
 - 設計の変更は無い。
 
