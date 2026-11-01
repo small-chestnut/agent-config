@@ -2,9 +2,9 @@
 
 目的: 新しいシステムを開発するとき、そのリポジトリの CLAUDE.md を作りこまなくても、agent-config の設定を読めば、すぐに AI 駆動開発に最適な環境ができること。
 
-そのために、AI コーディングエージェント(Claude Code / Codex CLI)の設定として、次の3つを置く。
+そのために、Claude Code の設定として、次の3つを置く。
 
-- 全プロジェクト共通の指示(`CLAUDE.md`・`AGENTS.md`)
+- 全プロジェクト共通の指示(`CLAUDE.md`)
 - 作業ごとの手順(skill。呼ばれたときだけ読み込まれる)
 - 意図しない破壊的操作を、設定で機械的に止める安全設定(deny ルール・hooks・サンドボックス)
 
@@ -18,10 +18,6 @@ agent-config/
 │   ├── CLAUDE.md              # → 各 Claude 設定ディレクトリの CLAUDE.md(プロンプト層・全プロジェクト共通)
 │   ├── skills/<名前>/SKILL.md  # → 各 Claude 設定ディレクトリの skills/<名前>/SKILL.md(手順。呼ばれたときだけ読み込まれる)
 │   └── hooks/                 # → 各 Claude 設定ディレクトリの hooks/(settings.json の hooks が走らせるスクリプト)
-├── codex/
-│   ├── safety-snippet.toml    # ~/.codex/config.toml に手動マージする安全設定(自動配置しない)
-│   ├── readonly.config.toml   # → ~/.codex/readonly.config.toml(調査専用プロファイル)
-│   └── AGENTS.md              # → ~/.codex/AGENTS.md(プロンプト層・全プロジェクト共通)
 ├── tests/                     # hooks と skill のテスト(python -m unittest discover -s tests)
 ├── install.ps1                # Windows 用配置スクリプト
 └── install.sh                 # WSL2 / Linux / macOS 用(Codespaces dotfiles でも自動実行される)
@@ -119,32 +115,9 @@ force push などサンドボックスを捨てても取り消せない操作は
   - VOICEVOX ツールの allow: `tts` MCP サーバーを設定していないマシンでは
     何にもマッチしないだけで無害
 
-## Codex CLI テンプレートの意図
+## プロンプト層(CLAUDE.md)の意図
 
-Codex は Claude Code のようなコマンド単位の deny リストではなく、
-**サンドボックス境界 + 承認ポリシー**で守る設計。
-
-**最重要の注意: `~/.codex/config.toml` は Codex 本体が状態を書き込むアプリ管理ファイル**
-(プラグイン・信頼済みプロジェクト・MCP サーバー・デスクトップ設定などが入る)。
-テンプレートで丸ごと上書きしてはいけない。そのため install スクリプトは config.toml に
-触らず、安全設定は `safety-snippet.toml` を見ながら**手動でマージ**する。
-
-- `approval_policy`: `"untrusted"`(毎回確認)が最も安全。`"on-request"` は緩め
-- `sandbox_mode = "workspace-write"` + `network_access = false`: 作業ディレクトリのみ
-  書き込み可・ネットワーク遮断。なお新方式の `default_permissions` /
-  `[permissions.<name>]` プロファイルもあるが、旧方式とは併用不可
-- `writable_roots` にネットワーク共有を足すと被害範囲がマシン外に広がるので慎重に
-- 調査だけさせたいときは `codex --profile readonly`(一切書き込ませない)
-- `shell_environment_policy` でサブプロセスに渡す環境変数を最小化
-  (KEY/SECRET/TOKEN を含む変数は Codex のデフォルトでも除外される)
-- `danger-full-access` + `approval_policy = "never"` は使い捨てコンテナ内以外で使わない
-- プロジェクト側の対応物: `AGENTS.md`(モデルへの指示。強制力はない)と
-  `.codex/config.toml`(プロジェクトを trust した場合のみ読み込まれる)
-
-## プロンプト層(CLAUDE.md / AGENTS.md)の意図
-
-deny ルールやサンドボックスが「実行を機械的に止める層」なのに対し、CLAUDE.md /
-AGENTS.md は「モデルの振る舞いを指示で誘導する層」。
+deny ルールやサンドボックスが「実行を機械的に止める層」なのに対し、CLAUDE.md は「モデルの振る舞いを指示で誘導する層」。
 
 - **プロンプト層は「お願い」であって「強制」ではない**。文脈次第の逸脱や
   プロンプトインジェクションで破られ得るため、enforcement をここに移さないこと。
@@ -166,9 +139,9 @@ AGENTS.md は「モデルの振る舞いを指示で誘導する層」。
   コード全体が増えても読む量は増えない。技術の層ごとのフォルダでは1つの機能が層の数だけ散らばり、マイクロサービスではリポジトリとネットワークをまたぐ。
   機能ごとにまとめる形と、モジュールに公開の入口を置いて中を隠す形は、人の開発の定石(vertical slice・Spring Modulith・Shopify)に沿う。
   AI が読む量が減るという理由は、実践者のブログで言われているだけで比べた調査は無く、agent-config が組み立てたもの
-- プロジェクト単位で効かせたい場合は、各リポジトリ直下に `CLAUDE.md` / `AGENTS.md` を
+- プロジェクト単位で効かせたい場合は、各リポジトリ直下に `CLAUDE.md` を
   コミットする(project-settings.json と同じ配布モデル)
-- **作業するリポジトリの決まりは、agent-config の規則に勝つ**(ADR 0004-1)。CLAUDE.md の冒頭と AGENTS.md の最初の節に書く。
+- **作業するリポジトリの決まりは、agent-config の規則に勝つ**(ADR 0004-1)。CLAUDE.md の冒頭に書く。
   agent-config は利用者が AI 駆動開発のために使う私的な規則で、これによって複数の人間が触るリポジトリの
   規則を逸脱するわけにはいかないため。リポジトリの決まりは、コミットされた文書(CLAUDE.md・AGENTS.md・
   README・CONTRIBUTING.md・`docs/` など)に書かれた決まりと、既にあるファイルの並び(ADR の番号など)。
@@ -318,9 +291,6 @@ PL がタスクごとにチームを起こし、SE(要件定義・設計)→ PG(
   子はタスク1つで終わり、
   長引いたときだけ自動圧縮に任せる。セッションを使い回して一定割合で引っ越す運用は、
   引き継ぎ文書を最初から書くこの形なら要らない
-- **QA を Codex にする案は保留**。Codex はこのアプリのセッションとして起こせず、PL がシェルから
-  回す別の仕組みになる。品質の差は確かめていない。QA の手順は skill 1つに閉じてあるので、
-  差し替えるときは QA の起こし方だけ変えればよい
 
 ## サンドボックス環境への自動配布
 

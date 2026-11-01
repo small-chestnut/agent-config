@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -64,5 +64,14 @@ agent-config から Codex 用の設定が無くなり、install しても `~/.co
 | `~/.agent-trash/` に2つのファイルがあり、`~/.codex/config.toml` のハッシュが移す前と同じ | PL | 6 |
 
 # 実装
+
+手順1〜3を実行した。
+
+- `git ls-files codex`: 出力なし(受け入れ条件1)
+- `bash -n install.sh`: エラーなし。`install.ps1` の `Parser::ParseFile`: エラー 0 個(受け入れ条件2)
+- `git grep -i -n codex -- . ':!docs/tasks'`: 出力なし(受け入れ条件1・2・3)
+- `git grep -n AGENTS.md -- README.md`: 146行(コミットされた文書の例)と151行(`check_rule_length.py` の説明)の2か所だけ(受け入れ条件4)
+- `python -m unittest discover -s tests`: 63 件 OK、lint のコマンドは CLAUDE.md に無い(受け入れ条件5)
+- 設計と違う所は無い。手順4(受け入れ条件6)は PL がマージの後にする。
 
 # レビュー
