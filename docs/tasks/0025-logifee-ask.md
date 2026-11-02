@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -53,5 +53,14 @@
 | 手順5のあと、`~/.claude/settings.json` を手順3と同じ `python -c …` で読む | — | 7 |
 
 # 実装
+
+手順1〜4をした。設計から変えた所は無い。
+
+- `claude/user-settings.json` の `permissions.ask` の末尾に `mcp__logifee-nnm__execute_plan`・`mcp__logifee-sd__execute_plan` を足した。
+- `.claude/rules/settings.md` に、ask にして deny にしない理由と、allow にしない理由の2行を足した。
+- `python -c "import json; …"` で `permissions.ask` の末尾3つに2つがあるのを確かめた(JSON として読める)。
+- `git diff` は、user-settings.json の2行と `,`、settings.md の2行だけ。
+- `python -m unittest discover -s tests`: 64 件 OK。
+- テストと lint は、設計のテスト一覧のとおり新しく作っていない。
 
 # レビュー

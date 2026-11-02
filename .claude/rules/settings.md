@@ -16,6 +16,8 @@ paths:
 - 正当な削除をゴミ箱で通し、deny を迂回する手段に流れる誘因を作っていない。
 - 設定ファイル自体の編集を deny にし、エージェントが自分の deny を外せない。
 - 履歴の書き換えは `--force-with-lease` を ask で通し、素の `--force` は塞いでいる。
+- LogiFee の本番に書く `execute_plan` は ask。開発者が本番に書けないと困るので deny にしない。
+- `execute_plan` を allow にしない。LogiFee の `LogiFeeMCP/README.md` が、毎回訊かせると決めている。
 
 # 原則2: 私用
 
