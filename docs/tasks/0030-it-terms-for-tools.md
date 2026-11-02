@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -71,5 +71,13 @@ main(a5b2574)からの差分で言う。各行は、左の文が右の文に置�
 | `python -m unittest discover -s tests` | 25 |
 
 # 実装
+
+受け入れ条件 1〜22 の置き換えをした。確かめた結果:
+
+- `git diff a5b2574 --stat`: 受け入れ条件のファイルと本記録だけ。`docs/adr/` は変わっていない(23)。
+- `git diff a5b2574 --word-diff`: 各変更は表の前と後の組だけ(1〜22)。1 と 2 の「テストの道具のタグ」は「テストフレームワークのタグ」にした。
+- 設計の `git grep`: `claude/hooks/require_verify_before_stop.py:130` の「更新時刻も写す」だけが残る。受け入れ条件の行に無いので変えていない。
+- 変えた箇条書きの行は、`rule_length` で数えてどれも 60 以下。最長は 5 の 59(24)。
+- `python -m unittest discover -s tests`: 64 件、OK(25)。
 
 # レビュー
