@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -47,5 +47,11 @@ main(958051b)からの差分で言う。
 | `python -m unittest discover -s tests`(`test_skill_md_bullet_length` が 1 の行の字数を数える) | 4・5 |
 
 # 実装
+
+- 手順1: `claude/skills/task-team-lead/SKILL.md` の33行目に ` --full-history` を足した。
+- 確かめ(結果):
+  - `git diff 958051b` の差分は、33行目の1行の置き換えだけ(受け入れ条件1・2)。
+  - `git log 958051b --full-history ... | sort -u | tail -1` は `docs/tasks/0027`(受け入れ条件3)。
+  - `python -m unittest discover -s tests` は 64 件すべて通った(受け入れ条件4・5)。lint のコマンドは無い。
 
 # レビュー
