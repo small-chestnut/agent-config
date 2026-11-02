@@ -1,7 +1,7 @@
 """決まりの文書を保存したときに、新しく足した決まりの1行の字数を数える(Claude Code の PostToolUse フック)。
 
 決まりの文書は、名前が CLAUDE.md・AGENTS.md・SKILL.md のファイルと、リポジトリの
-.claude/rule-documents.txt に1行ずつ書いた glob(リポジトリの根から)に当たるファイル。
+.claude/rule-documents.txt に1行ずつ書いた glob(リポジトリのルートから)に当たるファイル。
 決まりの1行は、その箇条書き(「- 」で始まる行。コードブロックの中は除く)。
 新しく足した行は、HEAD との差分で足された行。git にまだ入っていない文書は全部の行。
 字数は「- 」と行頭の空白を除いて数え、`…` で囲んだコードは1字と数える。
@@ -67,7 +67,7 @@ def too_long(text: str, new_lines: set[int] | None, limit: int = LIMIT) -> list[
 
 
 def is_rule_document(rel: str, patterns: list[str]) -> bool:
-    """リポジトリの根からのパス rel が決まりの文書か。"""
+    """リポジトリのルートからのパス rel が決まりの文書か。"""
     return Path(rel).name in RULE_DOCUMENT_NAMES or any(fnmatch.fnmatch(rel, p) for p in patterns)
 
 
@@ -82,7 +82,7 @@ def git(cwd: Path, *args: str) -> subprocess.CompletedProcess:
 
 
 def read_rule_document(path: Path) -> tuple[str, str, set[int] | None] | None:
-    """保存されたファイルが git の中の決まりの文書なら (根からのパス, 中身, 足された行の番号)。
+    """保存されたファイルが git の中の決まりの文書なら (ルートからのパス, 中身, 足された行の番号)。
     足された行の番号は、git にまだ入っていない文書なら None(全部の行)。"""
     top = git(path.parent, "rev-parse", "--show-toplevel")
     if top.returncode != 0:

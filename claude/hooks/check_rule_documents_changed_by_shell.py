@@ -2,8 +2,8 @@
 
 check_rule_length.py と ask_removable_words.py は Edit・Write・MultiEdit にだけ掛かるため、
 シェルから書いた行はどちらも通らない。そこでコマンドの前後で決まりの文書を見比べる。
-  before(PreToolUse):  決まりの文書の中身を一時ファイルに写す
-  after(PostToolUse):  写しと今の中身を比べ、このコマンドで足された行を数え、問う
+  before(PreToolUse):  決まりの文書の中身のスナップショットを一時ファイルに取る
+  after(PostToolUse):  スナップショットと今の中身を比べ、このコマンドで足された行を数え、問う
 見るリポジトリは、フックの cwd と、コマンドに書かれた絶対パス(C:/…・C:\\…・/c/…・~/…)が入っているもの。
 決まりの文書の決め方・字数の数え方は check_rule_length.py と同じ。知らせがあれば stderr に並べて exit 2。
 """
@@ -38,7 +38,7 @@ def paths_in_command(command: str) -> list[Path]:
 
 
 def repository_root(path: Path) -> Path | None:
-    """path が入っている git リポジトリの根。path が無ければ、ある所まで親へ上る。"""
+    """path が入っている git リポジトリのルート。path が無ければ、ある所まで親へ上る。"""
     for p in (path, *path.parents):
         if p.is_dir():
             top = git(p, "rev-parse", "--show-toplevel")
@@ -56,7 +56,7 @@ def repositories(cwd: str | None, command: str) -> list[Path]:
 
 
 def rule_documents(root: Path) -> dict[str, str]:
-    """リポジトリの中の決まりの文書 {根からのパス: 中身}。git が無視するファイルは除く。"""
+    """リポジトリの中の決まりの文書 {ルートからのパス: 中身}。git が無視するファイルは除く。"""
     listing = root / PROJECT_LIST
     patterns = read_patterns(listing.read_text(encoding="utf-8", errors="replace")) if listing.exists() else []
     files = git(root, "ls-files", "-co", "--exclude-standard")
@@ -91,7 +91,7 @@ def asked_lines(text: str, new_lines: set[int]) -> list[tuple[int, str]]:
 
 
 def findings(before: dict[str, dict[str, str]], roots: list[Path]) -> tuple[list[str], list[str]]:
-    """(上限を超えた行の知らせ, 問う行)。before は {リポジトリの根: {根からのパス: 中身}}。"""
+    """(上限を超えた行の知らせ, 問う行)。before は {リポジトリのルート: {ルートからのパス: 中身}}。"""
     long_lines, asked = [], []
     for root in roots:
         old = before.get(str(root), {})
@@ -111,7 +111,7 @@ def snapshot_path(event: dict) -> Path:
 
 
 def remove_old_snapshots(now: float) -> None:
-    """失敗したコマンドの写しは after が読まないので、1日たったものを消す。"""
+    """失敗したコマンドのスナップショットは after が読まないので、1日たったものを消す。"""
     for p in SNAPSHOT_DIR.glob("*.json"):
         if now - p.stat().st_mtime > SNAPSHOT_LIFETIME:
             p.unlink(missing_ok=True)
@@ -161,7 +161,7 @@ def main() -> int:
         try:
             return before_command(event)
         except Exception:
-            return 0   # 写しに失敗しても、コマンドは止めない
+            return 0   # スナップショットに失敗しても、コマンドは止めない
     if mode == "after":
         return after_command(event)
     return 0

@@ -2,7 +2,7 @@
 
 Bash・PowerShell のコマンドを &&・||・;・|・改行で区切り、git push の引数を見る。
 止めるのは、--force・--delete・--mirror・--prune、f か d を含む短いフラグ(-fu など)、
-+ か : で始まる指定(+main・:main)。止めたら stderr に理由を書いて exit 2(コマンドは走らない)。
++ か : で始まる refspec(+main・:main)。止めたら stderr に理由を書いて exit 2(コマンドは走らない)。
 --force-with-lease は、どの位置にあっても利用者の確認に回す(permissionDecision: ask)。
 """
 import json
