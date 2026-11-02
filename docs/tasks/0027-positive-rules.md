@@ -1,4 +1,4 @@
-ステータス: 設計レビュー済み
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -276,6 +276,11 @@ print(total)
 | `python -m unittest discover -s tests` | 既存 | 9 |
 
 # 実装
+
+「書き換える行」の表のとおりに、決まりの文書と「なぜ」のファイルを替えた。設計から変えたところは無い。
+- 確かめの手順: 0(main では 77)。
+- `python -m unittest discover -s tests`: 64 件、全部通る(`tests/test_skill_md_bullet_length.py` を含む)。
+- 保存のときのフックは字数で止めなかった。
 
 # レビュー
 
