@@ -1,4 +1,4 @@
-ステータス: 実装レビュー中
+ステータス: 実装レビュー済み
 
 # ゴール
 
@@ -81,3 +81,5 @@ main(a5b2574)からの差分で言う。各行は、左の文が右の文に置�
 - `python -m unittest discover -s tests`: 64 件、OK(25)。
 
 # レビュー
+
+- 実装: `claude/hooks/__pycache__/check_rule_length.cpython-314.pyc` がコミットに入っていて、受け入れ条件 23 を満たさない(実装の節の `--stat` の結果とも違う)。このファイルを git から外す。
