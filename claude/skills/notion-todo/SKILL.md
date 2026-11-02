@@ -16,4 +16,4 @@ description: 利用者の Notion の Todo(✅ Todo)を読む・作る・直す�
 
 ### 目指す状態: Todo を引くときに、Notion のプランの回数上限で止まらない
 
-- 行は query の rows モードで引いている。SQL モードは使っていない。
+- 行は、query の rows モードだけで引いている。

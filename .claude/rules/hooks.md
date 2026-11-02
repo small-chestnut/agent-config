@@ -9,7 +9,7 @@ paths:
 
 ### 目指す状態: 「短く」と書くだけでは通る長い決まりの行を、フックが止めている
 
-- `check_rule_length.py` を、文書の規則に置き換えていない。
+- 字数は、`check_rule_length.py` が数えて止めている。
 
 ### 目指す状態: 書いている最中には気づけない冗長さに、1か所を指して問い返している
 
@@ -22,9 +22,9 @@ paths:
 
 ### 目指す状態: モデルの判断で、確かめずにターンを終えない
 
-- `require_verify_before_stop.py` を、CLAUDE.md の規則に置き換えていない。
+- ターンの終わりの確かめは、`require_verify_before_stop.py` が見張っている。
 - ツールを使わずに8回続けて止めると、Claude Code がターンを終わらせる。
 
 ### 目指す状態: 文字列のパターンで書けない履歴を消す push も、止まっている
 
-- `block_history_erasing_push.py` を、deny のパターンに置き換えていない。
+- その push は、`block_history_erasing_push.py` が止めている。
