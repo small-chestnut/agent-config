@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -41,5 +41,9 @@ d92348c からの差分で言う。
 | `python -m unittest discover -s tests` が OK で終わる | 4 |
 
 # 実装
+
+- フックの 130 行目を、設計どおり「更新時刻も保持してコピーする」に替えた。
+- `python -m unittest discover -s tests`: 64 件 OK(lint のコマンドは CLAUDE.md に無い)。
+- `git diff d92348c -- claude/hooks`: 130 行目の1行の置き換えだけ。`--stat`: フックとこの記録の2ファイルだけ。
 
 # レビュー

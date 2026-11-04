@@ -127,7 +127,7 @@ def content_sig(root: str) -> str:
     os.close(fd)
     try:
         if index.exists():
-            # git は index の更新時刻と同じ秒に書き換えたファイルだけ中身を読み直すので、更新時刻も写す
+            # git は index の更新時刻と同じ秒に書き換えたファイルだけ中身を読み直すので、更新時刻も保持してコピーする
             shutil.copy2(index, tmp)
         else:
             os.unlink(tmp)
