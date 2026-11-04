@@ -22,7 +22,6 @@
 ### 目指す状態: 本番環境と安全設定は、自分の判断では変えない
 
 - 破壊的な DB 操作(DROP / TRUNCATE / WHERE なし DELETE)は、ローカル・開発用の DB にだけしている。
-- 本番環境の接続情報・認証情報に触れる作業は、利用者がしている。
 - permissions・フック・サンドボックスを変える・緩める・迂回するのは、利用者に頼まれたときだけ。編集は agent-config リポジトリの側でしている。
 - agent-config の main にマージしたものは、`install.ps1 -Yes` か `install.sh --yes` で入れている。
 
