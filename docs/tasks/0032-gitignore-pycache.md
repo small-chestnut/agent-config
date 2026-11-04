@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -52,5 +52,16 @@ __pycache__/
 | `git diff 65f35fe --stat` が `.gitignore` と本記録だけ | 5 |
 
 # 実装
+
+手順 1〜3 のとおり、ルートに `.gitignore`(`__pycache__/` の1行)を作ってコミットした。確かめた結果:
+
+- `.gitignore` の中身は `__pycache__/` と改行だけ(条件 1): OK
+- `python -m unittest discover -s tests`: 64 件、OK(条件 6)
+- そのあと `git status --porcelain --untracked-files=all` は `?? .gitignore`(コミット前)だけで、`__pycache__` の行なし(条件 2): OK
+- `git check-ignore -v` は2つとも `.gitignore:1:__pycache__/`(条件 3): OK
+- `git ls-files` に `__pycache__` のパスなし(条件 4): OK
+- `git diff 65f35fe --stat`(条件 5): 下の確認のとおり `.gitignore` と本記録だけ
+
+lint のコマンドは CLAUDE.md に無い。
 
 # レビュー
