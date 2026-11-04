@@ -1,6 +1,6 @@
 # 0035-1 タスクの進み具合は、記録に作業のつながりと3つの状態を書き、PL は聞かれたらそこから決まった形の図を描いて出す
 
-状態: 提案
+状態: 採用
 日付: 2026-11-04
 対象: task-team-lead・task-team-se・task-team-pg・task-team-messaging・draw-figure
 置き換える: 0034-1
