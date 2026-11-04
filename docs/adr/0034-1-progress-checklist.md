@@ -1,6 +1,6 @@
 # 0034-1 タスクの進み具合は、記録の「進み具合」の節のチェックリストで示し、PL はそれだけを出す
 
-状態: 採用
+状態: 置き換え済み(0035-1)
 日付: 2026-11-04
 対象: task-team-lead・task-team-se・task-team-pg・task-team-messaging
 
