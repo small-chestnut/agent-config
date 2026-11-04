@@ -1,4 +1,4 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 # ゴール
 
@@ -88,5 +88,14 @@ main(65f35fe)からの差分で言う。
 | `python -m unittest discover -s tests` | 7 |
 
 # 実装
+
+設計の手順 1〜3 のとおりに、`claude/CLAUDE.md`(129〜134 行目)・`.claude/rules/global-claude-md.md`(31〜34 行目)・`docs/用語集.md`(9 行削除)を直した。設計からの変更は無い。
+
+確かめた結果(コミット時点):
+
+- `git diff 65f35fe --stat`: 変わったのは上の3ファイルとこの記録だけ。`docs/adr/` は変わっていない。
+- 足した箇条書き8行の `rule_length`: 37・37・50・41・37・37・54・44。どれも 60 以下。
+- `docs/用語集.md` は、9行の削除だけ。残りは 21 行。
+- `python -m unittest discover -s tests`: 64 件、全部通った(lint のコマンドは、この CLAUDE.md には無い)。
 
 # レビュー
