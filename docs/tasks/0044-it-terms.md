@@ -145,8 +145,8 @@
 `docs/specs/check_rule_documents_changed_by_shell.py.md`
 
 - 16: `- コマンドの前のスナップショットと比べ、足した行と書き換えた行を、このコマンドで足した行とする。消しただけの行は数えない。`
-- 22: `- フックは、git の merge・pull・checkout・switch・rebase・cherry-pick・reset・restore・revert・am を走らせたコマンドを、取り込む git コマンドとする。`
-- 23: `- 取り込む git コマンドでは、コマンドの後の HEAD かインデックスの中身と同じ行を、足した行に数えない。`
+- 23: `- フックは、git の merge・pull・checkout・switch・rebase・cherry-pick・reset・restore・revert・am を走らせたコマンドを、取り込む git コマンドとする。`
+- 24: `- 取り込む git コマンドでは、コマンドの後の HEAD かインデックスの中身と同じ行を、足した行に数えない。`
 - 25: `- 取り込む git コマンドでは、git が書いたコンフリクトマーカーの行も、足した行に数えない。`
 - 26: `- 取り込む git コマンドでも、HEAD ともインデックスとも違う行は、足した行に数える。`
 - 37: `- コマンドの前のスナップショットが無ければ、フックは何もしない。`
