@@ -1,6 +1,6 @@
-"""決まりの文書を保存したときに、この保存で足した行を並べ、消しても意味が変わらない語を探させる(Claude Code の PostToolUse フック)。
+"""プロンプトを保存したときに、この保存で足した行を並べ、消しても意味が変わらない語を探させる(Claude Code の PostToolUse フック)。
 
-決まりの文書と、HEAD から足された行の取り方は check_rule_length.py と同じ。
+プロンプトと、HEAD から足された行の取り方は check_rule_length.py と同じ。
 問う行は、足された行のうち、この保存で書いた文字列(Edit・MultiEdit の new_string、Write の content)を含む行。
 空の行とコードブロックの中は除く。問う行があれば stderr に並べて exit 2(Claude に返る)。
 """

@@ -43,12 +43,12 @@ class 決まりの1行の字数(unittest.TestCase):
         self.assertEqual(crl.added_line_numbers("@@ -5,2 +4,0 @@\n-- a\n-- b\n"), set())
 
 
-class 決まりの文書(unittest.TestCase):
-    def test_CLAUDE_md_と_AGENTS_md_と_SKILL_md_は決まりの文書(self):
+class プロンプト(unittest.TestCase):
+    def test_CLAUDE_md_と_AGENTS_md_と_SKILL_md_はプロンプト(self):
         for rel in ("CLAUDE.md", "sub/AGENTS.md", ".claude/skills/x/SKILL.md"):
             self.assertTrue(crl.is_rule_document(rel, []), rel)
 
-    def test_リポジトリの一覧に書いた文書も決まりの文書(self):
+    def test_リポジトリの一覧に書いた文書もプロンプト(self):
         patterns = crl.read_patterns("# 説明\n\nrules/*.md\n")
         self.assertEqual(patterns, ["rules/*.md"])
         self.assertTrue(crl.is_rule_document("rules/a.md", patterns))
@@ -92,7 +92,7 @@ class 保存したときの動き(unittest.TestCase):
         r = self.run_hook(self.doc)
         self.assertEqual(r.returncode, 2, r.stderr.decode("utf-8", "replace"))
 
-    def test_決まりの文書でなければ数えない(self):
+    def test_プロンプトでなければ数えない(self):
         other = self.root / "README.md"
         other.write_text(f"{LONG}\n", encoding="utf-8")
         self.assertEqual(self.run_hook(other).returncode, 0)

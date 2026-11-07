@@ -61,7 +61,7 @@ class 保存したときの動き(unittest.TestCase):
         return subprocess.run([sys.executable, str(SCRIPT)], input=event.encode("utf-8"),
                               capture_output=True)
 
-    def test_決まりの文書に行を足して保存すると問いが返る(self):
+    def test_プロンプトに行を足して保存すると問いが返る(self):
         self.doc.write_text("- 前からある\n- 足した\n", encoding="utf-8")
         r = self.run_hook(self.doc, "- 足した")
         self.assertEqual(r.returncode, 2)
@@ -71,7 +71,7 @@ class 保存したときの動き(unittest.TestCase):
         self.doc.write_text("", encoding="utf-8")
         self.assertEqual(self.run_hook(self.doc, "").returncode, 0)
 
-    def test_決まりの文書でなければ問わない(self):
+    def test_プロンプトでなければ問わない(self):
         other = self.root / "README.md"
         other.write_text("- 足した\n", encoding="utf-8")
         self.assertEqual(self.run_hook(other, "- 足した").returncode, 0)

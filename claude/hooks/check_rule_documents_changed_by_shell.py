@@ -1,11 +1,11 @@
-"""Bash・PowerShell のコマンドで書き換えた決まりの文書にも、字数の数えと消せる語の問いを掛ける(Claude Code の PreToolUse と PostToolUse のフック)。
+"""Bash・PowerShell のコマンドで書き換えたプロンプトにも、字数の数えと消せる語の問いを掛ける(Claude Code の PreToolUse と PostToolUse のフック)。
 
 check_rule_length.py と ask_removable_words.py は Edit・Write・MultiEdit にだけ掛かるため、
-シェルから書いた行はどちらも通らない。そこでコマンドの前後で決まりの文書を見比べる。
-  before(PreToolUse):  決まりの文書の中身のスナップショットを一時ファイルに取る
+シェルから書いた行はどちらも通らない。そこでコマンドの前後でプロンプトを見比べる。
+  before(PreToolUse):  プロンプトの中身のスナップショットを一時ファイルに取る
   after(PostToolUse):  スナップショットと今の中身を比べ、このコマンドで足された行を数え、問う
 見るリポジトリは、フックの cwd と、コマンドに書かれた絶対パス(C:/…・C:\\…・/c/…・~/…)が入っているもの。
-決まりの文書の決め方・字数の数え方は check_rule_length.py と同じ。知らせがあれば stderr に並べて exit 2。
+プロンプトの決め方・字数の数え方は check_rule_length.py と同じ。知らせがあれば stderr に並べて exit 2。
 取り込むコマンド(git merge など)では、HEAD かインデックスと同じ行と衝突の印の行は問わない。
 """
 import hashlib
@@ -62,7 +62,7 @@ def repositories(cwd: str | None, command: str) -> list[Path]:
 
 
 def rule_documents(root: Path) -> dict[str, str]:
-    """リポジトリの中の決まりの文書 {ルートからのパス: 中身}。git が無視するファイルは除く。"""
+    """リポジトリの中のプロンプト {ルートからのパス: 中身}。git が無視するファイルは除く。"""
     listing = root / PROJECT_LIST
     patterns = read_patterns(listing.read_text(encoding="utf-8", errors="replace")) if listing.exists() else []
     files = git(root, "ls-files", "-co", "--exclude-standard")
@@ -177,7 +177,7 @@ def after_command(event: dict) -> int:
         for f in long_lines:
             print("  " + f, file=sys.stderr)
     if asked:
-        print("このコマンドで決まりの文書に足した行です。行ごとに、消しても意味が変わらない語を探し、あれば消してください:",
+        print("このコマンドでプロンプトに足した行です。行ごとに、消しても意味が変わらない語を探し、あれば消してください:",
               file=sys.stderr)
         for f in asked:
             print("  " + f, file=sys.stderr)
