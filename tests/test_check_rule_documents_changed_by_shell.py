@@ -22,8 +22,8 @@ spec.loader.exec_module(shell)
 LONG = "- " + "あ" * 61
 
 
-class 取り込むコマンド(unittest.TestCase):
-    def test_取り込むgitのコマンドを見分ける(self):
+class 取り込むgitコマンド(unittest.TestCase):
+    def test_取り込むgitコマンドを見分ける(self):
         for command in ("git merge --ff-only origin/main", "git -C x pull", "cd a && git checkout main",
                         "git cherry-pick abc"):
             self.assertTrue(shell.brings_other_commits(command), command)
@@ -35,11 +35,11 @@ class 取り込むコマンド(unittest.TestCase):
 
 
 class 取り込んだ行(unittest.TestCase):
-    def test_衝突の印の行は取り込んだ行に数える(self):
+    def test_コンフリクトマーカーの行は取り込んだ行に数える(self):
         text = "<<<<<<< HEAD\n- a\n=======\n- b\n>>>>>>> other\n"
         self.assertEqual(shell.imported_lines(text, []), {1, 3, 5})
 
-    def test_印に似た行は取り込んだ行に数えない(self):
+    def test_コンフリクトマーカーに似た行は取り込んだ行に数えない(self):
         text = "========\n- =======\n<<<<<<<x\n"
         self.assertEqual(shell.imported_lines(text, []), set())
 
@@ -110,7 +110,7 @@ class コマンドの前後の動き(unittest.TestCase):
         (self.root / "README.md").write_text(f"{LONG}\n", encoding="utf-8")
         self.assertEqual(self.run_hook("after").returncode, 0)
 
-    def test_写しが無ければ何もしない(self):
+    def test_スナップショットが無ければ何もしない(self):
         self.doc.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")
         self.assertEqual(self.run_hook("after").returncode, 0)
 
@@ -134,7 +134,7 @@ class コマンドの前後の動き(unittest.TestCase):
         self.git("merge", "--ff-only", "other")
         self.assertEqual(self.run_hook("after").returncode, 0)
 
-    def test_取り込むコマンドの後に書いた行は問う(self):
+    def test_取り込むgitコマンドの後に書いた行は問う(self):
         self.other_branch_with_long_line()
         self.set_command("git merge --ff-only other && python edit.py")
         self.run_hook("before")
@@ -146,7 +146,7 @@ class コマンドの前後の動き(unittest.TestCase):
         self.assertIn("CLAUDE.md:3", err)
         self.assertNotIn("CLAUDE.md:2", err)
 
-    def test_衝突した取り込みでは衝突の印と両方の行を問わない(self):
+    def test_コンフリクトした取り込みではコンフリクトマーカーと両方の行を問わない(self):
         self.git("checkout", "-q", "-b", "other")
         self.doc.write_text("- " + "い" * 61 + "\n", encoding="utf-8")
         self.git("commit", "-qam", "other")

@@ -1,8 +1,8 @@
-"""ターンの終わりに、今の中身で確かめのコマンドが通っているかを見る(Claude Code の Stop フック)。(ADR 0011-1)
+"""ターンの終わりに、今の作業ツリーで検証コマンドが通っているかを見る(Claude Code の Stop フック)。(ADR 0011-1)
 
 引数: turn-start(UserPromptSubmit)・record(PostToolUse の Bash|PowerShell)・stop(Stop)。
-ターンの始めの中身の印を記録し、確かめのコマンドが通るたびに、そのときの中身の印へ通ったと記録し、
-ターンの終わりに、中身が変わったのに今の中身で通っていない確かめがあれば、並べて exit 2 で止める。
+ターン開始時の作業ツリーのハッシュ値を記録し、検証コマンドが通るたびに、そのときのハッシュ値へ通ったと記録し、
+ターンの終わりに、作業ツリーが変わったのに今の作業ツリーで通っていない検証コマンドがあれば、並べて exit 2 で止める。
 フックはコマンドを走らせない。一覧の無いリポジトリと git の外では何もしない。
 """
 import json
@@ -25,7 +25,7 @@ SEPARATORS = re.compile(r"[|;&\n]")
 
 
 def read_commands(text: str) -> list[str]:
-    """確かめのコマンドの一覧から、頭を読む。空の行と # で始まる行は読まない。"""
+    """検証コマンドの一覧から、プレフィックスを読む。空行と # で始まる行は読まない。"""
     heads = []
     for line in text.splitlines():
         line = line.strip()
@@ -35,7 +35,7 @@ def read_commands(text: str) -> list[str]:
 
 
 def counted_heads(command: str, background: bool, heads: list[str]) -> list[str]:
-    """このコマンドが通ったときに、通ったと数える頭。"""
+    """このコマンドが通ったときに、通ったと数えるプレフィックス。"""
     if background:
         return []
     command = command.strip()
@@ -45,7 +45,7 @@ def counted_heads(command: str, background: bool, heads: list[str]) -> list[str]
 
 
 def unpassed_heads(start_sig: str | None, now_sig: str, passed: dict, heads: list[str]) -> list[str]:
-    """止めるときに並べる、今の中身で通っていない頭。止めないなら空。"""
+    """止めるときに並べる、今の作業ツリーで通っていないプレフィックス。止めないなら空。"""
     if not start_sig or start_sig == now_sig:
         return []
     done = passed.get(now_sig, [])
@@ -53,7 +53,7 @@ def unpassed_heads(start_sig: str | None, now_sig: str, passed: dict, heads: lis
 
 
 def load_record(path: Path) -> dict:
-    """確かめの記録。読めないか壊れていれば空。"""
+    """検証の状態ファイル。読めないか壊れていれば空。"""
     empty = {"turn_start": {}, "passed": {}}
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -178,7 +178,7 @@ def main(argv: list[str]) -> int:
         if missing:
             lines = "\n".join(f"  {h}" for h in missing)
             message = (
-                "このターンで中身が変わりましたが、今の中身で通っていない確かめのコマンドがあります。\n"
+                "このターンで作業ツリーが変わりましたが、今の作業ツリーで通っていない検証コマンドがあります。\n"
                 "リポジトリの中で走らせて通してから終えてください(パイプ・;・&・バックグラウンドを付けると数えません):\n"
                 f"{lines}\n"
             )

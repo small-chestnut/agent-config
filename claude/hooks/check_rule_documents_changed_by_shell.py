@@ -3,12 +3,12 @@
 check_rule_length.py と ask_removable_words.py は Edit・Write・MultiEdit にだけ掛かるため、
 シェルから書いた行はどちらも通らない。そこでコマンドの前後でプロンプトを見比べる。
   before(PreToolUse):  プロンプトの中身のスナップショットを一時ファイルに取る
-  after(PostToolUse):  スナップショットと今の中身を比べ、このコマンドで足された行を数え、問う
+  after(PostToolUse):  スナップショットと今のプロンプトの中身を比べ、このコマンドで足された行を数え、問う
   record(PreToolUse の Edit・Write・MultiEdit):  書こうとしている行を、書きかけの記録に取る(ADR 0041-1)
   confirm(PostToolUse の Edit・Write・MultiEdit):  書けた呼び出しの記録を、書けた記録にする。after は書けた記録の行を除く
 見るリポジトリは、フックの cwd と、コマンドに書かれた絶対パス(C:/…・C:\\…・/c/…・~/…)が入っているもの。
 プロンプトの決め方・字数の数え方は check_rule_length.py と同じ。知らせがあれば stderr に並べて exit 2。
-取り込むコマンド(git merge など)では、HEAD かインデックスと同じ行と衝突の印の行は問わない。
+取り込む git コマンド(git merge など)では、HEAD かインデックスと同じ行とコンフリクトマーカーの行は問わない。
 """
 import hashlib
 import json
@@ -97,7 +97,7 @@ def brings_other_commits(command: str) -> bool:
 
 
 def git_versions(root: Path, rel: str) -> list[str]:
-    """HEAD とインデックス(段階 0〜3)にある rel の中身のうち、取れたもの。"""
+    """HEAD とインデックス(ステージ 0〜3)にある rel の中身のうち、取れたもの。"""
     out = []
     for spec in (f"HEAD:{rel}", *(f":{n}:{rel}" for n in range(4))):
         shown = git(root, "show", spec)
@@ -107,7 +107,7 @@ def git_versions(root: Path, rel: str) -> list[str]:
 
 
 def imported_lines(text: str, versions: list[str]) -> set[int]:
-    """text の行のうち、git が持ってきた行(どれかの版と同じ行)と衝突の印の行の番号。"""
+    """text の行のうち、git が持ってきた行(どれかの版と同じ行)とコンフリクトマーカーの行の番号。"""
     lines = text.splitlines()
     imported = {n for n, line in enumerate(lines, 1) if CONFLICT_MARKER.match(line)}
     for version in versions:
@@ -151,7 +151,7 @@ def lines_matching(text: str, bodies: set[str]) -> set[int]:
 
 
 def written_prefix(path: Path) -> str:
-    """書き込み記録の名前の頭。ファイルのパスで決まる。"""
+    """書き込み記録のファイル名のプレフィックス。ファイルのパスで決まる。"""
     return hashlib.sha256(os.path.normcase(str(path.resolve())).encode("utf-8")).hexdigest()[:16]
 
 
