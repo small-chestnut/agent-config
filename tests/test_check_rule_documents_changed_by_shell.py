@@ -2,8 +2,10 @@
 
 実行(この階層で): python -m unittest discover -s tests
 """
+import hashlib
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -18,30 +20,6 @@ shell = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(shell)
 
 LONG = "- " + "あ" * 61
-
-
-class コマンドに書かれたパス(unittest.TestCase):
-    def test_ドライブ文字のパスを拾う(self):
-        paths = shell.paths_in_command('cd "E:/Dropbox/root/projects/gemini" && python x.py')
-        self.assertIn(Path("E:/Dropbox/root/projects/gemini"), paths)
-
-    def test_Git_Bash_の形のパスをドライブ文字に直す(self):
-        self.assertIn(Path("C:/Users/Reo/dev"), shell.paths_in_command("ls /c/Users/Reo/dev"))
-
-    def test_ホームからのパスを拾う(self):
-        self.assertIn(Path.home() / "dev/projects", shell.paths_in_command("cd ~/dev/projects && ls"))
-
-
-class 足された行(unittest.TestCase):
-    def test_足した行と書き換えた行の番号を返す(self):
-        self.assertEqual(shell.added_lines("- a\n- b\n", "- a\n- B\n- c\n"), {2, 3})
-
-    def test_消しただけなら足された行は無い(self):
-        self.assertEqual(shell.added_lines("- a\n- b\n", "- a\n"), set())
-
-    def test_コードブロックの中と空の行は問わない(self):
-        text = "- 足した\n\n```\n- コード\n```\n"
-        self.assertEqual(shell.asked_lines(text, {1, 2, 4}), [(1, "- 足した")])
 
 
 class 取り込むコマンド(unittest.TestCase):
@@ -88,6 +66,9 @@ class コマンドの前後の動き(unittest.TestCase):
 
     def tearDown(self):
         shell.snapshot_path(self.event).unlink(missing_ok=True)
+        key = hashlib.sha256(f"test:edit-1-{self.event['tool_use_id']}".encode("utf-8")).hexdigest()[:16]
+        for p in shell.WRITTEN_DIR.glob(f"*-{key}*.json"):
+            p.unlink(missing_ok=True)
         self.tmp.cleanup()
 
     def run_hook(self, mode):
@@ -193,6 +174,130 @@ class コマンドの前後の動き(unittest.TestCase):
         self.run_hook("before")
         self.git("restore", "CLAUDE.md")
         self.assertEqual(self.run_hook("after").returncode, 0)
+
+    def edit_event(self, tool_name, tool_input, n=1):
+        """Edit・Write・MultiEdit の event。n 番目の呼び出し。"""
+        return {"session_id": "test", "tool_use_id": f"edit-{n}-{self.event['tool_use_id']}", "tool_name": tool_name,
+                "cwd": str(self.root), "tool_input": tool_input}
+
+    def run_edit_hook(self, mode, event):
+        return subprocess.run([sys.executable, str(SCRIPT), mode], input=json.dumps(event).encode("utf-8"),
+                              capture_output=True)
+
+    def write_with(self, tool_name, tool_input, path, new_text, confirm=True):
+        """Claude Code が Edit などを走らせる順(record → 書き換え → confirm)。"""
+        event = self.edit_event(tool_name, tool_input)
+        self.assertEqual(self.run_edit_hook("record", event).returncode, 0)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(new_text, encoding="utf-8")
+        if confirm:
+            self.assertEqual(self.run_edit_hook("confirm", event).returncode, 0)
+
+    def test_コマンドの間にEditで足された行は問わない(self):
+        other = "- " + "い" * 61
+        self.run_hook("before")
+        self.write_with("Edit", {"file_path": str(self.doc), "old_string": LONG, "new_string": f"{LONG}\n{other}"},
+                        self.doc, f"{LONG}\n{other}\n")
+        self.assertEqual(self.run_hook("after").returncode, 0)
+
+    def test_コマンドで足した行はEditで足された行と並んでも問う(self):
+        edited, ran = "- " + "い" * 61, "- " + "う" * 61
+        self.run_hook("before")
+        self.write_with("Edit", {"file_path": str(self.doc), "old_string": LONG, "new_string": f"{LONG}\n{edited}"},
+                        self.doc, f"{LONG}\n{edited}\n")
+        self.doc.write_text(f"{LONG}\n{edited}\n{ran}\n", encoding="utf-8")
+        r = self.run_hook("after")
+        self.assertEqual(r.returncode, 2)
+        err = r.stderr.decode("utf-8")
+        self.assertIn("CLAUDE.md:3", err)
+        self.assertNotIn("CLAUDE.md:2", err)
+
+    def test_Writeで作られたプロンプトの行は問わない(self):
+        skill = self.root / ".claude" / "skills" / "x" / "SKILL.md"
+        self.run_hook("before")
+        self.write_with("Write", {"file_path": str(skill), "content": f"{LONG}\n"}, skill, f"{LONG}\n")
+        self.assertEqual(self.run_hook("after").returncode, 0)
+
+    def test_MultiEditで書かれた行は問わない(self):
+        one, two = "- " + "い" * 61, "- " + "う" * 61
+        edits = [{"old_string": LONG, "new_string": f"{LONG}\n{one}"}, {"old_string": one, "new_string": two}]
+        self.run_hook("before")
+        self.write_with("MultiEdit", {"file_path": str(self.doc), "edits": edits}, self.doc, f"{LONG}\n{two}\n")
+        self.assertEqual(self.run_hook("after").returncode, 0)
+
+    def test_別のファイルにEditで書かれた行と同じ行をコマンドで足すと問う(self):
+        line = "- " + "い" * 61
+        skill = self.root / ".claude" / "skills" / "x" / "SKILL.md"
+        self.run_hook("before")
+        self.write_with("Edit", {"file_path": str(self.doc), "old_string": LONG, "new_string": f"{LONG}\n{line}"},
+                        self.doc, f"{LONG}\n{line}\n")
+        skill.parent.mkdir(parents=True)
+        skill.write_text(f"{line}\n", encoding="utf-8")
+        r = self.run_hook("after")
+        self.assertEqual(r.returncode, 2)
+        err = r.stderr.decode("utf-8")
+        self.assertIn(".claude/skills/x/SKILL.md:1", err)
+        self.assertNotIn("CLAUDE.md:2", err)
+
+    def test_書けなかったEditの行はコマンドで足すと問う(self):
+        line = "- " + "い" * 61
+        self.run_hook("before")
+        event = self.edit_event("Edit", {"file_path": str(self.doc), "old_string": LONG, "new_string": f"{LONG}\n{line}"})
+        self.assertEqual(self.run_edit_hook("record", event).returncode, 0)
+        self.doc.write_text(f"{LONG}\n{line}\n", encoding="utf-8")
+        r = self.run_hook("after")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("CLAUDE.md:2", r.stderr.decode("utf-8"))
+
+    def test_EditWriteMultiEditでは知らせず書き込みを止めない(self):
+        line = "- " + "い" * 61
+        event = self.edit_event("Edit", {"file_path": str(self.doc), "old_string": LONG, "new_string": f"{LONG}\n{line}"})
+        for mode in ("record", "confirm"):
+            r = self.run_edit_hook(mode, event)
+            self.assertEqual((r.returncode, r.stderr), (0, b""), mode)
+
+    def test_Git_Bashの形のパスのリポジトリも見る(self):
+        posix = self.root.as_posix()
+        if not re.match(r"^[A-Za-z]:/", posix):
+            self.skipTest("ドライブ文字の無い環境")
+        self.event["tool_input"]["command"] = f'cd "/{posix[0].lower()}{posix[2:]}" && python edit.py'
+        self.run_hook("before")
+        self.doc.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")
+        self.assertEqual(self.run_hook("after").returncode, 2)
+
+    def test_ホームからのパスのリポジトリも見る(self):
+        try:
+            rel = self.root.relative_to(Path.home().resolve()).as_posix()
+        except ValueError:
+            self.skipTest("一時フォルダがホームの下に無い環境")
+        self.event["tool_input"]["command"] = f"cd ~/{rel} && python edit.py"
+        self.run_hook("before")
+        self.doc.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")
+        self.assertEqual(self.run_hook("after").returncode, 2)
+
+    def test_コマンドで書き換えた行も問う(self):
+        self.run_hook("before")
+        self.doc.write_text("- " + "い" * 61 + "\n", encoding="utf-8")
+        r = self.run_hook("after")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("CLAUDE.md:1", r.stderr.decode("utf-8"))
+
+    def test_コマンドで消しただけなら問わない(self):
+        self.doc.write_text(f"{LONG}\n- 消す\n", encoding="utf-8")
+        self.git("commit", "-qam", "two")
+        self.run_hook("before")
+        self.doc.write_text(f"{LONG}\n", encoding="utf-8")
+        self.assertEqual(self.run_hook("after").returncode, 0)
+
+    def test_空の行とコードブロックの中は問わない(self):
+        self.run_hook("before")
+        self.doc.write_text(f"{LONG}\n- 足した\n\n```\n- コード\n```\n", encoding="utf-8")
+        r = self.run_hook("after")
+        self.assertEqual(r.returncode, 2)
+        err = r.stderr.decode("utf-8")
+        self.assertIn("CLAUDE.md:2", err)
+        for n in (3, 5):
+            self.assertNotIn(f"CLAUDE.md:{n}", err)
 
 
 if __name__ == "__main__":
