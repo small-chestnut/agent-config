@@ -4,6 +4,8 @@ check_rule_length.py と ask_removable_words.py は Edit・Write・MultiEdit に
 シェルから書いた行はどちらも通らない。そこでコマンドの前後でプロンプトを見比べる。
   before(PreToolUse):  プロンプトの中身のスナップショットを一時ファイルに取る
   after(PostToolUse):  スナップショットと今の中身を比べ、このコマンドで足された行を数え、問う
+  record(PreToolUse の Edit・Write・MultiEdit):  書こうとしている行を、書きかけの記録に取る(ADR 0041-1)
+  confirm(PostToolUse の Edit・Write・MultiEdit):  書けた呼び出しの記録を、書けた記録にする。after は書けた記録の行を除く
 見るリポジトリは、フックの cwd と、コマンドに書かれた絶対パス(C:/…・C:\\…・/c/…・~/…)が入っているもの。
 プロンプトの決め方・字数の数え方は check_rule_length.py と同じ。知らせがあれば stderr に並べて exit 2。
 取り込むコマンド(git merge など)では、HEAD かインデックスと同じ行と衝突の印の行は問わない。
@@ -21,6 +23,7 @@ from pathlib import Path
 from check_rule_length import LIMIT, PROJECT_LIST, git, is_rule_document, read_patterns, too_long
 
 SNAPSHOT_DIR = Path(tempfile.gettempdir()) / "claude-rule-document-snapshots"
+WRITTEN_DIR = SNAPSHOT_DIR / "written"
 SNAPSHOT_LIFETIME = 24 * 60 * 60
 MAX_REPOSITORIES = 8
 
@@ -61,10 +64,15 @@ def repositories(cwd: str | None, command: str) -> list[Path]:
     return roots[:MAX_REPOSITORIES]
 
 
+def project_patterns(root: Path) -> list[str]:
+    """リポジトリの .claude/rule-documents.txt に書かれたプロンプトの glob。"""
+    listing = root / PROJECT_LIST
+    return read_patterns(listing.read_text(encoding="utf-8", errors="replace")) if listing.exists() else []
+
+
 def rule_documents(root: Path) -> dict[str, str]:
     """リポジトリの中のプロンプト {ルートからのパス: 中身}。git が無視するファイルは除く。"""
-    listing = root / PROJECT_LIST
-    patterns = read_patterns(listing.read_text(encoding="utf-8", errors="replace")) if listing.exists() else []
+    patterns = project_patterns(root)
     files = git(root, "ls-files", "-co", "--exclude-standard")
     docs = {}
     for rel in files.stdout.splitlines():
@@ -131,9 +139,34 @@ def findings(before: dict[str, dict[str, str]], roots: list[Path], command: str)
             new_lines = added_lines(old.get(rel, ""), text)
             if brings_other_commits(command):
                 new_lines -= imported_lines(text, git_versions(root, rel))
+            new_lines -= lines_matching(text, written_lines(root / rel))
             long_lines += [f"{rel}:{n}  {length}字  {body}" for n, length, body in too_long(text, new_lines)]
             asked += [f"{rel}:{n}  {body}" for n, body in asked_lines(text, new_lines)]
     return long_lines, asked
+
+
+def lines_matching(text: str, bodies: set[str]) -> set[int]:
+    """text の行のうち、bodies のどれかと同じ行の番号。"""
+    return {n for n, line in enumerate(text.splitlines(), 1) if line in bodies}
+
+
+def written_prefix(path: Path) -> str:
+    """書き込み記録の名前の頭。ファイルのパスで決まる。"""
+    return hashlib.sha256(os.path.normcase(str(path.resolve())).encode("utf-8")).hexdigest()[:16]
+
+
+def written_path(event: dict, path: Path, pending: bool) -> Path:
+    key = hashlib.sha256(f"{event.get('session_id')}:{event.get('tool_use_id')}".encode("utf-8")).hexdigest()[:16]
+    return WRITTEN_DIR / f"{written_prefix(path)}-{key}{'.pending' if pending else ''}.json"
+
+
+def written_lines(path: Path) -> set[str]:
+    """path に Edit・Write・MultiEdit が書けた行の本文。"""
+    out: set[str] = set()
+    for p in WRITTEN_DIR.glob(f"{written_prefix(path)}-*.json"):
+        if not p.name.endswith(".pending.json"):
+            out.update(json.loads(p.read_text(encoding="utf-8"))["lines"])
+    return out
 
 
 def snapshot_path(event: dict) -> Path:
@@ -144,9 +177,62 @@ def snapshot_path(event: dict) -> Path:
 
 def remove_old_snapshots(now: float) -> None:
     """失敗したコマンドのスナップショットは after が読まないので、1日たったものを消す。"""
-    for p in SNAPSHOT_DIR.glob("*.json"):
+    for p in (*SNAPSHOT_DIR.glob("*.json"), *WRITTEN_DIR.glob("*.json")):
         if now - p.stat().st_mtime > SNAPSHOT_LIFETIME:
             p.unlink(missing_ok=True)
+
+
+def written_content(current: str, tool_name: str, tool_input: dict) -> str | None:
+    """Edit・Write・MultiEdit が書いた後の中身。当てられなければ None。"""
+    if tool_name == "Write":
+        return tool_input["content"]
+    edits = tool_input["edits"] if tool_name == "MultiEdit" else [tool_input]
+    for edit in edits:
+        old, new = edit["old_string"], edit["new_string"]
+        if old == "":
+            if current != "":
+                return None
+            current = new
+        elif old in current:
+            current = current.replace(old, new)
+        else:
+            return None
+    return current
+
+
+def is_prompt_file(path: Path) -> bool:
+    """path(まだ無くてもよい)が、git の中にあり、git が無視せず、プロンプトの名前に当たるか。"""
+    root = repository_root(path.parent)
+    if root is None:
+        return False
+    rel = path.resolve().relative_to(root).as_posix()
+    patterns = project_patterns(root)
+    return is_rule_document(rel, patterns) and git(root, "check-ignore", "-q", "--", rel).returncode != 0
+
+
+def record_written(event: dict) -> int:
+    tool_input = event.get("tool_input") or {}
+    path = Path(tool_input["file_path"])
+    if not is_prompt_file(path):
+        return 0
+    current = path.read_text(encoding="utf-8", errors="replace") if path.is_file() else ""
+    after = written_content(current, event.get("tool_name"), tool_input)
+    if after is None:
+        return 0
+    body = after.splitlines()
+    WRITTEN_DIR.mkdir(parents=True, exist_ok=True)
+    remove_old_snapshots(time.time())
+    lines = [body[n - 1] for n in sorted(added_lines(current, after))]
+    written_path(event, path, pending=True).write_text(json.dumps({"lines": lines}, ensure_ascii=False), encoding="utf-8")
+    return 0
+
+
+def confirm_written(event: dict) -> int:
+    path = Path((event.get("tool_input") or {})["file_path"])
+    pending = written_path(event, path, pending=True)
+    if pending.is_file():
+        os.replace(pending, written_path(event, path, pending=False))
+    return 0
 
 
 def before_command(event: dict) -> int:
@@ -197,6 +283,11 @@ def main() -> int:
             return 0   # スナップショットに失敗しても、コマンドは止めない
     if mode == "after":
         return after_command(event)
+    if mode in ("record", "confirm"):
+        try:
+            return (record_written if mode == "record" else confirm_written)(event)
+        except Exception:
+            return 0   # Edit・Write・MultiEdit は、記録に失敗しても止めない
     return 0
 
 
