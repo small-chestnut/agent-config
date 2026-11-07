@@ -64,10 +64,15 @@ def repositories(cwd: str | None, command: str) -> list[Path]:
     return roots[:MAX_REPOSITORIES]
 
 
+def project_patterns(root: Path) -> list[str]:
+    """リポジトリの .claude/rule-documents.txt に書かれたプロンプトの glob。"""
+    listing = root / PROJECT_LIST
+    return read_patterns(listing.read_text(encoding="utf-8", errors="replace")) if listing.exists() else []
+
+
 def rule_documents(root: Path) -> dict[str, str]:
     """リポジトリの中のプロンプト {ルートからのパス: 中身}。git が無視するファイルは除く。"""
-    listing = root / PROJECT_LIST
-    patterns = read_patterns(listing.read_text(encoding="utf-8", errors="replace")) if listing.exists() else []
+    patterns = project_patterns(root)
     files = git(root, "ls-files", "-co", "--exclude-standard")
     docs = {}
     for rel in files.stdout.splitlines():
@@ -201,8 +206,7 @@ def is_prompt_file(path: Path) -> bool:
     if root is None:
         return False
     rel = path.resolve().relative_to(root).as_posix()
-    listing = root / PROJECT_LIST
-    patterns = read_patterns(listing.read_text(encoding="utf-8", errors="replace")) if listing.exists() else []
+    patterns = project_patterns(root)
     return is_rule_document(rel, patterns) and git(root, "check-ignore", "-q", "--", rel).returncode != 0
 
 

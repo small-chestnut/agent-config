@@ -139,6 +139,7 @@
 - テスト: `tests/test_check_rule_documents_changed_by_shell.py` は22件から28件(新しい7件・書き直した5件・消した6件)。大きさの印は付けていない(設計のとおり)。
 - 実行: `python -m unittest discover -s tests` で81件が通った(スキップ無し)。lint のコマンドはこのリポジトリに無い。
 - 設計の決めていない所を判断した所: なし。
+- 実装レビュー(1回目)の指摘を直した: `.claude/rule-documents.txt` を読む処理を `project_patterns` にまとめ、`rule_documents` と `is_prompt_file` の両方から呼ぶ。81件が通った。
 - 反映: `~/.claude` への `install.ps1 -Yes` は、main にマージした後に PL か利用者が行う(PG はしていない)。
 
 ## レビュー
