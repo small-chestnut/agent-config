@@ -1,11 +1,11 @@
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 ## 進み具合
 
 - 利用者待ち: なし
 - [x] 1. やり方を決める(済んだ印: 足す・変える行4行と、確かめ方5件が設計の節にある)
-- [ ] 2. 全体の CLAUDE.md に、変えた所のテストのコマンドを書き足す決まりがある(前: 1)(済んだ印: `claude/CLAUDE.md` に設計の2行がある)
-- [ ] 3. agent-config で、変えた所のテストだけを流せる(前: 1)(済んだ印: CLAUDE.md のコマンドで `test_check_rule_length.py` の11件だけが流れて通る)
+- [x] 2. 全体の CLAUDE.md に、変えた所のテストのコマンドを書き足す決まりがある(前: 1)(済んだ印: `claude/CLAUDE.md` の99〜101行目に verify-commands の行と設計の2行がこの順である)
+- [x] 3. agent-config で、変えた所のテストだけを流せる(前: 1)(済んだ印: CLAUDE.md の形のコマンドで `test_check_rule_length.py` の11件だけが流れて通った)
 - [ ] 4. できたものを見直す(前: 2・3)(済んだ印: レビューの節に実装レビューの指摘の数がある)
 
 ## ゴール
@@ -76,5 +76,10 @@
 | (字数) | `python -m unittest discover -s tests` が全部通る(マージの前に流す全部。`CLAUDE.md` の行の字数はフックが書くときに見る) |
 
 ## 実装
+
+- `claude/CLAUDE.md` に設計の2行を足した。`CLAUDE.md`(直下)は、テストの行を2行に直した。設計どおりで、設計からの変更なし。
+- 流したもの: `python -m unittest tests/test_check_rule_length.py` → Ran 11 tests, OK(受け入れ条件4)。`.claude/verify-commands.txt` の `python -m unittest` で始まる(5)。`python -m unittest discover -s tests` → Ran 71 tests, OK。
+- lint のコマンドはこのリポジトリに無い。
+- 画面の変更なし。
 
 ## レビュー
