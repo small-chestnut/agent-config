@@ -6,6 +6,7 @@ check_rule_length.py と ask_removable_words.py は Edit・Write・MultiEdit に
   after(PostToolUse):  スナップショットと今の中身を比べ、このコマンドで足された行を数え、問う
 見るリポジトリは、フックの cwd と、コマンドに書かれた絶対パス(C:/…・C:\\…・/c/…・~/…)が入っているもの。
 決まりの文書の決め方・字数の数え方は check_rule_length.py と同じ。知らせがあれば stderr に並べて exit 2。
+取り込むコマンド(git merge など)では、HEAD かインデックスと同じ行と衝突の印の行は問わない。
 """
 import hashlib
 import json
@@ -26,6 +27,11 @@ MAX_REPOSITORIES = 8
 WINDOWS_PATH = re.compile(r"[A-Za-z]:[\\/][^\s\"'`;|&<>()]*")
 GIT_BASH_PATH = re.compile(r"(?<![\w.])/([a-zA-Z])/[^\s\"'`;|&<>()]*")
 HOME_PATH = re.compile(r"(?:~|\$HOME|\$env:USERPROFILE)[\\/][^\s\"'`;|&<>()]*")
+
+IMPORTING_SUBCOMMANDS = "merge|pull|checkout|switch|rebase|cherry-pick|reset|restore|revert|am"
+IMPORTING_COMMAND = re.compile(
+    r"\bgit(?:\s+(?:-C\s+\S+|-c\s+\S+|--[\w-]+(?:=\S+)?))*\s+(?:" + IMPORTING_SUBCOMMANDS + r")(?=[\s;&|)]|$)")
+CONFLICT_MARKER = re.compile(r"^(?:<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|)(?:\s|$)")
 
 
 def paths_in_command(command: str) -> list[Path]:
@@ -77,6 +83,30 @@ def added_lines(before: str, after: str) -> set[int]:
     return added
 
 
+def brings_other_commits(command: str) -> bool:
+    """command が、git がほかのコミットの中身を持ってくるコマンドを含むか。"""
+    return bool(IMPORTING_COMMAND.search(command))
+
+
+def git_versions(root: Path, rel: str) -> list[str]:
+    """HEAD とインデックス(段階 0〜3)にある rel の中身のうち、取れたもの。"""
+    out = []
+    for spec in (f"HEAD:{rel}", *(f":{n}:{rel}" for n in range(4))):
+        shown = git(root, "show", spec)
+        if shown.returncode == 0:
+            out.append(shown.stdout)
+    return out
+
+
+def imported_lines(text: str, versions: list[str]) -> set[int]:
+    """text の行のうち、git が持ってきた行(どれかの版と同じ行)と衝突の印の行の番号。"""
+    lines = text.splitlines()
+    imported = {n for n, line in enumerate(lines, 1) if CONFLICT_MARKER.match(line)}
+    for version in versions:
+        imported |= set(range(1, len(lines) + 1)) - added_lines(version, text)
+    return imported
+
+
 def asked_lines(text: str, new_lines: set[int]) -> list[tuple[int, str]]:
     """問う行 [(行番号, 行)]。空の行とコードブロックの中は除く。"""
     out = []
@@ -90,7 +120,7 @@ def asked_lines(text: str, new_lines: set[int]) -> list[tuple[int, str]]:
     return out
 
 
-def findings(before: dict[str, dict[str, str]], roots: list[Path]) -> tuple[list[str], list[str]]:
+def findings(before: dict[str, dict[str, str]], roots: list[Path], command: str) -> tuple[list[str], list[str]]:
     """(上限を超えた行の知らせ, 問う行)。before は {リポジトリのルート: {ルートからのパス: 中身}}。"""
     long_lines, asked = [], []
     for root in roots:
@@ -99,6 +129,8 @@ def findings(before: dict[str, dict[str, str]], roots: list[Path]) -> tuple[list
             if old.get(rel) == text:
                 continue
             new_lines = added_lines(old.get(rel, ""), text)
+            if brings_other_commits(command):
+                new_lines -= imported_lines(text, git_versions(root, rel))
             long_lines += [f"{rel}:{n}  {length}字  {body}" for n, length, body in too_long(text, new_lines)]
             asked += [f"{rel}:{n}  {body}" for n, body in asked_lines(text, new_lines)]
     return long_lines, asked
@@ -134,7 +166,8 @@ def after_command(event: dict) -> int:
         return 0
     before = json.loads(path.read_text(encoding="utf-8"))
     os.remove(path)
-    long_lines, asked = findings(before, [Path(r) for r in before])
+    command = (event.get("tool_input") or {}).get("command") or ""
+    long_lines, asked = findings(before, [Path(r) for r in before], command)
     if not long_lines and not asked:
         return 0
     sys.stderr.reconfigure(encoding="utf-8")
