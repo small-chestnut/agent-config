@@ -56,6 +56,20 @@ class 取り込むコマンド(unittest.TestCase):
             self.assertFalse(shell.brings_other_commits(command), command)
 
 
+class 取り込んだ行(unittest.TestCase):
+    def test_衝突の印の行は取り込んだ行に数える(self):
+        text = "<<<<<<< HEAD\n- a\n=======\n- b\n>>>>>>> other\n"
+        self.assertEqual(shell.imported_lines(text, []), {1, 3, 5})
+
+    def test_印に似た行は取り込んだ行に数えない(self):
+        text = "========\n- =======\n<<<<<<<x\n"
+        self.assertEqual(shell.imported_lines(text, []), set())
+
+    def test_どれかの版と同じ行は取り込んだ行に数える(self):
+        self.assertEqual(shell.imported_lines("- a\n- b\n- c\n", ["- a\n- c\n", "- b\n"]), {1, 2, 3})
+        self.assertEqual(shell.imported_lines("- a\n- b\n- c\n", ["- a\n"]), {1})
+
+
 class コマンドの前後の動き(unittest.TestCase):
     """一時的な git リポジトリで、before と after をフックとして走らせる。"""
 
