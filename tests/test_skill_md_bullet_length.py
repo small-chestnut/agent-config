@@ -18,13 +18,11 @@ SKILL_MDS = sorted((ROOT / "claude" / "skills").glob("*/SKILL.md"))
 
 class SKILL_mdの箇条書きの字数(unittest.TestCase):
     def test_どのSKILL_mdの箇条書きの行も60字以内(self):
+        self.assertTrue(SKILL_MDS)
         for path in SKILL_MDS:
             with self.subTest(file=path.relative_to(ROOT).as_posix()):
                 text = path.read_text(encoding="utf-8")
                 self.assertEqual(crl.too_long(text, None), [])
-
-    def test_確かめるSKILL_mdが1つ以上見つかる(self):
-        self.assertTrue(SKILL_MDS)
 
 
 if __name__ == "__main__":
