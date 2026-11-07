@@ -15,7 +15,7 @@ paths:
 
 - `ask_removable_words.py` は、足した行を1か所ずつ指して問い返している。
 
-### 目指す状態: Bash や PowerShell で書いた決まりの文書も、素通りしていない
+### 目指す状態: Bash や PowerShell で書いたプロンプトも、素通りしていない
 
 - `check_rule_documents_changed_by_shell.py` が、シェルで書いた行にも同じ2つを掛けている。
 - コマンドに出ないパスへ書くスクリプトは、cwd のリポジトリの分だけ見えている。

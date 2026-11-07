@@ -1,4 +1,4 @@
-"""claude/hooks/check_rule_documents_changed_by_shell.py が、シェルで書き換えた決まりの文書を数え、問い返すテスト。
+"""claude/hooks/check_rule_documents_changed_by_shell.py が、シェルで書き換えたプロンプトを数え、問い返すテスト。
 
 実行(この階層で): python -m unittest discover -s tests
 """
@@ -104,12 +104,18 @@ class コマンドの前後の動き(unittest.TestCase):
         self.assertIn("消しても意味が変わらない語", err)
         self.assertNotIn("CLAUDE.md:1", err)
 
+    def test_コマンドで足した行はプロンプトに足した行と知らせる(self):
+        self.run_hook("before")
+        self.doc.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")
+        r = self.run_hook("after")
+        self.assertIn("このコマンドでプロンプトに足した行です。", r.stderr.decode("utf-8"))
+
     def test_コマンドの前からあった変更は問わない(self):
         self.doc.write_text(f"{LONG}\n- 前の変更\n", encoding="utf-8")
         self.run_hook("before")
         self.assertEqual(self.run_hook("after").returncode, 0)
 
-    def test_コマンドで作った決まりの文書も数える(self):
+    def test_コマンドで作ったプロンプトも数える(self):
         self.run_hook("before")
         skill = self.root / ".claude" / "skills" / "x" / "SKILL.md"
         skill.parent.mkdir(parents=True)
@@ -118,7 +124,7 @@ class コマンドの前後の動き(unittest.TestCase):
         self.assertEqual(r.returncode, 2)
         self.assertIn(".claude/skills/x/SKILL.md:1", r.stderr.decode("utf-8"))
 
-    def test_決まりの文書でなければ問わない(self):
+    def test_プロンプトでなければ問わない(self):
         self.run_hook("before")
         (self.root / "README.md").write_text(f"{LONG}\n", encoding="utf-8")
         self.assertEqual(self.run_hook("after").returncode, 0)
