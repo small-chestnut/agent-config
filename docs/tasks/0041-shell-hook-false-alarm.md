@@ -1,11 +1,11 @@
-ステータス: 設計レビュー済み
+ステータス: 実装中
 
 ## 進み具合
 
 - 利用者待ち: なし
-- [x] 1. やり方を決める(済んだ印: ADR 1件・仕様の3行・テスト一覧の26件がある)
+- [x] 1. やり方を決める(済んだ印: ADR 1件・仕様の3行・テスト一覧の28件がある)
 - [x] 2. やり方を見直す(前: 1)(済んだ印: レビューの節に設計レビューの指摘が5件ある)
-- [ ] 3. ほかのセッションが Edit・Write・MultiEdit で書いた行を、シェルのフックが知らせない(前: 2)(済んだ印: テスト一覧の新しい5件が通る)
+- [ ] 3. ほかのセッションが Edit・Write・MultiEdit で書いた行を、シェルのフックが知らせない(前: 2)(済んだ印: テスト一覧の新しい7件が通る)
 - [ ] 4. このフックの 10/31 より前のテスト11件を見直す(前: 2)(済んだ印: 6件を消し、5件を中のテストに書き直してある)
 - [ ] 5. できたものを見直す(前: 3・4)(済んだ印: レビューの節に実装レビューの結果がある)
 
@@ -34,34 +34,45 @@
 
 | ファイル | 直すこと |
 |---|---|
-| `claude/hooks/check_rule_documents_changed_by_shell.py` | 引数 `record` の動きを足す。after で、記録した行を足した行から除く。冒頭の docstring に record を足す |
-| `claude/user-settings.json` | `hooks.PreToolUse` に、matcher `Edit\|Write\|MultiEdit` の項を足し、このフックを `record` で呼ぶ(書き方は今の before の行と同じ) |
+| `claude/hooks/check_rule_documents_changed_by_shell.py` | 引数 `record` と `confirm` の動きを足す。after で、書けた記録の行を足した行から除く。`remove_old_snapshots` が `written/` の記録も消すようにする。冒頭の docstring に record・confirm の行を足し、その行の末尾に「(ADR 0041-1)」を付ける |
+| `claude/user-settings.json` | `hooks.PreToolUse` に、matcher `Edit\|Write\|MultiEdit` の項を足し、このフックを `record` で呼ぶ。`hooks.PostToolUse` の matcher `Edit\|Write\|MultiEdit` の項に、このフックを `confirm` で呼ぶ行を足す(書き方は今の before の行と同じ) |
 | `docs/specs/check_rule_documents_changed_by_shell.py.md` | 設計のコミットで直した(ADR の節と、受け入れ条件1・2の行) |
 | `.claude/rules/hooks.md` | 下の「なぜ」の見出しと2行を足す |
 | `tests/test_check_rule_documents_changed_by_shell.py` | テスト一覧のとおり |
 
 ### record の動き(PreToolUse の Edit・Write・MultiEdit)
 
-- `tool_input.file_path` が git の中のプロンプト(`rule_documents` と同じ決め方)でなければ、何もしない。
+- `tool_input.file_path` がプロンプトでなければ、何もしない。プロンプトかは、ファイルがまだ無くても決まるように、次の3つで決める。
+  - `repository_root(file_path の親)` で git リポジトリの中にある。
+  - ルートからのパスが `is_rule_document(rel, patterns)` に当たる(patterns は `rule_documents` と同じく `.claude/rule-documents.txt` から)。
+  - `git check-ignore -q -- <rel>` が当たらない(git が無視するファイルではない)。
 - 書いた後の中身を、今の中身から作る。
-  - Edit: 今の中身の `old_string` を、すべて `new_string` に置き換える(Claude Code は `replace_all` でなければ1か所しか無いときだけ書くので、すべて置き換えて同じ結果になる)。
+  - Edit: 今の中身の `old_string` を、すべて `new_string` に置き換える(Claude Code は `replace_all` でなければ1か所しか無いときだけ書くので、書けたときはすべて置き換えて同じ結果になる)。
   - MultiEdit: `edits` を上から順に、Edit と同じく当てる。
   - Write: `content`。
   - ファイルが無ければ、今の中身は空。`old_string` が見つからなければ、何も記録しない。
-- `added_lines(今の中身, 書いた後の中身)` の行の文字列を記録する。
+- `added_lines(今の中身, 書いた後の中身)` の行の文字列を、書きかけの記録に書く。
+- 何があっても exit 0、stderr には何も出さない(例外も 0)。
+
+### confirm の動き(PostToolUse の Edit・Write・MultiEdit)
+
+- 同じ呼び出し(`session_id` と `tool_use_id`)の書きかけの記録があれば、書けた記録に名前を替える。無ければ何もしない。
+- PostToolUse は書けた呼び出しにだけ来るので、拒まれた・失敗した呼び出しの記録は書きかけのまま残り、after は使わない。
 - 何があっても exit 0、stderr には何も出さない(例外も 0)。
 
 ### 記録(データ)
 
 - 置き場: `SNAPSHOT_DIR / "written"`。
-- 1つの呼び出しに1つの JSON ファイル。名前は `<ファイルのパスの sha256 の頭16字>-<session_id:tool_use_id の sha256 の頭16字>.json`。
+- 1つの呼び出しに1つの JSON ファイル。名前の頭は `<ファイルのパスの sha256 の頭16字>-<session_id:tool_use_id の sha256 の頭16字>`。
+- 書きかけの記録は `<頭>.pending.json`、書けた記録は `<頭>.json`。
 - ファイルのパスは `os.path.normcase(str(Path(file_path).resolve()))`。
 - 中身は `{"lines": [行の文字列, …]}`。
-- before の `remove_old_snapshots` が、写しと同じく、1日たった記録も消す。
+- before の `remove_old_snapshots` が、写しと同じく、1日たった記録(書きかけも書けたものも)を消す。
 
 ### after の除き方
 
-- `findings` で、取り込んだ行を除いた後に、そのファイルのパスの頭16字で始まる記録をすべて読み、記録の行と同じ文字列の行を `new_lines` から除く。
+- `findings` で、取り込んだ行を除いた後に、そのファイルのパスの頭16字で始まる書けた記録(`.pending.json` でないもの)をすべて読み、記録の行と同じ文字列の行を `new_lines` から除く。
+- 除くのは、同じファイルの記録の行だけ。
 - どのセッションの記録かは問わない(自分のセッションの Edit の行も、書いたときに問われている)。
 
 ### hooks.md に足す「なぜ」
@@ -79,17 +90,19 @@
 
 大きさの印(`.medium`)は付けない。このファイルは小と中が混ざっており、ファイルを分けるのは既にあるファイルの形を直す別の変更。
 
-「中」のテストは、今の `コマンドの前後の動き` の組み立て(一時的な git リポジトリで、フックを before・after として走らせる)を使う。record は、`tool_name` が `Edit` などで、`session_id` と `tool_use_id` が before と違う event でフックを走らせる。
+「中」のテストは、今の `コマンドの前後の動き` の組み立て(一時的な git リポジトリで、フックを before・after として走らせる)を使う。record と confirm は、`tool_name` が `Edit` などで、`session_id` と `tool_use_id` が before と違う event でフックを走らせる。書けた呼び出しは、record → ファイルを書き換える → confirm の順に走らせる。
 
 #### 足すテスト
 
 | テスト名 | 大きさ | 受け入れ条件・作る規則 |
 |---|---|---|
-| test_コマンドの間にEditで足された行は問わない | 中 | 1・バグの再現(before → record(Edit)→ Edit と同じ書き換え → after が exit 0) |
+| test_コマンドの間にEditで足された行は問わない | 中 | 1・バグの再現(before → record(Edit)→ Edit と同じ書き換え → confirm → after が exit 0) |
 | test_コマンドで足した行はEditで足された行と並んでも問う | 中 | 1(除くのは記録した行だけ。Edit の行とコマンドの長い行を足し、after がコマンドの行だけを出す) |
 | test_Writeで作られたプロンプトの行は問わない | 中 | 1・Write とファイルが無いときの分かれ目 |
 | test_MultiEditで書かれた行は問わない | 中 | 1・MultiEdit の分かれ目 |
-| test_EditWriteMultiEditでは知らせず書き込みを止めない | 中 | 2(長い行を足す Edit の record が exit 0、stderr が空) |
+| test_別のファイルにEditで書かれた行と同じ行をコマンドで足すと問う | 中 | 1・同じファイルの記録だけを除く分かれ目(ファイル A に Edit で長い行を書いて confirm まで済ませ、コマンドでファイル B に同じ行を足すと、after が B の行を出す) |
+| test_書けなかったEditの行はコマンドで足すと問う | 中 | 1・書けた呼び出しだけを除く分かれ目(record だけで confirm の無い Edit の行を、コマンドで足すと、after がその行を出す) |
+| test_EditWriteMultiEditでは知らせず書き込みを止めない | 中 | 2(長い行を足す Edit の record と confirm が、どちらも exit 0、stderr が空) |
 
 #### 見直し(2026-10-31 より前に作った11件)
 
@@ -113,10 +126,10 @@
 
 | 変更 | 確かめ方 |
 |---|---|
-| `claude/user-settings.json` | `python -c "import json;json.load(open('claude/user-settings.json',encoding='utf-8'))"` が通り、`hooks.PreToolUse` に matcher `Edit\|Write\|MultiEdit` で `check_rule_documents_changed_by_shell.py" record` の項が1つある |
+| `claude/user-settings.json` | `python -c "import json;json.load(open('claude/user-settings.json',encoding='utf-8'))"` が通り、matcher `Edit\|Write\|MultiEdit` の項に、`hooks.PreToolUse` では `check_rule_documents_changed_by_shell.py" record`、`hooks.PostToolUse` では `check_rule_documents_changed_by_shell.py" confirm` の行が1つずつある |
 | `.claude/rules/hooks.md` | 上の見出しと2行がある |
 
-テストの数: このファイルは今22件。消す6件・足す10件(新しい5件・書き直した5件)で26件。
+テストの数: このファイルは今22件。消す6件・足す12件(新しい7件・書き直した5件)で28件。
 
 ## 実装
 
