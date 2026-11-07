@@ -1,4 +1,4 @@
-"""claude/hooks/require_verify_before_stop.py が、中身が変わったのに確かめが通っていないターンを止めるテスト。
+"""claude/hooks/require_verify_before_stop.py が、作業ツリーが変わったのに検証コマンドが通っていないターンを止めるテスト。
 
 実行(この階層で): python -m unittest discover -s tests
 """
@@ -20,23 +20,23 @@ verify = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(verify)
 
 
-class 確かめのコマンドの一覧(unittest.TestCase):
-    def test_確かめのコマンドの一覧は空の行と井桁の行を読まない(self):
+class 検証コマンドの一覧(unittest.TestCase):
+    def test_検証コマンドの一覧は空行とコメント行を読まない(self):
         text = "# 説明\n\npython -m unittest\n  npm test  \n"
         self.assertEqual(verify.read_commands(text), ["python -m unittest", "npm test"])
 
 
-class 確かめとして数えるコマンド(unittest.TestCase):
+class 検証として数えるコマンド(unittest.TestCase):
     HEADS = ["python -m unittest", "npm test"]
 
     def count(self, command, background=False):
         return verify.counted_heads(command, background, self.HEADS)
 
-    def test_頭と同じか頭と空白で始まるコマンドを確かめとして数える(self):
+    def test_プレフィックスと同じかプレフィックスと空白で始まるコマンドを検証として数える(self):
         self.assertEqual(self.count("python -m unittest"), ["python -m unittest"])
         self.assertEqual(self.count("  python -m unittest discover -s tests "), ["python -m unittest"])
 
-    def test_頭の直後が空白でなければ数えない(self):
+    def test_プレフィックスの直後が空白でなければ数えない(self):
         self.assertEqual(self.count("python -m unittests"), [])
         self.assertEqual(self.count("npm testing"), [])
 
@@ -54,21 +54,21 @@ class 確かめとして数えるコマンド(unittest.TestCase):
 class 止めるかどうか(unittest.TestCase):
     HEADS = ["a", "b"]
 
-    def test_ターンの始めの印が無ければ止めない(self):
+    def test_ターン開始時の作業ツリーのハッシュ値が無ければ止めない(self):
         self.assertEqual(verify.unpassed_heads(None, "now", {}, self.HEADS), [])
 
-    def test_ターンの始めから中身が変わっていなければ止めない(self):
+    def test_ターン開始時から作業ツリーが変わっていなければ止めない(self):
         self.assertEqual(verify.unpassed_heads("same", "same", {}, self.HEADS), [])
 
-    def test_今の中身で通っていない確かめの頭を返す(self):
+    def test_今の作業ツリーで通っていない検証コマンドを返す(self):
         self.assertEqual(verify.unpassed_heads("old", "now", {"now": ["a"], "old": ["b"]}, self.HEADS), ["b"])
 
-    def test_今の中身で全部の確かめが通っていれば止めない(self):
+    def test_今の作業ツリーで全部の検証コマンドが通っていれば止めない(self):
         self.assertEqual(verify.unpassed_heads("old", "now", {"now": ["b", "a"]}, self.HEADS), [])
 
 
-class 確かめの記録の件数(unittest.TestCase):
-    def test_書き直したターンの始めの印は新しいものとして残す(self):
+class 検証の状態ファイルの件数(unittest.TestCase):
+    def test_書き直したターン開始時の作業ツリーのハッシュ値は新しいものとして残す(self):
         record = {"turn_start": {}, "passed": {}}
         verify.put_latest(record["turn_start"], "long", "1")
         for i in range(verify.KEEP):
@@ -78,7 +78,7 @@ class 確かめの記録の件数(unittest.TestCase):
         self.assertEqual(record["turn_start"]["long"], "2")
 
 
-class 確かめの記録のロック(unittest.TestCase):
+class 検証の状態ファイルのロック(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.addCleanup(self.tmp.cleanup)
@@ -105,7 +105,7 @@ class 確かめの記録のロック(unittest.TestCase):
         self.assertFalse(self.path.exists())
         self.assertTrue(self.lock.exists())
 
-    def test_確かめの記録が読めないか壊れていれば空として扱う(self):
+    def test_検証の状態ファイルが読めないか壊れていれば空として扱う(self):
         empty = {"turn_start": {}, "passed": {}}
         self.assertEqual(verify.load_record(self.path), empty)
         self.path.write_text("{壊れ", encoding="utf-8")
@@ -148,25 +148,25 @@ class フックを走らせる(unittest.TestCase):
     def sig(self):
         return verify.content_sig(str(self.repo))
 
-    def test_コミットしても中身の印は変わらない(self):
+    def test_コミットしても作業ツリーのハッシュ値は変わらない(self):
         (self.repo / "a.txt").write_text("2")
         before = self.sig()
         self.git("add", "-A")
         self.git("commit", "-q", "-m", "second")
         self.assertEqual(self.sig(), before)
 
-    def test_docsの下だけを変えても中身の印は変わらない(self):
+    def test_docsの下だけを変えても作業ツリーのハッシュ値は変わらない(self):
         before = self.sig()
         (self.repo / "docs").mkdir()
         (self.repo / "docs" / "n.md").write_text("x")
         self.assertEqual(self.sig(), before)
 
-    def test_まだ追っていないファイルを足すと中身の印が変わる(self):
+    def test_未追跡のファイルを足すと作業ツリーのハッシュ値が変わる(self):
         before = self.sig()
         (self.repo / "new.txt").write_text("x")
         self.assertNotEqual(self.sig(), before)
 
-    def test_前に書いたのと同じ秒の中に同じ大きさで書き換えても中身の印が変わる(self):
+    def test_前に書いたのと同じ秒の中に同じファイルサイズで書き換えても作業ツリーのハッシュ値が変わる(self):
         t = int(time.time()) - 100
         a = self.repo / "a.txt"
         a.write_text("1")
@@ -178,7 +178,7 @@ class フックを走らせる(unittest.TestCase):
         os.utime(a, (t, t))
         self.assertNotEqual(self.sig(), before)
 
-    def test_確かめを通すまでStopフックが止め通したら止めない(self):
+    def test_検証コマンドを通すまでStopフックが止め通したら止めない(self):
         self.write_list("python -m unittest")
         self.run_hook("turn-start")
         (self.repo / "a.txt").write_text("2")
@@ -203,7 +203,7 @@ class フックを走らせる(unittest.TestCase):
             r = self.run_hook(mode, cwd=outside)
             self.assertEqual((r.returncode, r.stderr), (0, ""))
 
-    def test_同時に記録しても通った頭が消えない(self):
+    def test_同時に記録しても通ったプレフィックスが消えない(self):
         heads = [f"check{i}" for i in range(8)]
         self.write_list(*heads)
         self.run_hook("turn-start")
