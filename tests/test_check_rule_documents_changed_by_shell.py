@@ -44,6 +44,18 @@ class 足された行(unittest.TestCase):
         self.assertEqual(shell.asked_lines(text, {1, 2, 4}), [(1, "- 足した")])
 
 
+class 取り込むコマンド(unittest.TestCase):
+    def test_取り込むgitのコマンドを見分ける(self):
+        for command in ("git merge --ff-only origin/main", "git -C x pull", "cd a && git checkout main",
+                        "git cherry-pick abc"):
+            self.assertTrue(shell.brings_other_commits(command), command)
+
+    def test_取り込まないコマンドは見分けない(self):
+        for command in ("git commit -am x", "git add .", "git stash pop", "git log --grep merge",
+                        "git merge-base a b", "python edit.py"):
+            self.assertFalse(shell.brings_other_commits(command), command)
+
+
 class コマンドの前後の動き(unittest.TestCase):
     """一時的な git リポジトリで、before と after をフックとして走らせる。"""
 
@@ -99,6 +111,67 @@ class コマンドの前後の動き(unittest.TestCase):
 
     def test_写しが無ければ何もしない(self):
         self.doc.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")
+        self.assertEqual(self.run_hook("after").returncode, 0)
+
+    def git(self, *args, check=True):
+        return subprocess.run(["git", *args], cwd=self.root, check=check, capture_output=True)
+
+    def set_command(self, command):
+        self.event["tool_input"]["command"] = f'cd "{self.root.as_posix()}" && {command}'
+
+    def other_branch_with_long_line(self):
+        """別のブランチに長い行を足してコミットし、元のブランチに戻る。"""
+        self.git("checkout", "-q", "-b", "other")
+        self.doc.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")
+        self.git("commit", "-qam", "other")
+        self.git("checkout", "-q", "-")
+
+    def test_早送りで取り込んだ行は問わない(self):
+        self.other_branch_with_long_line()
+        self.set_command("git merge --ff-only other")
+        self.run_hook("before")
+        self.git("merge", "--ff-only", "other")
+        self.assertEqual(self.run_hook("after").returncode, 0)
+
+    def test_取り込むコマンドの後に書いた行は問う(self):
+        self.other_branch_with_long_line()
+        self.set_command("git merge --ff-only other && python edit.py")
+        self.run_hook("before")
+        self.git("merge", "--ff-only", "other")
+        self.doc.write_text("\n".join([LONG] * 3) + "\n", encoding="utf-8")
+        r = self.run_hook("after")
+        self.assertEqual(r.returncode, 2)
+        err = r.stderr.decode("utf-8")
+        self.assertIn("CLAUDE.md:3", err)
+        self.assertNotIn("CLAUDE.md:2", err)
+
+    def test_衝突した取り込みでは衝突の印と両方の行を問わない(self):
+        self.git("checkout", "-q", "-b", "other")
+        self.doc.write_text("- " + "い" * 61 + "\n", encoding="utf-8")
+        self.git("commit", "-qam", "other")
+        self.git("checkout", "-q", "-")
+        self.doc.write_text("- " + "う" * 61 + "\n", encoding="utf-8")
+        self.git("commit", "-qam", "main")
+        self.set_command("git merge other")
+        self.run_hook("before")
+        self.assertNotEqual(self.git("merge", "other", check=False).returncode, 0)
+        self.assertIn("<<<<<<<", self.doc.read_text(encoding="utf-8"))
+        self.assertEqual(self.run_hook("after").returncode, 0)
+
+    def test_取り込まないコマンドでコミットした行は問う(self):
+        self.set_command("python edit.py && git commit -qam x")
+        self.run_hook("before")
+        self.doc.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")
+        self.git("commit", "-qam", "x")
+        r = self.run_hook("after")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("CLAUDE.md:2", r.stderr.decode("utf-8"))
+
+    def test_変更を捨ててHEADに戻した行は問わない(self):
+        self.doc.write_text("- 前の変更\n", encoding="utf-8")
+        self.set_command("git restore CLAUDE.md")
+        self.run_hook("before")
+        self.git("restore", "CLAUDE.md")
         self.assertEqual(self.run_hook("after").returncode, 0)
 
 
