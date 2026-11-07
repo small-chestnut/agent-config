@@ -1,6 +1,7 @@
 このリポジトリの目的と構成は README.md にある。
 
-- テストは、リポジトリのルートで `python -m unittest discover -s tests`。
+- 全部のテストは、リポジトリのルートで `python -m unittest discover -s tests`。
+- 変えた所のテストだけは、`python -m unittest tests/<テストのファイル>.py`(いくつもなら空白で並べる)。
 - ADR の「対象」に書くモジュールの名前は、skill の名前か hooks のファイル名。いくつもに及ぶなら「全体」。
 - README の目的とのずれは、PL が、やるかを利用者に聞かずにタスクにして回す。
 - permissions・フック・サンドボックスを変えるタスクは、原則1 のとおり利用者に頼まれてから回す。
