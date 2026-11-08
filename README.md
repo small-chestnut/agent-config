@@ -35,7 +35,6 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 
 - 既存ファイルと差分がある場合は diff を表示して確認してから上書きする。`-Yes`(install.sh は `--yes`)を付けると尋ねずに上書きする
 - 設定は**次のエージェントセッション起動時から**有効
-- 各設定ディレクトリの `agent-config-path.txt` に、この agent-config の本体の作業ツリー(`git worktree list` の1行目)の場所を書く。ほかのリポジトリで全体の規則のずれに気づいた AI が、そこの `docs/tasks/` にチケットを足すのに使う
 
 ## 複数アカウントを使い分ける場合
 
