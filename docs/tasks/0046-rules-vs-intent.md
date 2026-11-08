@@ -3,56 +3,61 @@
 ## 進捗
 
 - 利用者待ち: なし
-- [x] 1. やり方を決める(完了条件: 設計の節と ADR 1件がコミット済み → 設計の節と ADR 0046-1 の1件をコミットした)
-- [ ] 2. やり方を見直す(依存: 1)(完了条件: ADR 0046-1 の状態が採用)
-- [ ] 3. 規則を足す前と説明する前に目的と照らす決まりを、全体の CLAUDE.md に足す(依存: 2)(完了条件: 確かめ方 A・B・C・F がどれも1件)
-- [ ] 4. 目的に反する規則も Claude が直せるように、skill `prompt-structure` を直す(依存: 2)(完了条件: 確かめ方 D が0件、E が1件、G が1件)
-- [ ] 5. このリポジトリでは、気づいた矛盾を PL に回す決まりを足す(依存: 2)(完了条件: 確かめ方 H が2件)
-- [ ] 6. できたものを見直す(依存: 3・4・5)(完了条件: レビューの節に実装レビューの指摘の件数がある)
+- [x] 1. やり方を決める(完了条件: 設計の節と ADR 2件がコミット済み → 設計の節と ADR 0046-1・0046-2 の2件をコミットした)
+- [ ] 2. やり方を見直す(依存: 1)(完了条件: ADR 0046-1・0046-2 の2件の状態が採用)
+- [ ] 3. 規則を足す前に目的と照らす決まりを、全体の CLAUDE.md に足す(依存: 2)(完了条件: 確かめ方 A・B・C・G がどれも1件)
+- [ ] 4. 理由を聞かれたら、やりたいことを言葉にして答える決まりを、全体の CLAUDE.md に足す(依存: 2)(完了条件: 確かめ方 D・E・F・H がどれも1件)
+- [ ] 5. 目的に反する規則も Claude が直せるように、skill `prompt-structure` を直す(依存: 2)(完了条件: 確かめ方 I が0件、J・K がどれも1件)
+- [ ] 6. このリポジトリでは、気づいた矛盾を PL に回す決まりを足す(依存: 2)(完了条件: 確かめ方 L が2件)
+- [ ] 7. できたものを見直す(依存: 3・4・5・6)(完了条件: レビューの節に実装レビューの指摘の件数がある)
 
 ## ゴール
 
-AI が CLAUDE.md・skill の規則を足す・直す前と、規則を理由に説明する前に、その規則が親の目指す状態・目的とリポジトリの目的に反していないかを確かめ、反する規則は作らず、既にある反する規則に気づいたら AI が自分で直すか消し(agent-config ではタスクにして回し)、利用者が規則と目的の矛盾を探して AI に突きつけずに済む。
+AI が CLAUDE.md・skill の規則を足す・直す前に、その規則が親の目指す状態・目的とリポジトリの目的に反していないかを確かめ、反する規則は作らず、既にある反する規則に気づいたら AI が自分で直すか消し(agent-config ではタスクにして回し)、利用者に今の規則や作りの理由を聞かれたら、利用者のやりたいことを言葉にして、今の形がそれに合っているかを答え、利用者が規則と目的の矛盾を探して AI に突きつけずに済む。
 
 範囲外: 今ある規則を全部読み直して矛盾を探すこと(気づいたものをタスクにする決まりで回す)と、ほかのリポジトリで作業中に全体の CLAUDE.md・skill の規則の矛盾に気づいたときの渡し方。
 
 ## 受け入れ条件
 
 1. 全体の CLAUDE.md に、CLAUDE.md・skill の規則が、どれも親の目指す状態・目的とリポジトリの目的に反していない目指す状態がある。
-2. その目指す状態に、規則を足す・直す前と、規則を理由に説明する前に、反していないかを確かめる行がある。
+2. その目指す状態に、規則を足す・直す前に、反していないかを確かめる行がある。
 3. その目指す状態に、足すのは反しない規則だけで、反する規則に気づいたら自分で直すか消す行がある。
-4. skill `prompt-structure` で、Claude が規則に手を入れるのは、「違う」と言われたときと、規則が目的に反するときだけ。
-5. agent-config の CLAUDE.md で、目的に反する規則は、PL が、やるかを利用者に聞かずにタスクにして回す。
-6. agent-config の CLAUDE.md で、PL でないセッションは、目的に反する規則に気づいたら、直さずに PL に知らせる。
-7. 受け入れ条件 1 の目指す状態の「なぜ」が、`.claude/rules/global-claude-md.md` にある。
-8. 受け入れ条件 4 の行の「なぜ」が、`claude/skills/prompt-structure/CLAUDE.md` にある。
-9. 足した・変えた規則の行は、どれも60字以内。
+4. 全体の CLAUDE.md に、規則や作りの理由を聞かれた答えが、利用者のやりたいことと、今の形がそれに合っているかでできている目指す状態がある。
+5. その目指す状態に、規則や作りの理由を聞かれたら、先に利用者のやりたいことを1文で言葉にする行がある。
+6. その目指す状態に、続けて、今の規則や作りがそのやりたいことに合っているかを言い切る行がある。
+7. skill `prompt-structure` で、Claude が規則に手を入れるのは、「違う」と言われたときと、規則が目的に反するときだけ。
+8. agent-config の CLAUDE.md で、目的に反する規則は、PL が、やるかを利用者に聞かずにタスクにして回す。
+9. agent-config の CLAUDE.md で、PL でないセッションは、目的に反する規則に気づいたら、直さずに PL に知らせる。
+10. 受け入れ条件 1 と 4 の目指す状態の「なぜ」が、`.claude/rules/global-claude-md.md` にある。
+11. 受け入れ条件 7 の行の「なぜ」が、`claude/skills/prompt-structure/CLAUDE.md` にある。
+12. 足した・変えた規則の行は、どれも60字以内。
 
 ## 設計
 
 ### ADR
 
 - 0046-1 規則は親の段とリポジトリの目的に反しないものだけを足し、反する規則に気づいたら AI が直すか消す(`docs/adr/0046-1-rules-serve-purpose.md`、状態: 提案)
-- 書き換える行に付いた ADR: なし。prompt-structure 43 行の見出しにも番号は無い。足す行は、ADR 0027-1(規則は肯定形)・0020-1(`claude/` 直下の「なぜ」は `.claude/rules/`)・0045-1(手法の段に IT の用語)に沿わせた。
-- 添える IT の用語(ADR 0045-1): なし。近い用語の「要求のトレーサビリティ」は、要求の出どころと行き先をたどれること(Gotel & Finkelstein, "An analysis of the requirements traceability problem", 1994)で、反していないかを確かめるやり方とは定義が違う。
+- 0046-2 規則や作りの理由を聞かれたら、利用者のやりたいことを言葉にし、今の形がそれに合っているかを答える(`docs/adr/0046-2-answer-why-with-user-intent.md`、状態: 提案)
+- 書き換える行に付いた ADR: なし(原則2 に足す目指す状態の隣の見出しにも番号は無い)。prompt-structure 43 行の見出しにも番号は無い。足す行は、ADR 0027-1(規則は肯定形)・0020-1(`claude/` 直下の「なぜ」は `.claude/rules/`)・0045-1(手法の段に IT の用語)に沿わせた。
+- 添える IT の用語(ADR 0045-1): なし。0046-1 に近い用語の「要求のトレーサビリティ」は、要求の出どころと行き先をたどれること(Gotel & Finkelstein, "An analysis of the requirements traceability problem", 1994)で、反していないかを確かめるやり方とは定義が違う。0046-2 の答え方に、意味が1つに定まった用語は見つからなかった。
 - 仕様: 直すのはプロンプトだけで、プロンプトがそのまま仕様。番号は足す行と見出しにだけ付ける(ADR 0010-2)。
 
 ### 直すファイルと行
 
 行番号は今の main(8d0a96a)のもの。どのファイルも改行は CRLF なので、足す行も CRLF にする。足す規則の行は、どれも60字以内であることを `check_rule_length.py` の数え方で確かめてある。
 
-#### 作業3: `claude/CLAUDE.md`(する人: PG)
+#### 作業3: `claude/CLAUDE.md` の原則3(する人: PG)
 
 160 行(ファイルの最後の行)の後ろに、空行と次の4行(見出し・空行・規則2行)を足す。
 
 ```
 ### 目指す状態: CLAUDE.md・skill の規則は、どれも、親の目指す状態・目的とリポジトリの目的に反していない(ADR 0046-1)
 
-- 規則を足す・直す前と、規則を理由に説明する前に、反していないかを確かめている。
+- 規則を足す・直す前に、反していないかを確かめている。
 - 足すのは反しない規則だけで、反する規則に気づいたら、自分で直すか消している。
 ```
 
-`.claude/rules/global-claude-md.md` の最後の行の後ろに、空行と次の7行を足す。
+`.claude/rules/global-claude-md.md` の最後の行の後ろに、空行と次の7行を足す(作業4 で、この後ろにさらに4行足す)。
 
 ```
 # 原則8: 整合
@@ -66,7 +71,27 @@ AI が CLAUDE.md・skill の規則を足す・直す前と、規則を理由に�
 - 利用者は、その矛盾探しをしたくない。反する規則は、そもそも作らないのが理想。
 ```
 
-#### 作業4: `claude/skills/prompt-structure/SKILL.md`(する人: PG)
+#### 作業4: `claude/CLAUDE.md` の原則2(する人: PG)
+
+70 行(`### 目指す状態: 手順の説明には、そのとおりにやっても失敗する条件まで入っている`)の後ろの空行(71 行)の後ろに、次の4行と空行を足す。足した後、この目指す状態と 72 行の `# 原則3: 開発` の間は空行1つ。
+
+```
+### 目指す状態: 規則や作りの理由を聞かれた答えは、利用者のやりたいことと、今の形がそれに合っているかでできている(ADR 0046-2)
+
+- 規則や作りの理由を聞かれたら、先に利用者のやりたいことを1文で言葉にしている。
+- 続けて、今の規則や作りがそのやりたいことに合っているかを言い切っている。
+```
+
+`.claude/rules/global-claude-md.md` の、作業3 で足した原則8 の最後の行の後ろに、空行と次の4行を足す。
+
+```
+### 目指す状態: 理由を聞かれた答えが、利用者のやりたいことを言葉にする規則になっている
+
+- 利用者は、物を知り正確に話せる AI が、今の作りを直す場面では理屈で固めると感じている。
+- CLAUDE.md は「必ず従う」の添え書き付きで渡り、AI の答えは規則を守る説明になりやすい。
+```
+
+#### 作業5: `claude/skills/prompt-structure/SKILL.md`(する人: PG)
 
 - 43: `- Claude が規則に手を入れるのは、「違う」と言われたときと、規則が目的に反するときだけ。(ADR 0046-1)`
 
@@ -82,7 +107,7 @@ AI が CLAUDE.md・skill の規則を足す・直す前と、規則を理由に�
 - 「違う」と言われたときだけだと、規則と目的の矛盾を探す役が利用者に残る。
 ```
 
-#### 作業5: リポジトリ直下の `CLAUDE.md`(する人: PG)
+#### 作業6: リポジトリ直下の `CLAUDE.md`(する人: PG)
 
 6 行(「- README の目的とのずれは、…」)の後ろに、次の2行を足す。
 
@@ -102,25 +127,33 @@ AI が CLAUDE.md・skill の規則を足す・直す前と、規則を理由に�
 | A | 1 | 1 |
 | B | 1件 | 2 |
 | C | 1件 | 3 |
-| D | 0件 | 4 |
-| E | 1件 | 4 |
-| F | 1件 | 7 |
-| G | 1件 | 8 |
-| H | 2件 | 5・6 |
-| I | 何も出ない | 9 |
-| J | 全部通る(SKILL.md の箇条書きが60字以内も含む) | 4・9 |
+| D | 1 | 4 |
+| E | 1件 | 5 |
+| F | 1件 | 6 |
+| G | 1件 | 10 |
+| H | 1件 | 10 |
+| I | 0件 | 7 |
+| J | 1件 | 7 |
+| K | 1件 | 11 |
+| L | 2件 | 8・9 |
+| M | 何も出ない | 12 |
+| N | 全部通る(SKILL.md の箇条書きが60字以内も含む) | 7・12 |
 
 ```
 A: grep -c "反していない(ADR 0046-1)" claude/CLAUDE.md
-B: grep -n "規則を理由に説明する前に、反していないかを確かめている" claude/CLAUDE.md
+B: grep -n "規則を足す・直す前に、反していないかを確かめている" claude/CLAUDE.md
 C: grep -n "反する規則に気づいたら、自分で直すか消している" claude/CLAUDE.md
-D: grep -c "利用者に「違う」と言われた振る舞いを直すときだけ" claude/skills/prompt-structure/SKILL.md
-E: grep -n "規則が目的に反するときだけ。(ADR 0046-1)" claude/skills/prompt-structure/SKILL.md
-F: grep -n "# 原則8: 整合" .claude/rules/global-claude-md.md
-G: grep -n "# 原則3: 整合" claude/skills/prompt-structure/CLAUDE.md
-H: grep -n "(ADR 0046-1)" CLAUDE.md
-I: git diff -U0 main -- claude/CLAUDE.md claude/skills/prompt-structure CLAUDE.md .claude/rules/global-claude-md.md | python -c "import sys;sys.path.insert(0,'claude/hooks');import check_rule_length as c;[print(l) for l in sys.stdin.buffer.read().decode('utf-8').splitlines() if l.startswith('+- ') and c.rule_length(l[3:].rstrip(chr(13)))>60]"
-J: python -m unittest discover -s tests
+D: grep -c "合っているかでできている(ADR 0046-2)" claude/CLAUDE.md
+E: grep -n "先に利用者のやりたいことを1文で言葉にしている" claude/CLAUDE.md
+F: grep -n "そのやりたいことに合っているかを言い切っている" claude/CLAUDE.md
+G: grep -n "# 原則8: 整合" .claude/rules/global-claude-md.md
+H: grep -n "理由を聞かれた答えが、利用者のやりたいことを言葉にする規則になっている" .claude/rules/global-claude-md.md
+I: grep -c "利用者に「違う」と言われた振る舞いを直すときだけ" claude/skills/prompt-structure/SKILL.md
+J: grep -n "規則が目的に反するときだけ。(ADR 0046-1)" claude/skills/prompt-structure/SKILL.md
+K: grep -n "# 原則3: 整合" claude/skills/prompt-structure/CLAUDE.md
+L: grep -n "(ADR 0046-1)" CLAUDE.md
+M: git diff -U0 main -- claude/CLAUDE.md claude/skills/prompt-structure CLAUDE.md .claude/rules/global-claude-md.md | python -c "import sys;sys.path.insert(0,'claude/hooks');import check_rule_length as c;[print(l) for l in sys.stdin.buffer.read().decode('utf-8').splitlines() if l.startswith('+- ') and c.rule_length(l[3:].rstrip(chr(13)))>60]"
+N: python -m unittest discover -s tests
 ```
 
 ## 実装
