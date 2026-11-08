@@ -69,21 +69,9 @@ $claudeDirs = @("$env:USERPROFILE\.claude")
 foreach ($extra in @("$env:USERPROFILE\.claude-work")) {
     if (Test-Path $extra) { $claudeDirs += $extra }
 }
-# Record the main working tree of this repo (the first line of `git worktree list`),
-# so a session in another repository can file a ticket here when a global rule
-# conflicts with its purpose. A worktree is removed after merging, so its path is
-# not recorded. Outside git, record where this script is.
-$mainTree = $repo
-try {
-    $first = & git -C $repo worktree list --porcelain | Select-Object -First 1
-    if ($first -match '^worktree (.+)$') { $mainTree = $Matches[1] -replace '/', '\' }
-} catch {}
 foreach ($dir in $claudeDirs) {
     Install-ConfigFile "$repo\claude\user-settings.json" "$dir\settings.json"
     Install-ConfigFile "$repo\claude\CLAUDE.md" "$dir\CLAUDE.md"
-    $pathFile = "$dir\agent-config-path.txt"
-    [System.IO.File]::WriteAllText($pathFile, $mainTree)
-    Write-Host "  recorded: $pathFile"
 }
 
 # Skills: one folder per skill, SKILL.md inside. The body is loaded only when the

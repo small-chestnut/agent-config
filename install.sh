@@ -51,17 +51,9 @@ for extra in "$HOME/.claude-work"; do
     claude_dirs+=("$extra")
   fi
 done
-# Record the main working tree of this repo (the first line of `git worktree list`),
-# so a session in another repository can file a ticket here when a global rule
-# conflicts with its purpose. A worktree is removed after merging, so its path is
-# not recorded. Outside git, record where this script is.
-main_tree="$(git -C "$repo" worktree list --porcelain 2>/dev/null | sed -n '1s/^worktree //p' || true)"
-[ -n "$main_tree" ] || main_tree="$repo"
 for dir in "${claude_dirs[@]}"; do
   install_file "$repo/claude/user-settings.json" "$dir/settings.json"
   install_file "$repo/claude/CLAUDE.md" "$dir/CLAUDE.md"
-  printf '%s\n' "$main_tree" > "$dir/agent-config-path.txt"
-  echo "  recorded: $dir/agent-config-path.txt"
 done
 
 # Skills: one folder per skill, SKILL.md inside. The body is loaded only when the
