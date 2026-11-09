@@ -1,16 +1,17 @@
-"""claude/hooks/ask_removable_words.py が、この保存で足した行を並べて問い返すテスト。
+"""claude/hooks/ask_about_written_lines.py が、この保存で足した行を並べて問い返すテスト。
 
-仕様は docs/specs/ask_removable_words.py.md。
+仕様は docs/specs/ask_about_written_lines.py.md。
 実行(この階層で): python -m unittest discover -s tests
 """
 import json
+import os
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "claude" / "hooks" / "ask_removable_words.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "claude" / "hooks" / "ask_about_written_lines.py"
 
 
 class 保存したときの問い(unittest.TestCase):
@@ -74,6 +75,46 @@ class 保存したときの問い(unittest.TestCase):
         code, err = self.run_hook("Write", {"content": "- 前からある\n- 書いた\n"})
         self.assertEqual(code, 2)
         self.assertIn("CLAUDE.md:2", err)
+
+    def test_知らせは消せる語と具体例や出来事の並びの2つを問う(self):
+        self.doc.write_text("- 前からある\n- 足した\n", encoding="utf-8")
+        code, err = self.edit("- 足した")
+        self.assertEqual(code, 2)
+        self.assertIn("1. 消しても意味が変わらない語は、消す。", err)
+        self.assertIn("2. 言いたい決まりや事実を1文で言わずに、具体例や出来事を並べている所は", err)
+
+    def test_自動メモリでもこの保存で書いた行だけを問う(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            memory = Path(tmp) / "projects" / "p" / "memory" / "a.md"
+            memory.parent.mkdir(parents=True)
+            memory.write_text("- 前からある\n- 書いた\n- 別の保存で足した\n", encoding="utf-8")
+            event = json.dumps({"tool_name": "Edit",
+                                "tool_input": {"file_path": str(memory), "old_string": "",
+                                               "new_string": "- 書いた"}})
+            r = subprocess.run([sys.executable, str(SCRIPT)], input=event.encode("utf-8"),
+                               capture_output=True, env={**os.environ, "CLAUDE_CONFIG_DIR": tmp})
+            err = r.stderr.decode("utf-8")
+            self.assertEqual(r.returncode, 2, err)
+            self.assertIn("a.md:2", err)
+            self.assertNotIn("a.md:1", err)
+            self.assertNotIn("a.md:3", err)
+
+    def test_自動メモリでないgitの外のファイルは問わない(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            doc = Path(tmp) / "projects" / "p" / "notes" / "a.md"
+            doc.parent.mkdir(parents=True)
+            doc.write_text("- 書いた\n", encoding="utf-8")
+            event = json.dumps({"tool_name": "Edit",
+                                "tool_input": {"file_path": str(doc), "new_string": "- 書いた"}})
+            r = subprocess.run([sys.executable, str(SCRIPT)], input=event.encode("utf-8"),
+                               capture_output=True, env={**os.environ, "CLAUDE_CONFIG_DIR": tmp})
+            self.assertEqual((r.returncode, r.stderr), (0, b""))
+
+    def test_問いの文はask_about_written_linesの1か所にだけある(self):
+        sentence = "具体例や出来事を並べている所は、それらがみなそこから出てくる状態の1文に替える。"
+        found = [p.name for p in SCRIPT.parent.glob("*.py")
+                 if sentence in p.read_text(encoding="utf-8")]
+        self.assertEqual(found, ["ask_about_written_lines.py"])
 
 
 if __name__ == "__main__":
