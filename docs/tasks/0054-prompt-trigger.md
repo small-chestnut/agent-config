@@ -1,12 +1,12 @@
 # 0054-prompt-trigger
 
-ステータス: 実装中
+ステータス: 実装レビュー中
 
 ## 進捗
 
 - 利用者待ち: なし
 - [x] 1. やり方を決める(完了条件: 設計の節をコミットした)
-- [ ] 2. skill `prompt-structure` の、いつ使うかの説明(description)を書き換える(依存: 1)(完了条件: `claude/skills/prompt-structure/SKILL.md` の 3 行目が受け入れ条件 1 の行と一致する)
+- [x] 2. skill `prompt-structure` の、いつ使うかの説明(description)を書き換える(依存: 1)(完了条件: `claude/skills/prompt-structure/SKILL.md` の 3 行目が受け入れ条件 1 の行と一致する → 3 行目と受け入れ条件 1 の行を cmp で比べ、一字も違わなかった)
 - [ ] 3. できたものを見直す(依存: 2)(完了条件: レビューの節に QA の結果が1件ある)
 
 ## ゴール
@@ -63,3 +63,18 @@ description の行と frontmatter には ADR の番号が無いので、読む A
 | 書き換えた行を読み、発言や返す文の例が無い | — | 2 |
 | `git diff main --stat` が `claude/skills/prompt-structure/SKILL.md` とこのチケットだけで、SKILL.md の差分が 3 行目の置き換えだけ | — | 3 |
 | `python -m unittest discover -s tests` が 71 件 OK | 小 | 4 |
+
+## 実装
+
+`claude/skills/prompt-structure/SKILL.md` の 3 行目を、受け入れ条件 1 の行に置き換えた。
+
+確かめた結果:
+
+| 確かめ方 | 結果 |
+|---|---|
+| 3 行目と受け入れ条件 1 の行を `cmp` で比べる | 一字も違わない(条件 1) |
+| 書き換えた行を読む | 発言や返す文の例は無い(条件 2) |
+| `git diff main --stat` | `claude/skills/prompt-structure/SKILL.md`(1 行の置き換え)とこのチケットだけ。規則の行の数は変わらない(条件 3) |
+| `python -m unittest discover -s tests` | 71 件 OK(条件 4) |
+
+lint のコマンドは、このリポジトリの CLAUDE.md に無いので流していない。保存時のフックが「消せる語は無いか」と尋ねたが、この行は受け入れ条件 1 が一字ずつ指定しているので、語は消していない。
