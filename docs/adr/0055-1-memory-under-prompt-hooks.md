@@ -1,12 +1,12 @@
 # 0055-1 自動メモリにも、プロンプトの字数の数えと問いを掛ける
 
-状態: 提案
+状態: 採用
 日付: 2026-11-10
 対象: check_rule_length.py・ask_about_written_lines.py
 
 ## 決めたこと
 
-`check_rule_length.py` と `ask_about_written_lines.py` は、セッションの設定ディレクトリの `projects/<プロジェクト>/memory/` の md(自動メモリ)も、プロンプトと同じに数えて問い、足した行はこの保存で書いた文字列を含む行とする。
+`check_rule_length.py` と `ask_about_written_lines.py` は、セッションの設定ディレクトリの `projects/<プロジェクト>/memory/` の md(自動メモリ)も、プロンプトと同じに数えて問い、足した行は git の差分の代わりにこの保存の書き込み(Write の中身、Edit と MultiEdit の new_string で old_string に無い行)から決める。
 
 ## 捨てた案
 
@@ -18,5 +18,5 @@
 ## 理由
 
 1. 決まりの文書は利用者とフックが見ているが、メモリは Claude が一人で書き、誰も読み返さない。決まりの文書をどれほど抑えても、メモリで同じこと(例の並び・長い行)が起きる。フックは書いたその場で Claude に返すので、読み返す人がいなくても掛かる。
-2. 2つのフックは Edit・Write・MultiEdit の後に走り、その保存で書いた文字列を持っている。git の差分の代わりにそれを使えば、メモリでも、この保存で足した行だけを問える。
+2. 2つのフックは Edit・Write・MultiEdit の後に走り、その保存の old_string と new_string(Write では中身)を持っている。git の差分の代わりにそれを使えば、メモリでも、この保存で足した行だけを問える。old_string にあった行を除くので、写しただけの変わらない行は問わない。
 3. メモリの置き場は Claude Code が決めた形で、設定ディレクトリは環境変数 `CLAUDE_CONFIG_DIR`(無ければ `~/.claude`)。`~/.claude-work` のセッションもその変数を持つので、両方のディレクトリに掛かる。

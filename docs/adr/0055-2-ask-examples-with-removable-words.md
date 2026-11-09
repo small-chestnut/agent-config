@@ -1,6 +1,6 @@
 # 0055-2 例の並びの問いを、消せる語の問いと同じ知らせに入れる
 
-状態: 提案
+状態: 採用
 日付: 2026-11-10
 対象: ask_about_written_lines.py・check_rule_documents_changed_by_shell.py
 

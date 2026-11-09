@@ -1,13 +1,13 @@
 # 0055-memory-hook
 
-ステータス: 設計レビュー済み
+ステータス: 実装中
 
 ## 進捗
 
 - 利用者待ち: なし
-- [x] 1. やり方を決める(完了条件: 設計の節と ADR 2件(0055-1・0055-2、提案)をコミットした)
+- [x] 1. やり方を決める(完了条件: 設計の節と ADR 2件(0055-1・0055-2)をコミットした)
 - [x] 2. やり方を見直す(依存: 1)(完了条件: レビューの節に設計レビューの結果が1件ある(設計レビュー1件・指摘3件))
-- [ ] 3. 自動メモリに書いた行にも、字数の数えと問いが掛かる(依存: 2)(完了条件: テスト一覧の 1〜7 が通る)
+- [ ] 3. 自動メモリに書いた行にも、字数の数えと問いが掛かる(依存: 2)(完了条件: テスト一覧の 1〜7 と 11〜13 が通る)
 - [ ] 4. 書いた行の問いに、例の並びの問いが入る(シェルで書いた行も)(依存: 2)(完了条件: テスト一覧の 8〜10 が通る)
 - [ ] 5. できたものを見直す(依存: 3・4)(完了条件: レビューの節に実装レビューの結果が1件ある)
 
@@ -33,6 +33,8 @@ Claude が自動メモリ(会話をまたいで残すメモの md)を書く・�
 10. 問いの文は、`ask_about_written_lines.py` の1か所にだけある。
 11. `ask_removable_words.py` の名前は、リポジトリのどこにも残っていない(ADR を除く)。
 12. `python -m unittest discover -s tests` が全部通る。
+13. 自動メモリの Edit で、old_string から写した変わらない行と、書いた行を含むだけのほかの行は、足した行に数えない。
+14. 自動メモリを Write で書くと、全部の行を足した行とする。
 
 ## 設計
 
@@ -47,7 +49,7 @@ Claude が自動メモリ(会話をまたいで残すメモの md)を書く・�
 | `docs/specs/` の3つの仕様 | 下の「仕様」 | なし |
 | `.claude/rules/hooks.md` | `ask_removable_words.py` の目指す状態 | なし |
 
-読んだ ADR は 0041-1 だけ(書き換える所に効かないので、守ることは無い)。決定は ADR 0055-1(自動メモリにも掛ける)と 0055-2(例の問いを同じ知らせに入れ、名前を替える)に、状態「提案」で書いた。
+読んだ ADR は 0041-1 だけ(書き換える所に効かないので、守ることは無い)。決定は ADR 0055-1(自動メモリにも掛ける)と 0055-2(例の問いを同じ知らせに入れ、名前を替える)に書き、設計レビューを経て採用した。
 
 ### 全体の CLAUDE.md と prompt-structure に規則を足さない
 
@@ -60,14 +62,17 @@ Claude が自動メモリ(会話をまたいで残すメモの md)を書く・�
 - 設定ディレクトリは、環境変数 `CLAUDE_CONFIG_DIR` が空でなければそれ、無ければ `Path.home() / ".claude"`。
 - 自動メモリは、`<設定ディレクトリ>/projects/<1段>/memory/` の下にある、拡張子 `.md` のファイル。
 - 比べるパスは `os.path.abspath` と `os.path.normcase` を掛けたもので、リンク(ジャンクション)はたどらない。`~/.claude-work` の `projects` の下にはジャンクションがあり、たどると別の設定ディレクトリのパスになるため。
-- 関数 `is_memory(path: Path) -> bool` を足す。
+- 関数 `is_memory(path: Path) -> bool` を足し、その説明(docstring)の末尾に `(ADR 0055-1)` を付ける。
 
 ### 自動メモリの足した行(`check_rule_length.py`)
 
-- git の差分の代わりに、この保存で書いた文字列を使う。足した行は、書いた文字列の空でない1行(前後の空白を除く)を1つでも含む行。
-- 書いた文字列を取る `written_text(tool_input)` を、`ask_removable_words.py` から `check_rule_length.py` へ移す(中身は今のまま)。
-- 関数 `written_line_numbers(text: str, written: str) -> set[int]` を足す。
-- `read_rule_document(path, written)` は、書いた文字列を2つ目の引数で受け取る。自動メモリなら、git を見る前に `(path.as_posix(), 中身, written_line_numbers(中身, written))` を返す。自動メモリでなければ今のまま。
+- git の差分の代わりに、この保存の `tool_input` から足した行を決める。
+- Write(`content` があり `new_string` が無い)では、全部の行を足した行とする(`None` を返す)。
+- Edit と MultiEdit の各編集では、保存後の中身の中で `new_string` が現れる所(`replace_all` のときも、現れる所をみな)が掛かる行のうち、前後の空白を除いた本文が `old_string` のどの行の本文とも違う行を、足した行とする。`new_string` が空なら、足した行は無い。
+- `new_string` が保存後の中身に見つからなければ、その編集の足した行は無い。
+- 関数 `memory_added_lines(text: str, tool_input: dict) -> set[int] | None` を足す。
+- 書いた文字列を取る `written_text(tool_input)` を、`ask_removable_words.py` から `check_rule_length.py` へ移す(中身は今のまま)。問う行を決める `asked_lines` が使う。
+- `read_rule_document(path, tool_input)` は、`tool_input` を2つ目の引数で受け取る。自動メモリなら、git を見る前に `(path.as_posix(), 中身, memory_added_lines(中身, tool_input))` を返す。自動メモリでなければ今のまま。
 - `check(path, tool_input)` と `main()` は、`tool_input` を渡す。
 
 ### リンクの字数(`check_rule_length.py`)
@@ -78,7 +83,7 @@ Claude が自動メモリ(会話をまたいで残すメモの md)を書く・�
 ### 書いた行を問うフックの名前と問い(`ask_about_written_lines.py`)
 
 - `claude/hooks/ask_removable_words.py` を `git mv` で `claude/hooks/ask_about_written_lines.py` に替える。冒頭の説明も、2つを問うことに直す。
-- 問いの文を、モジュールの定数 `QUESTIONS` に置く。中身は次の2行(行頭の2つの空白も含む)。
+- 問いの文を、モジュールの定数 `QUESTIONS` に置き、その定義の上の行のコメントに `(ADR 0055-2)` を付ける。中身は次の2行(行頭の2つの空白も含む)。
 
   ```
     1. 消しても意味が変わらない語は、消す。
@@ -120,13 +125,12 @@ Claude が自動メモリ(会話をまたいで残すメモの md)を書く・�
 - `docs/specs/ask_removable_words.py.md` を `git mv` で `docs/specs/ask_about_written_lines.py.md` に替え、見出しを `# ask_about_written_lines.py` にする。
 - `docs/specs/ask_about_written_lines.py.md` の「ADR」の節を `- 0055-1 自動メモリにも、プロンプトの字数の数えと問いを掛ける` と `- 0055-2 例の並びの問いを、消せる語の問いと同じ知らせに入れる` の2行にし、「足した行を問い返す」の節に次の2行を足す。
   - `問いは、消しても意味が変わらない語と、決まりや事実を1文で言わずに具体例や出来事を並べている所の2つ。`
-  - `自動メモリでは、git の差分の代わりに、この保存で書いた文字列を含む行を足した行とする。`
+  - `自動メモリでは、HEAD から足した行の代わりに、check_rule_length.py と同じ決め方の足した行を使う。`
 - `docs/specs/check_rule_length.py.md` の「ADR」の節を `- 0055-1 自動メモリにも、プロンプトの字数の数えと問いを掛ける` にし、次を足す。
   - 「字数の数え方」に `リンク [文](先) は、文だけを数える。`(行の中のリンクの部分はバッククォートで囲む)
   - 新しい節 `## 自動メモリ` に、次の3行。
     - `設定ディレクトリ(CLAUDE_CONFIG_DIR、無ければ ~/.claude)の projects/<プロジェクト>/memory/ の下の md は、自動メモリ。`
-    - `自動メモリでは、この保存で書いた文字列を含む決まりの行を、足した行として数える。`
-    - `自動メモリのパスは、リンクをたどらずに比べる。`
+    - `自動メモリでは、Write は全部の行を、Edit と MultiEdit は new_string が掛かる行のうち old_string に無い行を、足した行として数える。`
   - 「プロンプト」の節の `git の外のファイルは数えない。` を `自動メモリのほかの、git の外のファイルは数えない。` に替える。
 - `docs/specs/check_rule_documents_changed_by_shell.py.md` の「ADR」の節に `- 0055-2 例の並びの問いを、消せる語の問いと同じ知らせに入れる` を足し、「知らせる」の節の `足した行を、空の行とコードブロックの中を除いて並べ、消しても意味が変わらない語を探すよう問う。` を `足した行を、空の行とコードブロックの中を除いて並べ、ask_about_written_lines.py と同じ2つを問う。` に替える。
 
@@ -152,9 +156,12 @@ Claude が自動メモリ(会話をまたいで残すメモの md)を書く・�
 | 9 | `test_コマンドで足した行にも同じ2つを問う` | test_check_rule_documents_changed_by_shell.py | 小 | 9 |
 | 10 | `test_問いの文はask_about_written_linesの1か所にだけある`(`QUESTIONS` の2行目の文が、`claude/hooks/` の中で `ask_about_written_lines.py` にだけある) | test_ask_about_written_lines.py | 小 | 10 |
 | — | `git grep -n ask_removable_words -- ':!docs/adr'` が何も出さない | — | — | 11 |
-| — | `python -m unittest discover -s tests` が 81 件 OK | 小 | — | 12 |
+| 11 | `test_自動メモリのEditでold_stringから写した変わらない行は知らせない` | test_check_rule_length.py | 小 | 13 |
+| 12 | `test_自動メモリで書いた行を含むだけのほかの行は知らせない` | test_check_rule_length.py | 小 | 13 |
+| 13 | `test_自動メモリをWriteで書くと全部の行を数える` | test_check_rule_length.py | 小 | 14 |
+| — | `python -m unittest discover -s tests` が 84 件 OK | 小 | — | 12 |
 
-テスト 5 は、`[` + 「あ」60 字 + `](x.md)` の行を知らせず、61 字の行を知らせる(境界値分析)。テスト 1・2・6 は Edit の new_string で書いた行を使う。
+テスト 5 は、`[` + 「あ」60 字 + `](x.md)` の行を知らせず、61 字の行を知らせる(境界値分析)。テスト 1・2・6 は Edit の new_string で書いた行を使う。テスト 11 は、old_string の 61 字の行 A を、new_string で A と 61 字の行 B の2行に替え、B の行だけを知らせる。テスト 12 は、前からある 61 字の行が new_string の短い行を一部に含んでも、知らせない。
 
 ### 既にある自動メモリ
 
