@@ -178,6 +178,12 @@ Claude が自動メモリ(会話をまたいで残すメモの md)を書く・�
 
 - install(`install.ps1 -Yes`)の後、`~/.claude/hooks/ask_removable_words.py` と `~/.claude-work/hooks/ask_removable_words.py` が残る(install は古いファイルを消さない)。どの設定からも呼ばれなくなるので、対象と理由を利用者に伝えてから `trash` で消す。
 
+### 設計への問い
+
+- 実装レビューの指摘1(`new_string` が行の一部で、保存後の中身に2か所以上あるときの決め方)は、設計が決めていない分かれ目で、直し方が利用者に見える動き(どの行を知らせ・問うか)を変えるので、PG は決めずに止めた。保存後の中身と `new_string` だけでは、どの所が書いた所か決まらない(`old_string` も行の一部で、前後の行が分からない)。
+- 選べる決め方は、(a) 決められないときは足した行を作らず、知らせも問いも出さない(書いた行を見逃すことがある)、(b) 全部の所を足した行とする(今の動き。書いていない行も出る)、(c) 保存前の中身を見る(フックは保存後にしか呼ばれないので、PreToolUse で控えを取る仕組みが要り、設計の範囲を超える)。
+- このときのテストも、テスト一覧に無いので、決め方に合わせて一覧に足す必要がある。
+
 ## 実装
 
 - 設計どおりに、`check_rule_length.py`(`is_memory`・`memory_added_lines`・`written_text` の移動・リンクの字数)、`ask_about_written_lines.py`(`git mv` の改名・`QUESTIONS`)、`check_rule_documents_changed_by_shell.py`、`user-settings.json`、3つの仕様、`.claude/rules/hooks.md`、テストの改名と追加を書いた。
