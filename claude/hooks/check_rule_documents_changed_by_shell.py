@@ -1,6 +1,6 @@
-"""Bash・PowerShell のコマンドで書き換えたプロンプトにも、字数の数えと消せる語の問いを掛ける(Claude Code の PreToolUse と PostToolUse のフック)。
+"""Bash・PowerShell のコマンドで書き換えたプロンプトにも、字数の数えと2つの問いを掛ける(Claude Code の PreToolUse と PostToolUse のフック)。
 
-check_rule_length.py と ask_removable_words.py は Edit・Write・MultiEdit にだけ掛かるため、
+check_rule_length.py と ask_about_written_lines.py は Edit・Write・MultiEdit にだけ掛かるため、
 シェルから書いた行はどちらも通らない。そこでコマンドの前後でプロンプトを見比べる。
   before(PreToolUse):  プロンプトの中身のスナップショットを一時ファイルに取る
   after(PostToolUse):  スナップショットと今のプロンプトの中身を比べ、このコマンドで足された行を数え、問う
@@ -20,6 +20,7 @@ import time
 from difflib import SequenceMatcher
 from pathlib import Path
 
+from ask_about_written_lines import QUESTIONS
 from check_rule_length import LIMIT, PROJECT_LIST, git, is_rule_document, read_patterns, too_long
 
 SNAPSHOT_DIR = Path(tempfile.gettempdir()) / "claude-rule-document-snapshots"
@@ -263,8 +264,9 @@ def after_command(event: dict) -> int:
         for f in long_lines:
             print("  " + f, file=sys.stderr)
     if asked:
-        print("このコマンドでプロンプトに足した行です。行ごとに、消しても意味が変わらない語を探し、あれば消してください:",
+        print("このコマンドでプロンプトに足した行です。行ごとに次の2つを確かめ、当たる所を直してください:",
               file=sys.stderr)
+        print(QUESTIONS, file=sys.stderr)
         for f in asked:
             print("  " + f, file=sys.stderr)
     return 2

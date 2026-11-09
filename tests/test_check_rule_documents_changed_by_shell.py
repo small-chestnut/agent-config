@@ -85,6 +85,13 @@ class コマンドの前後の動き(unittest.TestCase):
         self.assertIn("消しても意味が変わらない語", err)
         self.assertNotIn("CLAUDE.md:1", err)
 
+    def test_コマンドで足した行にも同じ2つを問う(self):
+        self.run_hook("before")
+        self.doc.write_text(f"{LONG}\n- 足した\n", encoding="utf-8")
+        err = self.run_hook("after").stderr.decode("utf-8")
+        self.assertIn("1. 消しても意味が変わらない語は、消す。", err)
+        self.assertIn("2. 言いたい決まりや事実を1文で言わずに、具体例や出来事を並べている所は", err)
+
     def test_コマンドで足した行はプロンプトに足した行と知らせる(self):
         self.run_hook("before")
         self.doc.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")

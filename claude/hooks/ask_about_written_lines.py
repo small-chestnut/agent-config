@@ -1,6 +1,6 @@
-"""プロンプトを保存したときに、この保存で足した行を並べ、消しても意味が変わらない語を探させる(Claude Code の PostToolUse フック)。
+"""プロンプトと自動メモリを保存したときに、この保存で足した行を並べ、2つ(消しても意味が変わらない語・具体例や出来事の並び)を問う(Claude Code の PostToolUse フック)。
 
-プロンプトと、HEAD から足された行の取り方は check_rule_length.py と同じ。
+プロンプトと自動メモリ、足された行の取り方は check_rule_length.py と同じ。
 問う行は、足された行のうち、この保存で書いた文字列(Edit・MultiEdit の new_string、Write の content)を含む行。
 空の行とコードブロックの中は除く。問う行があれば stderr に並べて exit 2(Claude に返る)。
 """
@@ -8,14 +8,13 @@ import json
 import sys
 from pathlib import Path
 
-from check_rule_length import read_rule_document
+from check_rule_length import read_rule_document, written_text
 
-
-def written_text(tool_input: dict) -> str:
-    """この保存で書いた文字列。"""
-    edits = tool_input.get("edits") or [tool_input]
-    parts = [e.get("new_string") or "" for e in edits] + [tool_input.get("content") or ""]
-    return "\n".join(parts)
+# 問いの文は、ここの1か所にだけ置く(check_rule_documents_changed_by_shell.py も import して使う)。(ADR 0055-2)
+QUESTIONS = (
+    "  1. 消しても意味が変わらない語は、消す。\n"
+    "  2. 言いたい決まりや事実を1文で言わずに、具体例や出来事を並べている所は、それらがみなそこから出てくる状態の1文に替える。"
+)
 
 
 def asked_lines(text: str, new_lines: set[int] | None, written: str) -> list[tuple[int, str]]:
@@ -44,7 +43,7 @@ def main() -> int:
     file_path = tool_input.get("file_path")
     if not file_path or not Path(file_path).is_file():
         return 0
-    doc = read_rule_document(Path(file_path))
+    doc = read_rule_document(Path(file_path), tool_input)
     if doc is None:
         return 0
     rel, text, new_lines = doc
@@ -52,8 +51,8 @@ def main() -> int:
     if not found:
         return 0
     sys.stderr.reconfigure(encoding="utf-8")
-    print("この保存で足した行です。行ごとに、消しても意味が変わらない語を探し、あれば消してください:",
-          file=sys.stderr)
+    print("この保存で足した行です。行ごとに次の2つを確かめ、当たる所を直してください:", file=sys.stderr)
+    print(QUESTIONS, file=sys.stderr)
     for n, body in found:
         print(f"  {rel}:{n}  {body}", file=sys.stderr)
     return 2
