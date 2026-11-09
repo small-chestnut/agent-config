@@ -146,6 +146,16 @@ class 自動メモリ(unittest.TestCase):
         added = crl.memory_added_lines(text, {"old_string": "- 古い", "new_string": "- 短い行"})
         self.assertEqual(added, {3})
 
+    def test_自動メモリのEditで書いた所が1つに決まらなければ現れる所をみな数える(self):
+        # 行の境目に当たる所が無い(行の一部)
+        text = f"- {'あ' * 55}の規則です\n- 短い行の規則\n"
+        added = crl.memory_added_lines(text, {"old_string": "foo", "new_string": "の規則"})
+        self.assertEqual(added, {1, 2})
+        # 行の境目に当たる所が2つ以上ある
+        text = "- 同じ行\n- 同じ行\n- 同じ行です\n"
+        added = crl.memory_added_lines(text, {"old_string": "x", "new_string": "- 同じ行"})
+        self.assertEqual(added, {1, 2, 3})
+
     def test_自動メモリをWriteで書くと全部の行を数える(self):
         self.assertIsNone(crl.memory_added_lines(f"{LONG}\n", {"content": f"{LONG}\n"}))
         self.memory.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")

@@ -28,3 +28,4 @@
 
 - 設定ディレクトリ(`CLAUDE_CONFIG_DIR`、無ければ `~/.claude`)の `projects/<プロジェクト>/memory/` の下の md は、自動メモリ。
 - 自動メモリでは、Write は全部の行を、Edit と MultiEdit は `new_string` が掛かる行のうち `old_string` に無い行を、足した行として数える。
+- 自動メモリの Edit で、書いた所が1つに決まらないときは、`new_string` が現れる所をみな足した行とする。

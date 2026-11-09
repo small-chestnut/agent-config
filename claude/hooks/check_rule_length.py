@@ -134,10 +134,11 @@ def memory_added_lines(text: str, tool_input: dict) -> set[int] | None:
         old_bodies = {line.strip() for line in (edit.get("old_string") or "").splitlines()}
         found = occurrences(text, new)
         if len(found) > 1 and not edit.get("replace_all"):
-            # 前後が行の境目の所が、書いた所。ほかの行の一部に同じ文字列があっても、そちらではない
+            # 前後が行の境目に当たる所が1つだけなら、そこが書いた所。決まらなければ、現れる所をみな書いた所とする
             whole = [p for p in found
                      if (p == 0 or text[p - 1] == "\n") and (p + len(new) == len(text) or text[p + len(new)] == "\n")]
-            found = whole or found
+            if len(whole) == 1:
+                found = whole
         for pos in found:
             for n in range(line_of(pos), line_of(pos + len(new) - 1) + 1):
                 body = lines[n].strip()
