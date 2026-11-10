@@ -1,13 +1,13 @@
 # 0059-model-selection
 
-ステータス: 設計レビュー済み
+ステータス: 実装中
 PC: Reo-Desktop
 
 ## 進捗
 
 - 利用者待ち: なし
 - [x] 1. やり方を決める(完了条件: 設計の節と ADR 0059-1 の2つがコミットされている。確かめた: 2つともコミットした)
-- [/] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の、設計への指摘が0件)
+- [x] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の、設計への指摘2件を直し、残りが0件)
 - [ ] 3. チームの手順を、仕事の難しさでモデルと effort を決める形に書き直す(依存: 2)(完了条件: 受け入れ条件 1〜17 の文が、6つのファイルにすべてある)
 - [ ] 4. あなた: PL のモデルを Opus 5.5 の medium に替える(依存: 3)(完了条件: `get_session` で引いた PL の model が `claude-opus-5-5`、effort が `medium`)
 - [ ] 5. PL に SE の effort を替えさせてみる(依存: 4)(完了条件: PL が替えた後に `get_session` で引いた SE の effort が、1回目は `medium`、2回目は `high`)
@@ -121,8 +121,8 @@ PC: Reo-Desktop
    - 「- `claude-opus-5-5` の medium でなければ、利用者に1行で伝えている。(ADR 0059-1)」
    - 「- 起こすときのモデルは、SE が `claude-opus-5-5`、PG と QA が `claude-sonnet-5-5`。(ADR 0059-1)」
    - 「- 起こすときの effort は、3つとも medium。(ADR 0059-1)」
-8. 「- 3つを起こしたら、3つのセッションの id を、各子セッションに `SendMessage` で渡している。」の次に、次の2行が、この順である。
-   - 「- チケットの SE の難しさが高なら、SE の effort を high に替えている。(ADR 0059-1)」
+8. 「### 目指す状態: ターンの受け渡しは、子セッションどうしが直接している」の下の最後に、次の2行が、この順である。
+   - 「- SE が難しさを高と知らせてきたら、SE の effort を high に替えている。(ADR 0059-1)」
    - 「- 替えるのは、`set_session_effort`。(ADR 0059-1)」
 
 `claude/skills/task-team-lead/CLAUDE.md`:
@@ -182,7 +182,7 @@ PC: Reo-Desktop
 | 役割 | 起こすときの値(PL が選ぶ) | 替える人 | 替えるとき |
 |---|---|---|---|
 | PL | 利用者が選ぶ(Opus 5.5 の medium) | 利用者 | PL が、違う値だと利用者に伝えたとき |
-| SE | Opus 5.5 の medium | PL | SE が、難しさを高と書いて知らせたとき(effort だけ high に) |
+| SE | Opus 5.5 の medium | PL | SE が、難しさを高と書いて PL に知らせ、PL がその知らせを受けたとき(effort だけ high に) |
 | PG・QA | Sonnet 5.5 の medium | SE | SE が、PG か QA に最初の仕事を頼む前 |
 
 - SE は、自分の仕事を高と書くことで、自分の effort を上げさせることになる(費用は、SWE-bench Pro の数字で medium の約1.4倍)。利用者が見られるように、難しさと理由を、SE の最初のターンの返答とチケットの「難しさ」の節に出す。
@@ -194,11 +194,11 @@ PC: Reo-Desktop
 | ファイル | すること |
 |---|---|
 | `claude/skills/task-team-se/SKILL.md` | 受け入れ条件 1〜5 の行を足す |
-| `claude/skills/task-team-lead/SKILL.md` | 受け入れ条件 6〜8 のとおり、1行を消し、6行を足す |
+| `claude/skills/task-team-lead/SKILL.md` | 受け入れ条件 6〜8 のとおり、1行を消し、6行を足す(4行は消した行の所、2行は受け渡しの見出しの下の最後) |
 | `claude/skills/task-team-lead/CLAUDE.md` | 受け入れ条件 9・10 のとおり、見出しと3行を、見出しと5行に替える |
 | `claude/skills/task-team-se/CLAUDE.md` | 受け入れ条件 11〜13 の行を足す |
 | `docs/用語集.md` | 受け入れ条件 14 の行を足す |
-| `docs/adr/0059-1-model-by-difficulty.md` | 設計レビューで指摘が無ければ、QA が状態を「採用」にする |
+| `docs/adr/0059-1-model-by-difficulty.md` | 書き換えない(設計レビューの指摘を直したときに、SE が状態を「採用」にした) |
 
 SKILL.md がプロンプトなので、その文書が仕様。`docs/specs/` に足すものは無い。
 
@@ -226,14 +226,16 @@ PL のモデルを Opus 5.5 の medium に替える。
 する人は PG。PL が Opus 5.5 の medium になってからする(サブタスク4 の後)。
 
 1. PG: `get_session` で PL の model と effort を引き、`claude-opus-5-5` の `medium` であることを「実装」の節に書く。
-2. PG: PL に `SendMessage` で、このチケットの「試運転」を読み、SE の effort を `set_session_effort` で `medium` に替えて PG に知らせるよう頼み、ターンを終える。
-3. PG: PL の知らせで始まったターンで、`get_session` で SE の effort を引く。`medium` なら次へ。
-4. PG: PL に、同じ形で、SE の effort を `high` に替えるよう頼み、ターンを終える。
-5. PG: PL の知らせで始まったターンで、`get_session` で SE の effort を引く。`high` なら、受け入れ条件 17 は済み。
-6. PG: 3 と 5 で引いた値と、PL のターンで利用者への確かめが出たか(PL の知らせに書いてもらう)を、「実装」の節に書く。
+2. PG: `get_session` で SE の effort を引き、試運転の前の値として「実装」の節に書く。
+3. PG: PL に `SendMessage` で、このチケットの「試運転」を読み、SE の effort を `set_session_effort` で `medium` に替えて PG に知らせるよう頼み、ターンを終える。
+4. PG: PL の知らせで始まったターンで、`get_session` で SE の effort を引く。`medium` なら次へ。
+5. PG: PL に、同じ形で、SE の effort を `high` に替えるよう頼み、ターンを終える。
+6. PG: PL の知らせで始まったターンで、`get_session` で SE の effort を引く。`high` なら、受け入れ条件 17 は済み。
+7. PG: 2 で書いた値が `high` でなければ、PL に、同じ形で、SE の effort をその値に戻すよう頼み、戻ったことを `get_session` で引く。
+8. PG: 4 と 6 で引いた値と、PL のターンで利用者への確かめが出たか(PL の知らせに書いてもらう)を、「実装」の節に書く。
 
 - 失敗する条件: PL が道具を呼べない・断られる。そのときは、PL の知らせの文を「設計への問い」に書いて、SE に知らせる。
-- SE の今のモデルは、利用者が手で上げた Fable 5.2。試運転で替えるのは effort だけで、終わると元の high に戻る。
+- 試運転で替えるのは、SE の effort だけ。SE のモデルには触らない。
 
 ### テスト一覧
 
@@ -260,3 +262,8 @@ PL のモデルを Opus 5.5 の medium に替える。
 - 試運転の最後の行が「SE の今のモデルは、利用者が手で上げた Fable 5.2」としているが、調べた事実2 では SE は `claude-opus-5-5` の high。試運転のあとに戻す値が、チケットから1つに決まらない。
 - テスト一覧: 文書だけの変更でテストを作らないのは、テストを作る決まりと合う。足す行は、SKILL.md の箇条書きの60字のテストに収まる。指摘なし。
 - ADR の番号: 足す行に (ADR 0059-1) を付ける設計で、指摘なし。ADR 0059-1 は、指摘があるので「提案」のまま。
+
+### 設計レビュー(1回目)の直し
+
+- 受け入れ条件 8: SE の effort を上げる2行を、子の知らせを受ける見出し(「ターンの受け渡しは、子セッションどうしが直接している」)の下に移し、きっかけを「SE が難しさを高と知らせてきたら」にした。
+- 試運転: SE のモデルを書いた行を消した。試運転の前に SE の effort を引いて書き、`high` でなければ終わりにその値へ戻す手順(2 と 7)を足した。
