@@ -241,5 +241,5 @@ description: PL から渡されたタスクの壁打ち・要件定義・設計�
 - 低は `claude-sonnet-5-5` の medium。
 - 中は `claude-opus-5-5` の medium、高は `claude-opus-5-5` の high。
 - SE の難しさが高なら、最初のターンで PL に知らせている。
-- PG と QA は、仕事を頼む前に、SE がモデルと effort を替えている。
+- 設計を書き終えたら、頼む前に、PG と QA のモデルと effort を替えている。
 - 替えるのは、`set_session_model` と `set_session_effort`。
