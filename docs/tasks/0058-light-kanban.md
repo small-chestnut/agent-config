@@ -51,7 +51,7 @@ PL が、リポジトリの決まりで聞かずに回すタスク(ADR 0046-3)�
 
 かんばんの更新の時刻:
 
-13. `claude/skills/team-kanban/SKILL.md` の「- 同じ書き込みで、`updated` の `at` を今の時刻にしている。」の次の行に、「- 今の時刻は、書き込む直前に `date -u +%Y-%m-%dT%H:%M:%SZ` で引いている。」がある。
+13. `claude/skills/team-kanban/SKILL.md` の「- 同じ書き込みで、`updated` の `at` を今の時刻にしている。」の次の行に、「- 今の時刻は、書き込む直前に、Bash の道具で `date -u +%Y-%m-%dT%H:%M:%SZ` を走らせて引いている。」がある。
 14. サブエージェントが書いた `datasets/cards` の `updated.at` と、サーバーが記録したその書き込みの時刻の差が、1分以内。
 
 ## 設計
@@ -113,9 +113,7 @@ PL が、リポジトリの決まりで聞かずに回すタスク(ADR 0046-3)�
 | `claude/skills/team-kanban/SKILL.md` に受け入れ条件 13 の行があることを、目で確かめる | — | 13 |
 | かんばんの更新の時刻の手順 2〜3 を実行した結果 | — | 14 |
 
-### 設計への問い
-
-レビューの実装の指摘(`date` が PowerShell 5.1 では現地時刻に Z を付けて返す)を直すには、受け入れ条件 13 の行に、どのシェルで引くかを足す必要がある(例: Bash の道具で引く、または PowerShell でも UTC を返す書き方にする)。受け入れ条件 13 の文は設計が一字一句決めているので、PG は変えずに止まった。どの文にするかを決めてほしい。
+Windows PowerShell 5.1 の `date` は `Get-Date -UFormat` になり、現地時刻に Z を付けて返すので、受け入れ条件 13 は Bash の道具で引く文にしている。Bash の道具は、Windows(Git Bash)・macOS・Linux のどれでも使え、`date -u` が UTC を返す(この PC の Git Bash で、10:45:50Z を返したのを確かめた)。
 
 ## 実装
 
