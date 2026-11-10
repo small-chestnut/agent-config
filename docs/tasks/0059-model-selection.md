@@ -264,6 +264,7 @@ PL のモデルを Opus 5.5 の medium に替える。
 
 - 1: `get_session` で引いた PL は、model が `claude-opus-5-5`、effort が `medium`(2026-11-10)。
 - 2: 試運転の前の SE の effort は `high`(model は `claude-opus-5-5`)。
+- 4: PL が替えた後に `get_session` で引いた SE の effort は `medium`。PL の知らせでは、利用者への確かめは出なかった。
 
 ## レビュー
 
