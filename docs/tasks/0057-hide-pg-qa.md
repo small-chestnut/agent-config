@@ -130,6 +130,7 @@ ADR: 0057-2(採用。0057-1 を置き換える)。書き換える行に付いた
 - 手順2: SE を `set_pinned` で外して付け直し、`get_session` で `pinned` が true と確かめた。
 - 手順5・6: `claude/skills/task-team-lead/CLAUDE.md` の2行と1行、`README.md` の「なぜ」を書いた。小のテスト(`python -m unittest discover -s tests`)は86件が通った。
 - 手順4(SKILL.md)は、手順3の利用者の確認の後に入れる。
+- 手順3の利用者の返事(2026-11-10、利用者が SE の会話にサイドバーの画面を送った): 「ピン留め済み」に「0057-hide-pg-qa SE」が出ている。畳んだ PL の下は「0057-hide-pg-qa PG」と「他に 1 件のネストされたセッション・未読 1 件」の2行。
 - (ADR 0057-1 の設計で)区切り「PG と QA」を作った。`move_sessions` は、入れ子のセッションだけを移せず失敗した。変更したファイルは無い。
 
 ## レビュー
