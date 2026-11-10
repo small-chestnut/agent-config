@@ -1,6 +1,6 @@
 # 0059-model-selection
 
-ステータス: 実装レビュー済み
+ステータス: 実装中
 PC: Reo-Desktop
 
 ## 進捗
@@ -110,7 +110,7 @@ PC: Reo-Desktop
    - 「- 低は `claude-sonnet-5-5` の medium。」
    - 「- 中は `claude-opus-5-5` の medium、高は `claude-opus-5-5` の high。」
    - 「- SE の難しさが高なら、最初のターンで PL に知らせている。」
-   - 「- PG と QA は、仕事を頼む前に、SE がモデルと effort を替えている。」
+   - 「- 設計を書き終えたら、頼む前に、PG と QA のモデルと effort を替えている。」
    - 「- 替えるのは、`set_session_model` と `set_session_effort`。」
 
 `claude/skills/task-team-lead/SKILL.md`:
@@ -183,7 +183,7 @@ PC: Reo-Desktop
 |---|---|---|---|
 | PL | 利用者が選ぶ(Opus 5.5 の medium) | 利用者 | PL が、違う値だと利用者に伝えたとき |
 | SE | Opus 5.5 の medium | PL | SE が、難しさを高と書いて PL に知らせ、PL がその知らせを受けたとき(effort だけ high に) |
-| PG・QA | Sonnet 5.5 の medium | SE | SE が、PG か QA に最初の仕事を頼む前 |
+| PG・QA | Sonnet 5.5 の medium | SE | SE が設計を書き終えたとき。QA か PG に頼む前に、PG と QA の両方を替える |
 
 - SE は、自分の仕事を高と書くことで、自分の effort を上げさせることになる(費用は、SWE-bench Pro の数字で medium の約1.4倍)。利用者が見られるように、難しさと理由を、SE の最初のターンの返答とチケットの「難しさ」の節に出す。
 - PG と QA を SE が替える道は、確かめた: 2026-11-10 に、この SE(権限のモードは bypassPermissions)から、QA の effort を high → medium → high、モデルを Opus → Sonnet → Opus と替えられ、利用者への確かめは出なかった。
@@ -294,3 +294,8 @@ PL のモデルを Opus 5.5 の medium に替える。
 - テスト: 文書だけでテストを作らないのは、テスト一覧と合う。小テスト 86 件・失敗 0 件は「実装」の節による。指摘なし。
 - ADR の番号: SKILL.md の足した行に (ADR 0059-1) がある。CLAUDE.md の行は「なぜ」で、番号を付けない受け入れ条件どおり。指摘なし。
 - 仕様: SKILL.md が仕様で、試運転の結果(PL が SE の effort を medium → high に替えられた)は、task-team-lead/SKILL.md の足した2行と合う。指摘なし。
+
+### 実装レビュー(1回目)の直し(設計)
+
+- 受け入れ条件 5 の4行目を「- 設計を書き終えたら、頼む前に、PG と QA のモデルと effort を替えている。」に替えた。SE は、設計を書き終えたときに、PG と QA の両方を替える。設計レビューで指摘が無く、QA が PG に実装を頼む道でも、PG は先に替わっている。作りの表の PG・QA の行も、同じ意味に直した。
+- PG が直す所: `claude/skills/task-team-se/SKILL.md` の「- PG と QA は、仕事を頼む前に、SE がモデルと effort を替えている。」の1行を、受け入れ条件 5 の4行目の文に替える。
