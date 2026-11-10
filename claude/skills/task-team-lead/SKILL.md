@@ -45,7 +45,10 @@ description: 利用者の話題をタスクにし、SE(壁打ち・設計)・PG(
 - SE への prompt は、`task-team-se` に従う指示と、タスクの文と、チケットの置き場。(ADR 0024-1)
 - 聞かずに回すタスクは、SE への prompt にそう添えている。(ADR 0056-2)
 - QA と PG への最初の prompt は、役割の skill を読んでターンを待つ指示だけ。
-- モデルと effort は、SE と QA が `claude-opus-5-5` の high、PG が `claude-sonnet-5-5` の medium。
+- 起こす前に、`get_session` で PL 自身のモデルと effort を引いている。(ADR 0059-1)
+- `claude-opus-5-5` の medium でなければ、利用者に1行で伝えている。(ADR 0059-1)
+- 起こすときのモデルは、SE が `claude-opus-5-5`、PG と QA が `claude-sonnet-5-5`。(ADR 0059-1)
+- 起こすときの effort は、3つとも medium。(ADR 0059-1)
 - SE は `use_worktree: true`、`branch_name` にタスク名。
 - PG と QA は、SE の worktree を `cwd` にし、`use_worktree: false`。
 - チケットだけのリポジトリでは、子セッション3つとも `use_worktree: false` で、PL のフォルダを `cwd` にする。
@@ -55,6 +58,8 @@ description: 利用者の話題をタスクにし、SE(壁打ち・設計)・PG(
 
 - 設計・レビュー・実装・直しの依頼は、子セッションどうしが `SendMessage` で送り合う。
 - 子セッションから戻ってきたもの(本番環境に触る作業・原則1 に触れる指摘)は、利用者に判断を聞いている。
+- SE が難しさを高と知らせてきたら、SE の effort を high に替えている。(ADR 0059-1)
+- 替えるのは、`set_session_effort`。(ADR 0059-1)
 
 ### 目指す状態: 採用した ADR を、利用者は終わったタスクの報告で知っている(ADR 0007-1)
 

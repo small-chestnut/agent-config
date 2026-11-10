@@ -1,15 +1,15 @@
 # 0059-model-selection
 
-ステータス: 実装中
+ステータス: 利用者の操作待ち(PL のモデルを Opus 5.5 の medium に替える)
 PC: Reo-Desktop
 
 ## 進捗
 
-- 利用者待ち: なし
+- 利用者待ち: PL のモデルを Opus 5.5 の medium に替える([0059-model-selection PG](#local_f893a2d6-d717-446b-a9fb-bb5cc4c6c3c1))
 - [x] 1. やり方を決める(完了条件: 設計の節と ADR 0059-1 の2つがコミットされている。確かめた: 2つともコミットした)
 - [x] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の、設計への指摘2件を直し、残りが0件)
-- [ ] 3. チームの手順を、仕事の難しさでモデルと effort を決める形に書き直す(依存: 2)(完了条件: 受け入れ条件 1〜17 の文が、6つのファイルにすべてある)
-- [ ] 4. あなた: PL のモデルを Opus 5.5 の medium に替える(依存: 3)(完了条件: `get_session` で引いた PL の model が `claude-opus-5-5`、effort が `medium`)
+- [x] 3. チームの手順を、仕事の難しさでモデルと effort を決める形に書き直す(依存: 2)(完了条件: 受け入れ条件 1〜14 の文が5つのファイルにある。確かめた: 足した59行・消した6行を差分で数えた。ADR は書き換えていない)
+- [/] 4. あなた: PL のモデルを Opus 5.5 の medium に替える(依存: 3)(完了条件: `get_session` で引いた PL の model が `claude-opus-5-5`、effort が `medium`)
 - [ ] 5. PL に SE の effort を替えさせてみる(依存: 4)(完了条件: PL が替えた後に `get_session` で引いた SE の effort が、1回目は `medium`、2回目は `high`)
 - [ ] 6. できたものを見直す(依存: 5)(完了条件: レビューの節の、実装への指摘が0件)
 
@@ -253,6 +253,12 @@ PL のモデルを Opus 5.5 の medium に替える。
 (まだ無い)
 
 ## 実装
+
+### サブタスク3
+
+- 受け入れ条件 1〜14 のとおり、5つのファイル(`task-team-se/SKILL.md`・`task-team-lead/SKILL.md`・`task-team-lead/CLAUDE.md`・`task-team-se/CLAUDE.md`・`docs/用語集.md`)を書き換えた。ADR 0059-1 は触っていない(状態は「採用」)。
+- 流したテスト: `python -m unittest discover -s tests` が 86 件、失敗 0 件(受け入れ条件 16)。lint のコマンドは無い。
+- 書き換えた行は、受け入れ条件が文面を決めているので、そのまま入れた。
 
 ## レビュー
 
