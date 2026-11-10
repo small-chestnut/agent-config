@@ -1,0 +1,323 @@
+<meta name="dash-one-writer">
+<style>
+.kb{container-type:inline-size;color:var(--color-fg);font-family:var(--font-anthropic-sans);font-size:1rem;line-height:1.6;
+--kb-sm:.875rem;--kb-md:1rem;--kb-lg:1.125rem;--kb-xl:1.75rem;
+--kb-accent:var(--color-fg);
+--kb-s1:color-mix(in oklab,var(--kb-accent) 45%,var(--color-bg));
+--kb-s2:color-mix(in oklab,var(--kb-accent) 65%,var(--color-bg));
+--kb-s3:color-mix(in oklab,var(--kb-accent) 82%,var(--color-bg));
+--kb-warn-bg:color-mix(in oklab,var(--color-warn) 8%,var(--color-bg))}
+.kb-title{font-family:var(--font-anthropic-serif);font-weight:400;font-size:2rem;line-height:1.3;margin:0 0 var(--cds-gap-sm)}
+.kb-lead{font-size:var(--kb-lg);margin:0 0 var(--cds-gap-lg)}
+.kb-num{font-family:var(--font-anthropic-serif);font-weight:400;font-size:var(--kb-xl);line-height:1;font-variant-numeric:tabular-nums;padding:0 .125rem}
+.kb-num-wait{color:var(--color-warn)}
+.kb-note{font-size:var(--kb-md);margin:0 0 var(--cds-gap-lg)}
+.kb-tabs{display:flex;flex-wrap:wrap;gap:var(--cds-gap-lg);border-bottom:1px solid var(--color-border-line);margin:0 0 var(--cds-gap-lg);min-height:2.875rem}
+.kb-tab{display:flex;align-items:center;gap:var(--cds-gap-xs);background:none;border:none;border-bottom:3px solid transparent;margin:0 0 -1px;padding:.5rem .125rem;font:inherit;font-size:var(--kb-lg);color:var(--color-fg);cursor:pointer}
+.kb-tab:hover{border-bottom-color:var(--color-border-line)}
+.kb-tab[aria-selected=true]{border-bottom-color:var(--kb-accent);font-weight:500}
+.kb-tab:focus-visible{outline:2px solid var(--kb-accent);outline-offset:2px}
+.kb-pill{background:var(--color-warn);color:var(--color-bg);font-size:var(--kb-sm);font-weight:500;border-radius:999px;padding:.0625rem .625rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.kb-waits{border:1px solid var(--color-warn);background:var(--kb-warn-bg);border-radius:.75rem;padding:var(--cds-pad-lg);margin:0 0 var(--cds-gap-lg)}
+.kb-waits:not(:has(.kb-wait-item)){display:none}
+.kb-waits-name{font-size:var(--kb-md);font-weight:500;color:var(--color-warn);margin:0 0 var(--cds-gap-xs)}
+.kb-waits ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:var(--cds-gap-sm)}
+.kb-wait-line{font-size:var(--kb-lg);font-weight:500;line-height:1.5}
+.kb-wait-sub{font-size:var(--kb-sm)}
+.kb-scroll{overflow-x:auto}
+.kb-board{display:grid;grid-template-columns:repeat(5,minmax(11.5rem,1fr));gap:var(--cds-gap-md)}
+.kb-col{--kb-stage:var(--color-fg-muted);--kb-colbg:color-mix(in oklab,var(--color-fg-muted) 7%,var(--color-bg));background:var(--kb-colbg);border-radius:.75rem;padding:var(--cds-pad-lg);min-width:0}
+.kb-st1{--kb-stage:var(--kb-s1);--kb-colbg:color-mix(in oklab,var(--kb-accent) 5%,var(--color-bg))}
+.kb-st2{--kb-stage:var(--kb-s2);--kb-colbg:color-mix(in oklab,var(--kb-accent) 8%,var(--color-bg))}
+.kb-st3{--kb-stage:var(--kb-s3);--kb-colbg:color-mix(in oklab,var(--kb-accent) 11%,var(--color-bg))}
+.kb-st4{--kb-stage:var(--kb-accent);--kb-colbg:color-mix(in oklab,var(--kb-accent) 14%,var(--color-bg))}
+.kb-col-head{display:flex;align-items:center;gap:var(--cds-gap-xs);margin:0 0 var(--cds-gap-sm)}
+.kb-dot{box-sizing:border-box;width:.75rem;height:.75rem;border-radius:50%;background:var(--kb-stage);flex:none}
+.kb-st0 .kb-dot{background:none;border:2px solid var(--kb-stage)}
+.kb-col-name{font-size:var(--kb-md);font-weight:500;margin:0}
+.kb-count{margin-left:auto;font-size:var(--kb-sm);font-variant-numeric:tabular-nums}
+.kb-cards{display:flex;flex-direction:column;gap:var(--cds-gap-sm);min-height:5rem}
+.kb-card{background:var(--color-bg);border:1px solid var(--color-border-line);border-radius:var(--cds-radius);padding:var(--cds-pad-lg);display:flex;flex-direction:column;gap:var(--cds-gap-xs)}
+.kb-card.kb-wait{border-color:var(--color-warn);background:var(--kb-warn-bg)}
+.kb-name{font-size:var(--kb-sm);color:var(--color-fg-muted);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.kb-goal{font-size:var(--kb-md);font-weight:500;line-height:1.5;margin:0}
+.kb-prog{display:flex;align-items:center;gap:var(--cds-gap-xs)}
+.kb-bar{flex:1;height:.375rem;border-radius:999px;background:color-mix(in oklab,var(--kb-stage) 20%,var(--color-bg));overflow:hidden}
+.kb-bar-fill{height:100%;border-radius:999px;background:var(--kb-stage)}
+.kb-frac{font-size:var(--kb-sm);font-variant-numeric:tabular-nums;white-space:nowrap}
+.kb-foot{display:flex;flex-wrap:wrap;align-items:center;gap:var(--cds-gap-xs)}
+.kb-chip{font-size:var(--kb-sm);border:1px solid var(--color-border-line);border-radius:999px;padding:0 .625rem;white-space:nowrap}
+.kb-badge{background:var(--color-warn);color:var(--color-bg);font-size:var(--kb-sm);font-weight:500;border-radius:999px;padding:0 .625rem;white-space:nowrap}
+[data-dash-source-state=refreshing]{opacity:.5}
+@container (max-width:760px){.kb-board{grid-template-columns:1fr}.kb-cards{min-height:0}.kb-title{font-size:1.625rem}}
+</style>
+<div class="kb">
+<h1 class="kb-title" id="kb-title">チームかんばん</h1>
+<p class="kb-lead" id="kb-lead">進行中のタスクは <b class="kb-num" data-draw="active" data-source="summary" data-field="active" data-row="0">—</b> 件、そのうち <b class="kb-num" data-draw="waiting" data-source="summary" data-field="waiting" data-row="0">—</b> 件があなたの答えを待っています。</p>
+<p class="kb-note" id="kb-empty" hidden>タスクは、まだ1つもありません。</p>
+
+<div class="kb-tabs" role="tablist" aria-label="リポジトリ" id="kb-tabs" data-draw="tabs" data-source="by-repo"></div>
+
+<div class="kb-waits" id="kb-waits"><h2 class="kb-waits-name">あなたの答えを待っているタスク</h2><ul data-draw="waits" data-source="cards"></ul></div>
+
+<div class="kb-scroll"><div class="kb-board" id="kb-board">
+<section class="kb-col kb-st0" id="col-mada"><div class="kb-col-head"><span class="kb-dot"></span><h2 class="kb-col-name">まだ</h2><span class="kb-count" data-draw="count" data-stage="まだ" data-source="stage-counts"></span></div><div class="kb-cards" data-draw="cards" data-source="cards" data-stage="まだ"></div></section>
+<section class="kb-col kb-st1" id="col-kabeuchi"><div class="kb-col-head"><span class="kb-dot"></span><h2 class="kb-col-name">壁打ち</h2><span class="kb-count" data-draw="count" data-stage="壁打ち" data-source="stage-counts"></span></div><div class="kb-cards" data-draw="cards" data-source="cards" data-stage="壁打ち"></div></section>
+<section class="kb-col kb-st2" id="col-sekkei"><div class="kb-col-head"><span class="kb-dot"></span><h2 class="kb-col-name">設計</h2><span class="kb-count" data-draw="count" data-stage="設計" data-source="stage-counts"></span></div><div class="kb-cards" data-draw="cards" data-source="cards" data-stage="設計"></div></section>
+<section class="kb-col kb-st3" id="col-jisso"><div class="kb-col-head"><span class="kb-dot"></span><h2 class="kb-col-name">実装</h2><span class="kb-count" data-draw="count" data-stage="実装" data-source="stage-counts"></span></div><div class="kb-cards" data-draw="cards" data-source="cards" data-stage="実装"></div></section>
+<section class="kb-col kb-st4" id="col-minaoshi"><div class="kb-col-head"><span class="kb-dot"></span><h2 class="kb-col-name">見直し</h2><span class="kb-count" data-draw="count" data-stage="見直し" data-source="stage-counts"></span></div><div class="kb-cards" data-draw="cards" data-source="cards" data-stage="見直し"></div></section>
+</div></div>
+</div>
+
+<script>
+// カードを出す列は、ここでステータスから決める。(ADR 0056-4)
+dash.loader('cards', {
+  description: 'チケットから写した行に、かんばんの列(まだ・壁打ち・設計・実装・見直し)と、あなた待ちかどうかを足す',
+  fn: ({answer}) => {
+    const rows = Array.isArray(answer) ? answer : [];
+    const stageOf = (status) => {
+      const s = String(status || '');
+      if (s === '壁打ち中') return '壁打ち';
+      if (s.indexOf('設計') === 0) return '設計';
+      if (s.indexOf('実装レビュー') === 0) return '見直し';
+      if (s.indexOf('実装') === 0 || s.indexOf('利用者の操作待ち') === 0) return '実装';
+      return 'まだ';
+    };
+    return rows.map((r) => ({
+      id: r.repo + '/' + r.task,
+      repo: r.repo,
+      machine: r.machine || '',
+      task: r.task,
+      goal: r.goal,
+      status: r.status,
+      stage: stageOf(r.status),
+      done: r.done == null ? null : Number(r.done),
+      total: r.total == null ? null : Number(r.total),
+      waiting: Boolean(r.waitingLine),
+      waitingLine: r.waitingLine || '',
+    }));
+  },
+});
+
+dash.onData(() => {
+  const d = dash.data('cards');
+  document.querySelectorAll('#kb-empty').forEach((el) => {
+    el.hidden = !(d.status === 'ok' && d.data.length === 0);
+  });
+});
+
+document.querySelectorAll('.kb').forEach((el) => el.style.setProperty('--kb-accent', dash.colors[0]));
+
+dash.calc('summary', {
+  inputs: ['cards'],
+  title: '進行中と、あなた待ちの数',
+  description: '全部のカードのうち、まだの列にないものと、あなた待ちのものを数えた数',
+  fn: (cards) => [{
+    active: cards.filter((t) => t.stage !== 'まだ').length,
+    waiting: cards.filter((t) => t.waiting === true).length,
+  }],
+});
+
+dash.calc('by-repo', {
+  inputs: ['cards'],
+  title: 'リポジトリごとのあなた待ちの数',
+  description: 'カードをリポジトリごとにまとめ、あなた待ちのものを数えた数',
+  fn: (cards) => {
+    const out = [];
+    cards.forEach((t) => {
+      let r = out.find((x) => x.repo === t.repo);
+      if (!r) { r = {repo: t.repo, waiting: 0}; out.push(r); }
+      if (t.waiting === true) r.waiting += 1;
+    });
+    return out;
+  },
+});
+
+dash.calc('stage-counts', {
+  inputs: ['cards'],
+  title: 'リポジトリと列ごとのカードの数',
+  description: '各リポジトリのカードを、列(まだ・壁打ち・設計・実装・見直し)ごとに数えた数',
+  fn: (cards) => {
+    const stages = ['まだ', '壁打ち', '設計', '実装', '見直し'];
+    const repos = [];
+    cards.forEach((t) => { if (!repos.includes(t.repo)) repos.push(t.repo); });
+    const out = [];
+    repos.forEach((repo) => stages.forEach((stage) => out.push({
+      key: repo + '/' + stage,
+      count: cards.filter((t) => t.repo === repo && t.stage === stage).length,
+    })));
+    return out;
+  },
+});
+
+function kbEnc(v) {
+  return String(v).replace(/[%&=]/g, (c) => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+}
+
+function kbMark(el, source, field, where) {
+  el.setAttribute('data-source', source);
+  el.setAttribute('data-field', field);
+  el.setAttribute('data-where', where);
+}
+
+function kbText(tag, cls, text) {
+  const el = document.createElement(tag);
+  if (cls) el.className = cls;
+  el.textContent = text;
+  return el;
+}
+
+function kbCurrent() {
+  const s = dash.data('by-repo');
+  const repos = s.status === 'ok' && s.data ? s.data.map((r) => r.repo) : [];
+  if (window.kbRepo && repos.includes(window.kbRepo)) return window.kbRepo;
+  let h = '';
+  try { h = decodeURIComponent(location.hash.slice(1)); } catch (e) { h = ''; }
+  if (h && repos.includes(h)) return h;
+  return repos.length ? repos[0] : null;
+}
+
+function kbSelect(repo) {
+  window.kbRepo = repo;
+  try { dash.setLink(repo); } catch (e) { /* リンクにできない名前は、タブだけ切り替える */ }
+  ['tabs', 'waits', 'count', 'cards'].forEach((n) => dash.draw(n));
+}
+
+dash.draw('active', (el) => {
+  const s = dash.data('summary');
+  el.textContent = s.status === 'ok' && s.data && s.data.length ? String(s.data[0].active) : '—';
+});
+
+dash.draw('waiting', (el) => {
+  const s = dash.data('summary');
+  const ok = s.status === 'ok' && s.data && s.data.length;
+  el.textContent = ok ? String(s.data[0].waiting) : '—';
+  el.classList.toggle('kb-num-wait', Boolean(ok) && s.data[0].waiting > 0);
+});
+
+dash.draw('tabs', (el) => {
+  const s = dash.data('by-repo');
+  el.replaceChildren();
+  if (s.status !== 'ok' || !s.data) return;
+  const cur = kbCurrent();
+  s.data.forEach((r) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'kb-tab';
+    b.id = 'tab-' + r.repo;
+    b.setAttribute('role', 'tab');
+    b.setAttribute('aria-selected', r.repo === cur ? 'true' : 'false');
+    const name = kbText('span', '', r.repo);
+    kbMark(name, 'by-repo', 'repo', 'repo=' + kbEnc(r.repo));
+    b.append(name);
+    if (r.waiting > 0) {
+      const pill = document.createElement('span');
+      pill.className = 'kb-pill';
+      const n = kbText('span', '', String(r.waiting));
+      kbMark(n, 'by-repo', 'waiting', 'repo=' + kbEnc(r.repo));
+      pill.append('待ち ', n);
+      b.append(pill);
+    }
+    b.addEventListener('click', () => kbSelect(r.repo));
+    el.append(b);
+  });
+});
+
+dash.draw('waits', (el) => {
+  const d = dash.data('cards');
+  el.replaceChildren();
+  if (d.status !== 'ok') return;
+  const cur = kbCurrent();
+  d.data.filter((t) => t.repo === cur && t.waiting === true).forEach((t) => {
+    const where = 'id=' + kbEnc(t.id);
+    const li = document.createElement('li');
+    li.className = 'kb-wait-item';
+    const line = kbText('div', 'kb-wait-line', t.waitingLine);
+    kbMark(line, 'cards', 'waitingLine', where);
+    const sub = document.createElement('div');
+    sub.className = 'kb-wait-sub';
+    const goal = kbText('span', '', t.goal);
+    kbMark(goal, 'cards', 'goal', where);
+    const task = kbText('span', '', t.task);
+    kbMark(task, 'cards', 'task', where);
+    sub.append(goal, '(', task);
+    if (t.machine) {
+      const pc = kbText('span', '', t.machine);
+      kbMark(pc, 'cards', 'machine', where);
+      sub.append('・PC: ', pc);
+    }
+    sub.append(')');
+    li.append(line, sub);
+    el.append(li);
+  });
+});
+
+dash.draw('count', (el) => {
+  const stage = el.getAttribute('data-stage');
+  const s = dash.data('stage-counts');
+  const cur = kbCurrent();
+  el.replaceChildren();
+  const row = s.status === 'ok' && s.data && cur ? s.data.find((r) => r.key === cur + '/' + stage) : null;
+  if (!row) return;
+  const n = kbText('span', '', String(row.count));
+  kbMark(n, 'stage-counts', 'count', 'key=' + kbEnc(row.key));
+  el.append(n);
+});
+
+dash.draw('cards', (el) => {
+  const stage = el.getAttribute('data-stage');
+  const d = dash.data('cards');
+  el.replaceChildren();
+  if (d.status === 'error') { el.append(kbText('p', 'kb-name', '読み込めませんでした')); return; }
+  if (d.status !== 'ok') return;
+  const cur = kbCurrent();
+  d.data.filter((t) => t.repo === cur && t.stage === stage).forEach((t) => {
+    const where = 'id=' + kbEnc(t.id);
+    const card = document.createElement('div');
+    card.className = 'kb-card' + (t.waiting === true ? ' kb-wait' : '');
+    const name = kbText('div', 'kb-name', t.task);
+    kbMark(name, 'cards', 'task', where);
+    const goal = kbText('p', 'kb-goal', t.goal);
+    kbMark(goal, 'cards', 'goal', where);
+    card.append(name, goal);
+    if (t.total) {
+      const prog = document.createElement('div');
+      prog.className = 'kb-prog';
+      const bar = document.createElement('div');
+      bar.className = 'kb-bar';
+      bar.setAttribute('aria-hidden', 'true');
+      const fill = document.createElement('div');
+      fill.className = 'kb-bar-fill';
+      fill.style.width = Math.max(0, Math.min(100, (Number(t.done) / Number(t.total)) * 100)) + '%';
+      bar.append(fill);
+      const frac = document.createElement('span');
+      frac.className = 'kb-frac';
+      const done = kbText('span', '', String(t.done));
+      kbMark(done, 'cards', 'done', where);
+      const total = kbText('span', '', String(t.total));
+      kbMark(total, 'cards', 'total', where);
+      frac.append('済み ', done, ' / ', total);
+      prog.append(bar, frac);
+      card.append(prog);
+    }
+    const foot = document.createElement('div');
+    foot.className = 'kb-foot';
+    if (t.stage === 'まだ' && t.status) {
+      const st = kbText('span', 'kb-chip', t.status);
+      kbMark(st, 'cards', 'status', where);
+      foot.append(st);
+    }
+    if (t.machine) {
+      const chip = document.createElement('span');
+      chip.className = 'kb-chip';
+      const pc = kbText('span', '', t.machine);
+      kbMark(pc, 'cards', 'machine', where);
+      chip.append('PC: ', pc);
+      foot.append(chip);
+    }
+    if (t.waiting === true) foot.append(kbText('span', 'kb-badge', 'あなた待ち'));
+    if (foot.childNodes.length) card.append(foot);
+    el.append(card);
+  });
+});
+</script>

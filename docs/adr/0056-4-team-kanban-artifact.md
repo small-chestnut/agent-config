@@ -2,7 +2,7 @@
 
 状態: 採用
 日付: 2026-11-10
-対象: task-team-lead・task-team-se・task-team-messaging・team-kanban
+対象: task-team-lead・task-team-se・task-team-messaging・team-kanban・team-kanban-page
 置き換える: 0035-1 の、PL が図を描いて出す所
 
 ## 決めたこと
