@@ -1,6 +1,6 @@
 # 0059-model-selection
 
-ステータス: 実装中
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -10,8 +10,8 @@ PC: Reo-Desktop
 - [x] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の、設計への指摘2件を直し、残りが0件)
 - [x] 3. チームの手順を、仕事の難しさでモデルと effort を決める形に書き直す(依存: 2)(完了条件: 受け入れ条件 1〜14 の文が5つのファイルにある。確かめた: 足した59行・消した6行を差分で数えた。ADR は書き換えていない)
 - [x] 4. あなた: PL のモデルを Opus 5.5 の medium に替える(依存: 3)(完了条件: `get_session` で引いた PL の model が `claude-opus-5-5`、effort が `medium`。確かめた: 2026-11-10 に引いて、model が `claude-opus-5-5`、effort が `medium`)
-- [/] 5. PL に SE の effort を替えさせてみる(依存: 4)(完了条件: PL が替えた後に `get_session` で引いた SE の effort が、1回目は `medium`、2回目は `high`)
-- [ ] 6. できたものを見直す(依存: 5)(完了条件: レビューの節の、実装への指摘が0件)
+- [x] 5. PL に SE の effort を替えさせてみる(依存: 4)(完了条件: PL が替えた後に `get_session` で引いた SE の effort が、1回目は `medium`、2回目は `high`。確かめた: PL が替えた後に引いた SE の effort は、1回目が `medium`、2回目が `high`)
+- [/] 6. できたものを見直す(依存: 5)(完了条件: レビューの節の、実装への指摘が0件)
 
 ## ゴール
 
@@ -265,6 +265,13 @@ PL のモデルを Opus 5.5 の medium に替える。
 - 1: `get_session` で引いた PL は、model が `claude-opus-5-5`、effort が `medium`(2026-11-10)。
 - 2: 試運転の前の SE の effort は `high`(model は `claude-opus-5-5`)。
 - 4: PL が替えた後に `get_session` で引いた SE の effort は `medium`。PL の知らせでは、利用者への確かめは出なかった。
+- 6: PL が2回目に替えた後に引いた SE の effort は `high`。PL の知らせでは、PL 自身の effort(medium)より高い値でも、利用者への確かめは出なかった(PL は bypassPermissions)。
+- 7: 試運転の前の値が `high` だったので、戻す操作は要らない。
+- 8: 受け入れ条件 17 は済み。SE のモデルには触れていない(`claude-opus-5-5` のまま)。
+
+### まとめ
+
+- 受け入れ条件 1〜14 は5つのファイルに入れ、15 は ADR が「採用」、16 は小テスト 86 件が失敗 0 件、17 は試運転で確かめた。
 
 ## レビュー
 
