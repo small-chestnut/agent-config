@@ -1,6 +1,6 @@
 # 0058-light-kanban
 
-ステータス: 実装レビュー済み
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -133,6 +133,12 @@ Windows PowerShell 5.1 の `date` は `Get-Date -UFormat` になり、現地時�
 
 - サブエージェントの最後の返答は、かんばんのリンク1行だけ。
 - ArtifactData の `get` で読んだ `datasets/cards` は、version 15、`updated.at` が 2026-11-10T10:39:51Z、サーバーの記録(`updatedAt`)が 10:39:56Z で、差は5秒(受け入れ条件 14)。
+- `python -m unittest discover -s tests`: 86件 OK。
+
+レビューの実装の指摘への直し: 受け入れ条件 13 の SE が決めた文(Bash の道具で `date` を走らせる)のとおりに `claude/skills/team-kanban/SKILL.md` の行を直した(b031ce9)。push した後、サブエージェントをもう一度起こした。
+
+- サブエージェントの最後の返答は、かんばんのリンク1行だけ。
+- `datasets/cards` は version 17、`updated.at` が 2026-11-10T10:47:11Z、サーバーの記録(`updatedAt`)が 10:47:20Z で、差は9秒(受け入れ条件 14)。
 - `python -m unittest discover -s tests`: 86件 OK。
 
 ## レビュー
