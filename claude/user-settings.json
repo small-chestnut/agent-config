@@ -9,6 +9,7 @@
   },
   "skipWorkflowUsageWarning": true,
   "theme": "auto",
+  "language": "japanese",
   "agentPushNotifEnabled": true,
   "permissions": {
     "deny": [
