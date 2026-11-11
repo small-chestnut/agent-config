@@ -105,9 +105,8 @@ task-team のセッションが、ほかのセッションから届いた利用�
 
 ## 実装
 
-- 設計の手順1・2・2b・3 のとおりに、3つの SKILL.md を直した。設計は変えていない。
-- 確かめたこと: 差分の `+-` の行が11行。`python -m unittest discover -s tests` は91件が通った(小)。lint のコマンドはこのリポジトリに無い。
-- レビューの実装1に合わせ、設計の手順5のとおりに、messaging の3行(利用者の言葉の見分け方)を、手順1の囲みの3行目〜5行目に替えた。`python -m unittest discover -s tests` は91件が通った。
+- 設計の手順1〜3 のとおりに、3つの SKILL.md を直した。設計は変えていない。
+- 確かめたこと: `grep -rn "ADR 0064-" claude/skills` は 0064-2 が4行で 0064-1 が0行。`grep -n "list_events"` は messaging で0行。`python -m unittest discover -s tests` は91件が通った(小)。lint のコマンドはこのリポジトリに無い。
 - 設計のとおりの行に、フックから「消せる語が無いか」の確認が出たが、設計の文のまま残した。
 
 ## レビュー
