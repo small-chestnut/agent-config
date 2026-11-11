@@ -242,11 +242,11 @@ frontmatter の description の「原則・目的・目指す状態・規則の4
 | ファイル | 今の行の言い方 | 新しい言い方 |
 |---|---|---|
 | `claude/CLAUDE.md` | 原則2 は、利用者に向けて書く文に当てている。 | 人間側の最適化の原則は、利用者に向けて書く文に当てている。 |
-| `claude/skills/task-team-lead/SKILL.md` | (本番環境に触る作業・原則1 に触れる指摘) | (本番環境に触る作業・全体の CLAUDE.md の安全の原則に触れる指摘) |
+| `claude/skills/task-team-lead/SKILL.md` | 子セッションから戻ってきたもの(本番環境に触る作業・原則1 に触れる指摘)は、利用者に判断を聞いている。 | 子セッションから戻った本番環境の作業と、CLAUDE.md の安全の原則に触れる指摘は、利用者に判断を聞いている。 |
 | `claude/skills/task-team-lead/SKILL.md` | CLAUDE.md 原則1 のとおりマージする | CLAUDE.md の安全の原則のとおりマージする |
 | `claude/skills/task-team-lead/SKILL.md` | 原則2 の、かんばんの書き直しの見出しに従っている | AI 側の最適化の原則の、かんばんの書き直しの見出しに従っている |
 | `claude/skills/task-team-qa/SKILL.md` | CLAUDE.md 原則1 に触れる指摘は | CLAUDE.md の安全の原則に触れる指摘は |
-| `CLAUDE.md`(リポジトリ直下) | 原則1 のとおり利用者に頼まれてから回す | 全体の CLAUDE.md の安全の原則のとおり利用者に頼まれてから回す |
+| `CLAUDE.md`(リポジトリ直下) | 原則1 のとおり利用者に頼まれてから回す | 安全の原則のとおり利用者に頼まれてから回す |
 
 ### 8. 全体の CLAUDE.md の照らす行(PG)
 
@@ -277,6 +277,7 @@ frontmatter の description の「原則・目的・目指す状態・規則の4
 - 設計 7. の2行は、新しい言い方にすると、1行の上限 60 字を超え、`check_rule_documents_changed_by_shell.py`・`check_rule_length.py` が止める。そのため2行は今の言い方のまま残した。60 字に収まる言い方を決めてほしい。
   - リポジトリ直下の `CLAUDE.md`: 「- permissions・フック・サンドボックスを変えるタスクは、全体の CLAUDE.md の安全の原則のとおり利用者に頼まれてから回す。」は 69 字。
   - `claude/skills/task-team-lead/SKILL.md`: 「- 子セッションから戻ってきたもの(本番環境に触る作業・全体の CLAUDE.md の安全の原則に触れる指摘)は、利用者に判断を聞いている。」は 68 字。
+  - SE の答え: 設計 7. の表の2行を、60 字に収まる言い方に直した。リポジトリ直下の CLAUDE.md は原則を持たないので、「安全の原則」で全体の CLAUDE.md のものと読める。どちらも `check_rule_length.py` の `too_long` で上限の内に収まるのを確かめた。
 
 ## 実装
 
