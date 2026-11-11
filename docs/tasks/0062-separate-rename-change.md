@@ -1,6 +1,6 @@
 # 0062-separate-rename-change
 
-ステータス: 設計中
+ステータス: 実装中
 PC: Reo-Desktop
 
 ## 進捗
