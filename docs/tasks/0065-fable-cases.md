@@ -1,6 +1,6 @@
 # 0065-fable-cases
 
-ステータス: 設計中
+ステータス: 設計レビュー中
 PC: Reo-Desktop
 
 ## 進捗
