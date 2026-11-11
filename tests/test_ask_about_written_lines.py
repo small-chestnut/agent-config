@@ -110,6 +110,32 @@ class 保存したときの問い(unittest.TestCase):
                                capture_output=True, env={**os.environ, "CLAUDE_CONFIG_DIR": tmp})
             self.assertEqual((r.returncode, r.stderr), (0, b""))
 
+    def test_段の見出しを足すとすぐ上の段から導いたかを問う(self):
+        for heading in ("# 原則1: 安全", "## 目的: 足した目的", "### 目指す状態: 足した状態"):
+            with self.subTest(heading=heading):
+                self.doc.write_text(f"- 前からある\n{heading}\n", encoding="utf-8")
+                code, err = self.edit(heading)
+                self.assertEqual(code, 2)
+                self.assertIn("3. 原則・目的・目指す状態の見出しは、すぐ上の段(原則なら命題)から導いた文にし", err)
+
+    def test_段の見出しを足していなければ段の問いを出さない(self):
+        self.doc.write_text("- 前からある\n- 足した\n", encoding="utf-8")
+        code, err = self.edit("- 足した")
+        self.assertEqual(code, 2)
+        self.assertNotIn("すぐ上の段", err)
+
+    def test_段の見出しに似た4段目の見出しでは段の問いを出さない(self):
+        self.doc.write_text("- 前からある\n#### 目的\n", encoding="utf-8")
+        code, err = self.edit("#### 目的")
+        self.assertEqual(code, 2)
+        self.assertNotIn("すぐ上の段", err)
+
+    def test_段の問いの文はask_about_written_linesの1か所にだけある(self):
+        sentence = "すぐ上の段(原則なら命題)から導いた文にし、下の段の手段の言葉を入れない。"
+        found = [p.name for p in SCRIPT.parent.glob("*.py")
+                 if sentence in p.read_text(encoding="utf-8")]
+        self.assertEqual(found, ["ask_about_written_lines.py"])
+
     def test_問いの文はask_about_written_linesの1か所にだけある(self):
         sentence = "具体例や出来事を並べている所は、それらがみなそこから出てくる状態の1文に替える。"
         found = [p.name for p in SCRIPT.parent.glob("*.py")

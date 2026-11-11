@@ -1,10 +1,11 @@
-"""プロンプトと自動メモリを保存したときに、この保存で足した行を並べ、2つ(消しても意味が変わらない語・具体例や出来事の並び)を問う(Claude Code の PostToolUse フック)。
+"""プロンプトと自動メモリを保存したときに、この保存で足した行を並べ、2つ(消しても意味が変わらない語・具体例や出来事の並び)と、段の見出しがあれば段の導き方を問う(Claude Code の PostToolUse フック)。
 
 プロンプトと自動メモリ、足された行の取り方は check_rule_length.py と同じ。
 問う行は、足された行のうち、この保存で書いた文字列(Edit・MultiEdit の new_string、Write の content)を含む行。
 空の行とコードブロックの中は除く。問う行があれば stderr に並べて exit 2(Claude に返る)。
 """
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -15,6 +16,16 @@ QUESTIONS = (
     "  1. 消しても意味が変わらない語は、消す。\n"
     "  2. 言いたい決まりや事実を1文で言わずに、具体例や出来事を並べている所は、それらがみなそこから出てくる状態の1文に替える。"
 )
+# 段の見出しの行があるときだけ足す問い。(ADR 0061-1)
+LAYER_QUESTION = "  3. 原則・目的・目指す状態の見出しは、すぐ上の段(原則なら命題)から導いた文にし、下の段の手段の言葉を入れない。"
+LAYER_HEADING = re.compile(r"^(?:# 原則|## 目的|### 目指す状態)")
+
+
+def questions_for(bodies: list[str]) -> str:
+    """問う行の本文の並びに出す問いの文。段の見出しがあれば段の問いを足す。"""
+    if any(LAYER_HEADING.match(body) for body in bodies):
+        return QUESTIONS + "\n" + LAYER_QUESTION
+    return QUESTIONS
 
 
 def asked_lines(text: str, new_lines: set[int] | None, written: str) -> list[tuple[int, str]]:
@@ -51,8 +62,8 @@ def main() -> int:
     if not found:
         return 0
     sys.stderr.reconfigure(encoding="utf-8")
-    print("この保存で足した行です。行ごとに次の2つを確かめ、当たる所を直してください:", file=sys.stderr)
-    print(QUESTIONS, file=sys.stderr)
+    print("この保存で足した行です。行ごとに次の問いを確かめ、当たる所を直してください:", file=sys.stderr)
+    print(questions_for([body for _, body in found]), file=sys.stderr)
     for n, body in found:
         print(f"  {rel}:{n}  {body}", file=sys.stderr)
     return 2

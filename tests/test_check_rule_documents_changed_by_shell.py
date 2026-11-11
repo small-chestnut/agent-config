@@ -92,6 +92,14 @@ class コマンドの前後の動き(unittest.TestCase):
         self.assertIn("1. 消しても意味が変わらない語は、消す。", err)
         self.assertIn("2. 言いたい決まりや事実を1文で言わずに、具体例や出来事を並べている所は", err)
 
+    def test_シェルで段の見出しを足しても段の問いが返る(self):
+        self.run_hook("before")
+        self.doc.write_text(f"{LONG}\n## 目的: 足した目的\n", encoding="utf-8")
+        r = self.run_hook("after")
+        self.assertEqual(r.returncode, 2)
+        self.assertIn("3. 原則・目的・目指す状態の見出しは、すぐ上の段(原則なら命題)から導いた文にし",
+                      r.stderr.decode("utf-8"))
+
     def test_コマンドで足した行はプロンプトに足した行と知らせる(self):
         self.run_hook("before")
         self.doc.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")
