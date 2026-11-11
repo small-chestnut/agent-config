@@ -86,7 +86,8 @@ description: 利用者の話題をタスクにし、SE(壁打ち・設計)・PG(
 - 子セッションから戻った本番環境の作業と、CLAUDE.md の安全の原則に触れる指摘は、利用者に判断を聞いている。
 - 利用者の許可を子セッションに届けるときは、skill `task-team-messaging` の届け方に従っている。(ADR 0064-2)
 - SE が難しさを高と知らせてきたら、SE の effort を high に替えている。(ADR 0059-1)
-- 替えるのは、`set_session_effort`。(ADR 0059-1)
+- SE が Fable と知らせてきたら、SE を `claude-fable-5-2` の high に替えている。(ADR 0065-1)
+- 替えるのは、`set_session_model` と `set_session_effort`。(ADR 0059-1・0065-1)
 
 ### 目指す状態: 採用した ADR を、利用者は終わったタスクの報告で知っている(ADR 0007-1)
 
