@@ -88,6 +88,6 @@ main にマージしたあとの `install.ps1 -Yes` で、`~/.claude/settings.js
 - 受け入れ条件1: json の `language` が `japanese` と出た。
 - 受け入れ条件3: `.claude/rules/settings.md` の末尾に、直した設計の文(母語の段)がある。
 - 既にあるテスト: `python -m unittest discover -s tests` が 86 件で OK。
-- 受け入れ条件2: `claude -p "What is 2+2? Answer in one short sentence." --settings claude/user-settings.json` が `Failed to authenticate: OAuth session expired and could not be refreshed` で失敗した(未確認)。再ログイン後に同じコマンドを走らせる必要がある。
+- 受け入れ条件2: `claude -p "What is 2+2? Answer in one short sentence." --settings claude/user-settings.json` が `Failed to authenticate: OAuth session expired and could not be refreshed` で失敗した(未確認)。利用者も再ログインで OAuth に失敗し、確認できなかったと知らせた。再ログインできたあとに同じコマンドを走らせる必要がある。
 
 ## レビュー
