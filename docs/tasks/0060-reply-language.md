@@ -5,7 +5,7 @@ PC: Reo-Desktop
 
 ## 進捗
 
-- 利用者待ち: なし
+- 利用者待ち: Claude Code の再ログイン(`claude` を端末で起動して `/login`)のあと、受け入れ条件2の確認を走らせる。[0060-reply-language-pg](#local_50dfab61-717e-48bc-9df8-d2b7d74a2cc2)
 - [x] 1. やり方を決める(完了条件: 設計の節がコミットされている。確かめた: 設計の節・受け入れ条件・難しさを書いてコミットした)
 - [/] 2. 返答の言葉を日本語に決める設定と、その「なぜ」を足す(依存: 1)(完了条件: 足した設定で、英語の問いへの返答が日本語になる)
 - [ ] 3. できたものを見直す(依存: 2)(完了条件: レビューの節の、実装への指摘が0件)
@@ -83,5 +83,11 @@ main にマージしたあとの `install.ps1 -Yes` で、`~/.claude/settings.js
 2. `--settings` は、そのファイルの設定を足して1回だけ起動する Claude Code の引数で、`~/.claude/settings.json` を書き換えない。
 
 ## 実装
+
+- `claude/user-settings.json` に `"language": "japanese",` を `theme` の次の行へ足した。`.claude/rules/settings.md` に設計の3行の段を足した。
+- 受け入れ条件1: json の `language` が `japanese` と出た。
+- 受け入れ条件3: `.claude/rules/settings.md` の末尾にその段がある。
+- 既にあるテスト: `python -m unittest discover -s tests` が 86 件で OK。
+- 受け入れ条件2: `claude -p "What is 2+2? Answer in one short sentence." --settings claude/user-settings.json` が `Failed to authenticate: OAuth session expired and could not be refreshed` で失敗した(未確認)。再ログイン後に同じコマンドを走らせる必要がある。
 
 ## レビュー
