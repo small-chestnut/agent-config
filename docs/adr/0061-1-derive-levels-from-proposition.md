@@ -1,6 +1,6 @@
 # 0061-1 プロンプトの段は、命題を頂点に、すぐ上の段から導いて書く
 
-状態: 採用
+状態: 提案
 日付: 2026-11-11
 対象: prompt-structure・ask_about_written_lines.py
 
