@@ -1,6 +1,6 @@
 # 0061-purpose-state-ratio
 
-ステータス: 設計レビュー済み
+ステータス: 実装中
 PC: Reo-Desktop
 
 ## 進捗
