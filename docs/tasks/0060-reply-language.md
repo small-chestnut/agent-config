@@ -41,7 +41,7 @@ agent-config を入れた Claude Code が、日本語でなく英語で返答す
 
 1. 配る設定 `claude/user-settings.json` の `language` が `japanese` である。
 2. 配る設定を読ませた Claude Code は、英語の問いにも日本語で返答する。
-3. `.claude/rules/settings.md` の「原則2: 私用」の下に、目的「利用者が、返答を母語で読める」、目指す状態「返答の言葉が、設定で利用者の母語に決まっている」、規則「`language` は、利用者の母語の `japanese`。」がある。
+3. `.claude/rules/settings.md` の「原則2: 私用」の下に、目的「利用者が、AI の出力を少ない負担で読める」、目指す状態「返答の言葉が、設定で利用者の母語に決まっている」、規則「`language` は、利用者の母語の `japanese`。」がある。
 
 ## 設計
 
@@ -51,7 +51,7 @@ agent-config を入れた Claude Code が、日本語でなく英語で返答す
 2. `.claude/rules/settings.md`: 「原則2: 私用」の既にある目的の段の後に、次の段を足す。する人: PG。
 
 ```
-## 目的: 利用者が、返答を母語で読める
+## 目的: 利用者が、AI の出力を少ない負担で読める
 
 ### 目指す状態: 返答の言葉が、設定で利用者の母語に決まっている
 
