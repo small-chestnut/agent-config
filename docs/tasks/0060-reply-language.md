@@ -1,13 +1,13 @@
 # 0060-reply-language
 
-ステータス: 実装中
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
 
 - 利用者待ち: なし
 - [x] 1. やり方を決める(完了条件: 設計の節がコミットされている。確かめた: 設計の節・受け入れ条件・難しさを書いてコミットした)
-- [/] 2. 返答の言葉を日本語に決める設定と、その「なぜ」を足す(依存: 1)(完了条件: 受け入れ条件1と3の確かめ方の2つが通る)
+- [x] 2. 返答の言葉を日本語に決める設定と、その「なぜ」を足す(依存: 1)(完了条件: 受け入れ条件1と3の確かめ方の2つが通る。確かめた: json の `language` が `japanese`、settings.md の末尾に3行の段がある、unittest 86件 OK)
 - [ ] 3. できたものを見直す(依存: 2)(完了条件: レビューの節の、実装への指摘が0件)
 - [ ] 4. あなた: 入れた設定で、英語で聞いても日本語で返るかを確かめる(依存: 3)(完了条件: 新しいセッションで英語で聞いた問いへの返答が日本語)
 
@@ -90,6 +90,6 @@ main にマージしたあとの `install.ps1 -Yes` で、`~/.claude/settings.js
 - 受け入れ条件1: json の `language` が `japanese` と出た。
 - 受け入れ条件3: `.claude/rules/settings.md` の末尾に、直した設計の文(母語の段)がある。
 - 既にあるテスト: `python -m unittest discover -s tests` が 86 件で OK。
-- 受け入れ条件2: `claude -p "What is 2+2? Answer in one short sentence." --settings claude/user-settings.json` が `Failed to authenticate: OAuth session expired and could not be refreshed` で失敗した(未確認)。利用者も再ログインで OAuth に失敗し、確認できなかったと知らせた。再ログインできたあとに同じコマンドを走らせる必要がある。
+- 受け入れ条件2: 設計どおり、install 後に利用者がするサブタスク4で確かめる(PG の `claude -p` はログインの期限切れで起動できなかった)。
 
 ## レビュー
