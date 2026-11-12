@@ -55,8 +55,9 @@ def has_status_line(text: str) -> bool:
     return any(line.startswith(STATUS_PREFIX) for line in text.splitlines()[:HEAD_LINES])
 
 
+# core.quotePath=false で、日本語のパスを八進数の引用の形にせず、そのまま読む。
 def touches_ticket(tree: str, git) -> bool:
-    code, out = git(["diff-tree", "-r", "--root", "--no-commit-id", "--name-status", "--no-renames", "HEAD"], tree)
+    code, out = git(["-c", "core.quotePath=false", "diff-tree", "-r", "--root", "--no-commit-id", "--name-status", "--no-renames", "HEAD"], tree)
     if code != 0:
         return False
     for line in out.splitlines():

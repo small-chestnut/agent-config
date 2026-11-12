@@ -219,6 +219,7 @@ PC: Reo-Desktop
 - 流したもの: `python -m unittest discover -s tests` が 111 件通った(lint のコマンドは無い)。
 - 受け入れ条件 7〜13 は grep で確かめた: `task-team-messaging` の「push」0件、3つの役割の「を読んでいる」0件、`task-team-lead` の `set_pinned` 0件・「SE を high で起こせなければ」1件、`claude/CLAUDE.md` 200 行で消す・移す4行0件、`module-layout` の移した行1件、リポジトリ直下の install の行1件。
 - 実際の git での通し(一時リポジトリに push)は、実行が許可されず、していない。git は偽物に差し替えたテストだけで確かめた。
+- 実装レビューの指摘の直し: 実装1は `diff-tree` に `-c core.quotePath=false` を付け、日本語の名前のテストを1件足した。実装2・3は、仕様の ADR の節の題を ADR の題に直した。`python -m unittest discover -s tests` が 112 件通った。
 
 ## レビュー
 

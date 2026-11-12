@@ -28,9 +28,13 @@ class 偽のgit:
         self.files = {"HEAD:docs/tasks/0001-x.md": TICKET} if files is None else files
         self.upstream, self.push_result = upstream, push_result
         self.calls = []
+        self.quote_path_off = False
 
     def __call__(self, args, cwd):
         self.calls.append((args, cwd))
+        self.quote_path_off = args[:2] == ["-c", "core.quotePath=false"]
+        if self.quote_path_off:
+            args = args[2:]
         if args[0] == "symbolic-ref":
             return (0, self.branch) if self.branch else (1, "")
         if args[0] == "diff-tree":
@@ -78,6 +82,14 @@ class チケットのコミットの後のpush(unittest.TestCase):
         git = 偽のgit()
         run("Set-Location 'y'; cd z; git commit -m y", git)
         self.assertEqual(git.pushes(), [(["push"], os.path.join(CWD, "z"))])
+
+    def test_日本語の名前のチケットをコミットしてもpushする(self):
+        path = "docs/tasks/0001-日本語.md"
+        git = 偽のgit(changed=(("A", path),), files={f"HEAD:{path}": TICKET})
+        run("git commit -m y", git)
+        diff_tree = [a for a, _ in git.calls if "diff-tree" in a]
+        self.assertEqual(diff_tree[0][:3], ["-c", "core.quotePath=false", "diff-tree"])
+        self.assertEqual(len(git.pushes()), 1)
 
     def test_チケットを消したコミットの後にもpushする(self):
         git = 偽のgit(changed=(("D", "docs/tasks/0001-x.md"),),
