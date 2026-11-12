@@ -1,6 +1,6 @@
 # 0070-two-difficulty-levels
 
-ステータス: 設計レビュー済み
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -8,8 +8,8 @@ PC: Reo-Desktop
 - 利用者待ち: なし
 - [x] 1. やり方を決める(完了条件: 設計の節に、直す5つのファイルと、足す・直す・消す行が文のまま書いてある。ADR 2件を提案で書いた)
 - [x] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の設計への指摘2件を、どれも設計の節と ADR 0070-1 で直し、ADR 0070-1・0070-2 が採用になった)
-- [ ] 3. 難しさを低と高の2段にする(依存: 2)(完了条件: skill `task-team-se` の SKILL.md と CLAUDE.md、skill `task-team-lead` の SKILL.md と CLAUDE.md、用語集に「中は、決まった枠」「中と高」「中か低」「3段」が0件。「ADR 0070-1」を含む行が、skill `task-team-se` の SKILL.md に3行、skill `task-team-lead` の SKILL.md に1行ある)
-- [ ] 4. 低の仕事を Sonnet 5.5 の high で動かす(依存: 2)(完了条件: skill `task-team-se` の SKILL.md に「低は `claude-sonnet-5-5` の high。(ADR 0070-2)」が1行あり、「`claude-sonnet-5-5` の medium」が0件)
+- [x] 3. 難しさを低と高の2段にする(依存: 2)(完了条件: skill `task-team-se` の SKILL.md と CLAUDE.md、skill `task-team-lead` の SKILL.md と CLAUDE.md、用語集で「中は、決まった枠」「中と高」「中か低」「3段」が0件になった。「ADR 0070-1」を含む行は、skill `task-team-se` の SKILL.md に3行、skill `task-team-lead` の SKILL.md に1行ある)
+- [x] 4. 低の仕事を Sonnet 5.5 の high で動かす(依存: 2)(完了条件: skill `task-team-se` の SKILL.md に「低は `claude-sonnet-5-5` の high。(ADR 0070-2)」が1行あり、「`claude-sonnet-5-5` の medium」が0件になった)
 - [ ] 5. できたものを見直す(依存: 3・4)(完了条件: レビューの節の実装の指摘が0件)
 
 ## 難しさ
@@ -132,6 +132,16 @@ ADR の状態の行は、SE が設計レビューのあとで直す(ADR 0069-3 �
 | `python -m unittest discover -s tests` が通る | 小 | (既にあるテストを壊していない) |
 
 ## 実装
+
+設計の「直すファイルと行」の5ファイルを、文のまま直した。
+
+- 確かめ方(テスト一覧のとおり):
+  - 「中は、決まった枠」「中と高」「中か低」「3段」「中も高」「中の仕事」「0069-3」「の medium。」の grep は、5ファイルのどれも0件。
+  - 「ADR 0070-1」を含む行は、skill `task-team-se` の SKILL.md に3行(237・247・255行目)、skill `task-team-lead` の SKILL.md に1行(75行目)。
+  - 受け入れ条件 1〜7 の行は、それぞれ1件ある。
+  - ADR 0069-3 の状態は「置き換え済み(0070-1)」、ADR 0059-1 は「採用」のまま(SE が直した状態を読んだだけ)。
+- テスト: `python -m unittest discover -s tests` は 91 件とも通った(小)。
+- lint: このリポジトリの CLAUDE.md に lint のコマンドは無い。
 
 ## レビュー
 

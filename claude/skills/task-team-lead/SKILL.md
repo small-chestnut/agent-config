@@ -72,7 +72,7 @@ description: 利用者の話題をタスクにし、SE(壁打ち・設計)・PG(
 - SE への依頼は、`task-team-se` に従う指示と、タスクの文と、チケットの置き場。(ADR 0024-1)
 - 聞かずに回すタスクは、SE への依頼にそう添えている。(ADR 0056-2)
 - 起こす前に、`get_session` で PL 自身のモデルと effort を引いている。(ADR 0059-1)
-- `claude-opus-5-5` の high でなければ、利用者に1行で伝えている。(ADR 0069-3)
+- `claude-opus-5-5` の high でなければ、利用者に1行で伝えている。(ADR 0070-1)
 - 起こすときのモデルは、SE が `claude-opus-5-5`、PG と QA が `claude-sonnet-5-5`。(ADR 0059-1)
 - 起こすときの effort は、3つとも medium。(ADR 0059-1)
 - SE は `use_worktree: true`、`branch_name` にタスク名。
