@@ -1,24 +1,30 @@
 # 0071-prompt-consistency-cleanup
 
-ステータス: 設計中
+ステータス: 設計レビュー中
 PC: Reo-Desktop
 
 ## 進捗
 
 - 利用者待ち: なし
-- [/] 1. やり方を決める(完了条件: 設計の節に、直すファイルと、消す・まとめる行が文のまま書いてある)
+- [x] 1. やり方を決める(完了条件: 設計の節に、直す11のファイルと足す3つのフック、消す・直す・移す行が文のまま書いてある。ADR 2件を提案で書いた)
+- [ ] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の設計への指摘が0件で、ADR 0071-1・0071-2 が採用)
+- [ ] 3. チケットをコミットしたら自動で push する(依存: 2)(完了条件: `tests/test_push_after_ticket_commit.py` の11件が通り、skill `task-team-messaging` の SKILL.md に「push」が0件)
+- [ ] 4. 役割の skill と一緒に task-team-messaging が読まれる(依存: 2)(完了条件: `tests/test_add_messaging_skill_to_team_roles.py` の4件が通り、skill `task-team-se`・`task-team-pg`・`task-team-qa` の SKILL.md に「`task-team-messaging` を読んでいる」が0件)
+- [ ] 5. SE を起こす手順を短くする(依存: 2)(完了条件: `tests/test_remind_pin_after_starting_se.py` の3件が通り、skill `task-team-lead` の SKILL.md に「`set_pinned`」と「`set_session_effort` で high」が0件)
+- [ ] 6. 全体の CLAUDE.md を 200 行以内にする(依存: 2)(完了条件: `claude/CLAUDE.md` が 200 行以内で、設計の節で消す・移す4行が0件)
+- [ ] 7. できたものを見直す(依存: 3・4・5・6)(完了条件: レビューの節の実装の指摘が0件)
 
 ## 難しさ
 
 - SE: 高(ADR 0067-1 のとおり、いつも高)
-- PG: 設計を書き終えたときに決める
-- QA: 設計を書き終えたときに決める
+- PG: 低(消す・直す・移す行は、設計の節に文のまま書いてある。フック3つも、動き・名前・つなぐ所・テストが設計の節に決まっていて、残るのは利用者に見えない中の作り。ADR 0070-2 のとおり Sonnet 5.5 の high)
+- QA: 高(設計レビューで、ADR 2件が利用者の「なぜ」と README の目的と既にある ADR に合うかと、消す行が止めていた失敗が戻らないかを見る、枠を決める仕事のレビュー。Fable の3つの特徴のうち、利用者が中身を確かめられない分野の知識は要らないので、Opus)
 
 ## ゴール
 
 規則を足し続けてきたプロンプト(全体の CLAUDE.md と skill)が肥大していないかを確かめ、食い違いを直し、要らない行を消して整理する。
 
-範囲外: permissions・サンドボックスの設定。hooks は、プロンプトの行から移す作業のためにだけ足す・直す。
+範囲外: permissions・サンドボックスの設定。hooks は、プロンプトの行から移す作業のためにだけ足す。テストの大きさの印の食い違い(ファイルと git を使うテストを小と呼んでいる)は、PL に知らせ、このタスクでは直さない。
 
 ## 壁打ち
 
@@ -68,7 +74,136 @@ PC: Reo-Desktop
 
 ## 受け入れ条件
 
+1. チケットの md を足す・直す・消したコミットの後に、フックが作業ブランチを push する。
+2. 上流の無いブランチでは、フックが、リモートと HEAD を指して push する。
+3. チケットに触れないコミットと、リモートの無いリポジトリと、ブランチに居ない HEAD では、フックが push しない。
+4. push に失敗したら、フックが git の出力を Claude に知らせる。
+5. SE・PG・QA の skill を読んだ直後に、フックが skill `task-team-messaging` の本文を Claude に渡す。
+6. `name` が `-se` で終わるセッションを起こした直後に、フックが、そのセッションをピン留めするよう Claude に知らせる。
+7. skill `task-team-messaging` の SKILL.md に、push の行と、見出し「チケットの今は、ほかの PC からも見える」が無い。
+8. skill `task-team-se`・`task-team-pg`・`task-team-qa` の SKILL.md に「始めるとき、skill `task-team-messaging` を読んでいる。」が無い。
+9. skill `task-team-lead` の SKILL.md の、SE を起こす手順に、`set_pinned` と `set_session_effort` の行が無く、「effort は、SE が high、PG と QA が medium で起こす。(ADR 0059-1・0071-2)」がある。
+10. skill `task-team-lead` の SKILL.md の名前の行は「`title` は `<タスク名> SE`、`name` は `<タスクの番号>-se` の形。PG と QA も同じ。」。
+11. skill `task-team-lead` の SKILL.md に、閉じる前のピン外しの行と、`wrap_up` のあとの本文の行が無く、チケットのコミットの行に「push」が無い。
+12. 全体の CLAUDE.md は 200 行以内で、force push の行・公開の入口の行・モジュールの単位の行・install の行が無い。
+13. skill `module-layout` の SKILL.md にモジュールの単位の2行があり、リポジトリ直下の CLAUDE.md に install の行がある。
+
 ## 設計
+
+### 読んだ ADR
+
+- 書き換える行に付いた番号: 0012-2・0022-2・0047-3・0056-5・0057-2・0059-1・0067-1。
+- 0067-1 の捨てた案5の根拠(PL が medium)は、ADR 0070-1 で PL が Opus 5.5 の high になり、無くなった。
+
+### 探したもの(ADR 0068-1)
+
+- 探した語: フック・push・ピン留め・`set_pinned`・effort・`task-team-messaging`・`additionalContext`。`claude/hooks/`・`docs/specs/`・`claude/skills/`・CLAUDE.md を grep した。
+- push をするフックは無い。`block_history_erasing_push.py` は、履歴を消す push を止めるだけ。
+- skill を読んだ後と、セッションを起こした後に掛かるフックは無い。
+- 道具の結果の後に Claude に知らせるフックは、プロンプトを保存した後にだけ掛かる(`check_rule_length.py` など)。
+
+### 消す行の決め方
+
+1. フック・deny・アプリが必ずする作業か、必ず止める作業を書いた行は消す。
+2. 同じときに読む別の文書と同じ規則の行は、1か所にだけ残す。
+3. 1つのリポジトリでだけ要る行は、そのリポジトリの CLAUDE.md へ移す。
+4. 道具の今の作りや、今の ADR と食い違う行は直す。
+
+- 全部のプロンプトを読んで、当たったのが下の行。
+- 当たらなかったもの: skill `draw-figure`・`explain-to-non-experts`・`notion-learning-log`・`notion-todo`・`prompt-structure`・`restructure-modules`・`team-kanban`・`team-kanban-page`・`ui-mockup` と、`.claude/rules/` の3つ。
+
+### 直すファイル(どれも PG)
+
+1. `claude/CLAUDE.md`(200 行以内にする)
+   - 消す: 「- force push は `--force-with-lease` でしている。」(素の `--force` は deny、`--force-with-lease` は ask で、設定が守っている。決め方1)
+   - 消す: 「- ほかのモジュールは、公開の入口だけを使っている。(ADR 0012-2)」(skill `module-layout` の、見出しに ADR 0012-2 の付いた「ほかのモジュールが使うものは、公開の入口から出している。」と同じ規則。決め方2)
+   - skill `module-layout` へ移す: 「- モジュールは、利用者が画面のナビやメニューで選ぶ行き先ごとにある。画面の無いシステムでは、扱うデータのまとまりごとにある。」(モジュールを作るときに読む skill の中身。決め方2)
+   - リポジトリ直下の CLAUDE.md へ移す: 「- agent-config の main にマージしたものは、`install.ps1 -Yes` か `install.sh --yes` で入れている。」(決め方3)
+2. `CLAUDE.md`(リポジトリ直下)
+   - 末尾に足す: 「- main にマージしたものは、`install.ps1 -Yes` か `install.sh --yes` で入れている。」
+3. `claude/skills/module-layout/SKILL.md`
+   - 「### 目指す状態: 業務の画面・処理・データの出し入れが、その業務のモジュールにある」の下の、いちばん上に足す: 「- モジュールは、利用者が画面のナビやメニューで選ぶ行き先ごとにある。」「- 画面の無いシステムでは、扱うデータのまとまりごとにある。」(1行にすると 60 字を越える)
+4. `claude/skills/task-team-lead/SKILL.md`
+   - 消す: 見出し「### 目指す状態: サイドバーの上には、利用者が話す PL と SE が出ている(ADR 0057-2)」と、その下の「- SE は、起こしたら、`set_pinned` でピン留めしている。」(フック `remind_pin_after_starting_se.py` が知らせる。決め方1)
+   - 直す: 「- 名前は `<タスク名>-se`・`<タスク名>-pg`・`<タスク名>-qa`。」→「- `title` は `<タスク名> SE`、`name` は `<タスクの番号>-se` の形。PG と QA も同じ。」(`start_session` の `name` は `[a-z0-9-]` の 24 字までで、タスク名の多くは入らない。このタスクの PG と QA の name は「0071-prompt-consisten-3」「0071-prompt-consisten-2」に切られた。決め方4)
+   - 直す: 「- 起こすときの effort は、3つとも medium。(ADR 0059-1)」→「- effort は、SE が high、PG と QA が medium で起こす。(ADR 0059-1・0071-2)」
+   - 消す: 「- SE を起こしたら、`set_session_effort` で high に替えてから、依頼を `SendMessage` で送る。(ADR 0067-1)」(ADR 0071-2)
+   - 直す: 「- まだ始めていないチケットは、`small-chestnut` のリポジトリなら既定のブランチにコミットし、push している。」→「- まだ始めていないチケットは、`small-chestnut` のリポジトリなら既定のブランチにコミットしている。」(push はフック。決め方1)
+   - 直す: 「- 終えるときは、作業ブランチでチケットとそのフォルダを消し、コミットして push している。(ADR 0022-2)」→「- 終えるときは、作業ブランチでチケットとそのフォルダを消し、コミットしている。(ADR 0022-2)」(同じ)
+   - 消す: 「- 子セッションを閉じるときは、先に SE のピン留めを `set_pinned` で外している。(ADR 0057-2)」(`archive_session` は、ピン留めしたセッションを閉じずに、そう返す。決め方1)
+   - 消す: 「- 報告は `wrap_up` のあとの本文で出している。」(アプリの指示が、`wrap_up` のあとの本文に報告を書かせている。決め方1)
+5. `claude/skills/task-team-lead/CLAUDE.md`
+   - 直す: 「- 起こすときの effort は、PL の effort を越えられない。SE は、起こしてから high に替える。」→「- 起こすときの effort は、PL の effort を越えられない。PL は high なので、SE は high で起こせる。」
+6. `claude/skills/task-team-messaging/SKILL.md`
+   - 消す: 見出し「### 目指す状態: チケットの今は、ほかの PC からも見える(ADR 0056-5)」と、その下の「- チケットをコミットしたら、作業ブランチを push している。」「- リモートの無いリポジトリでは、push を飛ばしている。」(フック `push_after_ticket_commit.py` がする。決め方1)
+7. `claude/skills/task-team-se/SKILL.md`・`claude/skills/task-team-pg/SKILL.md`・`claude/skills/task-team-qa/SKILL.md`
+   - 消す: 「- 始めるとき、skill `task-team-messaging` を読んでいる。」(フック `add_messaging_skill_to_team_roles.py` が渡す。決め方1)
+8. `.claude/rules/hooks.md`
+   - 末尾に足す:
+     - 「### 目指す状態: 道具を使った直後に例外なくする作業を、Claude が覚えていなくても抜かさない(ADR 0071-1)」
+     - 「- チケットの push は `push_after_ticket_commit.py`、`task-team-messaging` を読むのは `add_messaging_skill_to_team_roles.py` がしている。」
+     - 「- アプリの道具をフックから呼べるかは分からないので、SE のピン留めは `remind_pin_after_starting_se.py` が知らせている。」
+     - 「- 利用者は、必ずする作業をフックに移して、プロンプトの文量を浮かせたい。」
+9. `claude/user-settings.json` の `hooks`
+   - `PostToolUse` の matcher `Bash|PowerShell` の組の末尾に、`push_after_ticket_commit.py` を足す。
+   - `PostToolUse` に、matcher `Skill` の組を足し、`add_messaging_skill_to_team_roles.py` をつなぐ。
+   - `PostToolUse` に、matcher `mcp__ccd_session__start_session` の組を足し、`remind_pin_after_starting_se.py` をつなぐ。
+   - command は、今ある行と同じ形 `P=python3; python3 -c '' 2>/dev/null || P=python; "$P" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/<ファイル>"`。
+   - install は `claude/hooks/` のファイルをみな配るので、install のスクリプトは直さない。
+
+### 足すフック(どれも PG。ADR 0071-1 の番号は、各ファイルの先頭の説明の文に付ける)
+
+- 3つとも、Claude Code の PostToolUse の JSON を stdin で受け、Claude に知らせる文は stdout に `{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "<文>"}}` で出し、exit 0 で終わる。知らせることが無ければ何も出さない。
+- 外部(git・ファイル)に触る所は、関数の引数で渡し、テストで差し替える。
+
+1. `claude/hooks/push_after_ticket_commit.py`(ADR 0071-1・0056-5)
+   - `tool_name` が Bash か PowerShell で、`tool_input.command` に `git commit` を含むときだけ動く。git は入力の `cwd` で動かす。
+   - チケットは、HEAD のコミットで足した・直した・消した `.md` のうち、HEAD かその親での中身の冒頭5行に「ステータス: 」で始まる行があるもの。
+   - チケットが無い・リモートが無い・HEAD がブランチに居ないときは、何もしない。
+   - リモートは `origin`。無ければ `git remote` の1行目。
+   - 上流があれば `git push`、無ければ `git push -u <リモート> HEAD`。
+   - push したら「チケットのコミットを <リモート>/<ブランチ> へ push した。」を、失敗したら「チケットのコミットの push に失敗した:」と git の出力を知らせる。
+2. `claude/hooks/add_messaging_skill_to_team_roles.py`(ADR 0071-1)
+   - `tool_name` が Skill で、`tool_input.skill` が `task-team-se`・`task-team-pg`・`task-team-qa` のどれかのときだけ動く。
+   - `${CLAUDE_CONFIG_DIR:-~/.claude}/skills/task-team-messaging/SKILL.md` の、先頭の `---` で囲んだ所を除いた本文を、「skill `task-team-messaging` も読む。」の次の行から続けて知らせる。
+   - そのファイルが無ければ、何もしない。
+3. `claude/hooks/remind_pin_after_starting_se.py`(ADR 0071-1・0057-2)
+   - `tool_name` が `mcp__ccd_session__start_session` で、`tool_input.name` が `-se` で終わるときだけ、「起こした SE を、`set_pinned` でピン留めする。(ADR 0057-2)」を知らせる。
+
+### 作る仕様
+
+- `docs/specs/push_after_ticket_commit.py.md`・`docs/specs/add_messaging_skill_to_team_roles.py.md`・`docs/specs/remind_pin_after_starting_se.py.md`。
+- 冒頭は `# <ファイル名>`、節は `## ADR` と `## 動き`。
+- ADR の節は、上の「足すフック」の各ファイルの括弧の番号と題。動きの節は、各ファイルの行を、外から見える動きの文で書く。
+
+### テスト一覧
+
+| テスト名 | 大きさ | 受け入れ条件 |
+|---|---|---|
+| `tests/test_push_after_ticket_commit.py` の test_チケットを足したコミットの後に作業ブランチをpushする(コマンドは `cd x && git commit -m y`) | 小 | 1 |
+| test_チケットを消したコミットの後にもpushする | 小 | 1 |
+| test_ステータスの行が冒頭5行目にあるmdはチケットと見る | 小 | 1 |
+| test_ステータスの行が6行目にあるmdはチケットと見ない | 小 | 3 |
+| test_上流の無いブランチではリモートとHEADを指してpushする | 小 | 2 |
+| test_originが無ければgit_remoteの1行目のリモートへpushする | 小 | 2 |
+| test_チケットに触れないコミットの後にはpushしない | 小 | 3 |
+| test_リモートの無いリポジトリではpushしない | 小 | 3 |
+| test_ブランチに居ないHEADではpushしない | 小 | 3 |
+| test_git_commitでないコマンドの後には何もしない | 小 | 3 |
+| test_pushに失敗したらgitの出力をClaudeに知らせる | 小 | 4 |
+| `tests/test_add_messaging_skill_to_team_roles.py` の test_SEとPGとQAのskillを読んだ後にtask_team_messagingの本文を渡す | 小 | 5 |
+| test_ほかのskillを読んだ後には何も渡さない(`task-team-lead` と `draw-figure`) | 小 | 5 |
+| test_task_team_messagingのSKILL_mdが無ければ何も渡さない | 小 | 5 |
+| test_渡す本文から先頭のfrontmatterを除く | 小 | 5 |
+| `tests/test_remind_pin_after_starting_se.py` の test_nameがseで終わるセッションを起こした後にピン留めを知らせる(`0071-se`) | 小 | 6 |
+| test_nameがseで終わらないセッションの後には知らせない(`0071-pg` と `0071-sea`) | 小 | 6 |
+| test_nameの無いstart_sessionの後には知らせない | 小 | 6 |
+
+- 受け入れ条件 7〜13 はプロンプトだけの変更なので、テストを作らず、次で確かめる。
+  - `python -m unittest discover -s tests` が通る(SKILL.md の決まりの行が 60 字以内)。
+  - `wc -l claude/CLAUDE.md` が 200 以下。
+  - 受け入れ条件 7〜13 の文を、それぞれのファイルで grep して、無い文は0件、ある文は1件。
+  - `claude/user-settings.json` を `python -c "import json; json.load(open(...))"` で読め、3つのフックのファイル名がそれぞれ1回ずつ出る。
 
 ## 実装
 
