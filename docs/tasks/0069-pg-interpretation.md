@@ -1,16 +1,16 @@
 # 0069-pg-interpretation
 
-ステータス: 設計レビュー済み
+ステータス: 実装中
 PC: Reo-Desktop
 
 ## 進捗
 
 - 利用者待ち: なし
-- [x] 1. やり方を決める(完了条件: 設計の節に、直す6つのファイルと、足す・直す・消す行が文のまま書いてある。ADR 3件を提案で書いた)
-- [ ] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の設計への指摘を、どれも設計の節で直し、ADR 0069-1〜0069-3 が採用か却下になった)
+- [x] 1. やり方を決める(完了条件: 設計の節に、直す8つのファイルと、足す・直す・消す行が文のまま書いてある。ADR 3件を提案で書いた)
+- [x] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の設計への指摘2件を、どれも設計の節と ADR で直し、ADR 0069-1〜0069-3 が採用になった)
 - [ ] 3. PG が、利用者に見える動きを左右する所を SE に聞く形にする(依存: 2)(完了条件: skill `task-team-pg` と `task-team-se` の SKILL.md に「ADR 0069-1」を含む行が合わせて3行あり、「設計の節を同じコミットで直している」が0行)
 - [ ] 4. QA が、合意した設計と実装を照らす形にする(依存: 2)(完了条件: skill `task-team-qa` の SKILL.md に「ADR 0069-2」を含む見出しが1つあり、その下に行が7行ある。skill `task-team-se` の SKILL.md に「ADR 0069-2」を含む行が1行ある)
-- [ ] 5. 難しさが中の仕事を Opus 5.5 の high で動かす形にする(依存: 2)(完了条件: skill `task-team-se` の SKILL.md に「ADR 0069-3」を含む行が1行あり、「`claude-opus-5-5` の medium」が0行)
+- [ ] 5. 難しさが中の仕事を Opus 5.5 の high で動かす形にする(依存: 2)(完了条件: skill `task-team-se` と `task-team-lead` の SKILL.md に「ADR 0069-3」を含む行が合わせて2行あり、skill `task-team-se` の SKILL.md の「の medium、高は」と、skill `task-team-lead` の SKILL.md の「の medium でなければ」が0行)
 - [ ] 6. できたものを見直す(依存: 3・4・5)(完了条件: レビューの節の実装の指摘が0件か、どれも直した)
 
 ## 難しさ
@@ -77,7 +77,8 @@ PC: Reo-Desktop
 - skill `task-team-qa` で、設計の節が二通りに読める所は、設計の指摘にする。
 - skill `task-team-qa` で、この照らし合わせも、code-review と同じ1回のレビューで見る。
 - skill `task-team-se` で、難しさが中と高の仕事は、`claude-opus-5-5` の high。
-- skill `task-team-pg`・`task-team-qa`・`task-team-se` のフォルダの CLAUDE.md に、変えた形の「なぜ」がある。
+- skill `task-team-lead` で、PL は、自分が `claude-opus-5-5` の high でなければ、利用者に1行で伝える。
+- skill `task-team-pg`・`task-team-qa`・`task-team-se`・`task-team-lead` のフォルダの CLAUDE.md に、変えた形の「なぜ」がある。
 - どの SKILL.md と CLAUDE.md の箇条書きも、足した行は60字以内。
 
 ## 設計
@@ -87,16 +88,18 @@ PC: Reo-Desktop
 - `claude/skills/task-team-pg/SKILL.md` の21〜28行目、「目指す状態: 設計を変える判断は、PG がしていない」と「目指す状態: チケットの設計の節が、作ったものと合っている」。どちらも ADR は付いていない。
 - `claude/skills/task-team-se/SKILL.md` の221行目(「目指す状態: ターンが終わるとき、次の子セッションが動ける」の下。ADR は付いていない)と、241行目(見出し「各役割は、仕事を始める前に、難しさに合うモデルと effort になっている」に ADR 0059-1)。
 - `claude/skills/task-team-qa/SKILL.md` の、見出し「SE が作った本質的におかしな設計は…(ADR 0067-3)」の下の行の後、見出し「レビューは、公式の code-review を1回かけたもの」(ADR は付いていない)の前に、見出しを1つ足す。
-- 3つの skill のフォルダの `CLAUDE.md`(「なぜ」)。
+- `claude/skills/task-team-lead/SKILL.md` の75行目(行に ADR 0059-1)と、`claude/skills/task-team-lead/CLAUDE.md` の63行目(設計レビューの指摘2)。
+- 4つの skill のフォルダの `CLAUDE.md`(「なぜ」)。
 - 読んだ ADR: 0059-1(書き換える所に付いた番号)。足す見出しの隣の 0067-3 も読み、レビューを1回で終える決まり(理由5)に沿わせた。
 - 仕様: skill はプロンプトなので、SKILL.md が仕様。`docs/specs/` は直さない。用語集は直さない(「難しさ」の意味は変えない)。
 - タスク 0068-search-existing が直す所(skill `task-team-se` の「設計で読む ADR」の見出しとその前、全体の CLAUDE.md の原則3の1行)とは、同じ行に当たらない。
 
 ### ADR
 
-- [0069-1](../adr/0069-1-pg-asks-se-on-visible-choices.md)(提案): PG は、設計が決めていない所で利用者に見える動きを左右する所を判断せず、「設計への問い」にして SE に聞く。
-- [0069-2](../adr/0069-2-qa-checks-impl-against-agreed-design.md)(提案): QA の実装レビューは、code-review より先に、作ったものを、利用者が合意した時点の設計の節と受け入れ条件に照らす。
-- [0069-3](../adr/0069-3-middle-difficulty-opus-high.md)(提案): 難しさが中の仕事にも、高と同じ Opus 5.5 の high を割り当てる。ADR 0059-1 の中の割り当てだけを置き換えるので、0059-1 は「採用」のまま。
+- [0069-1](../adr/0069-1-pg-asks-se-on-visible-choices.md)(採用): PG は、設計が決めていない所で利用者に見える動きを左右する所を判断せず、「設計への問い」にして SE に聞く。
+- [0069-2](../adr/0069-2-qa-checks-impl-against-agreed-design.md)(採用): QA の実装レビューは、code-review より先に、作ったものを、利用者が合意した時点の設計の節と受け入れ条件に照らす。
+- [0069-3](../adr/0069-3-middle-difficulty-opus-high.md)(採用): 難しさが中の仕事にも、PL の仕事も含め、高と同じ Opus 5.5 の high を割り当てる。ADR 0059-1 の中の割り当てだけを置き換えるので、0059-1 は「採用」のまま。
+- 実装レビューの設計の指摘の流れは、今の skill のまま。SE は「設計への指摘で戻ってきたら…PG に実装を頼む」(手順 4-2)、PG は「レビューの指摘で戻ってきたら…PL に直したと知らせる」(skill `task-team-pg` の今の行)。QA はもう一度は見ない(ADR 0069-2 の捨てた案6)。この直しは実装レビューの後に入るので、照らす相手の決まり(手順 4-1)には当たらない。
 
 ### 手順(する人: すべて PG)
 
@@ -179,6 +182,7 @@ PC: Reo-Desktop
 - 照らすのは合意した時点の設計の節で、PG が書き換えた後の節ではない。
 - 問いへの SE の直しは問いの下に書かせ、合意の後に入った正しい直しと見分けている。
 - 二通りに読める所は、どちらが合意した中身かを知る SE に返している。
+- 実装レビューの設計の指摘は、SE と PG が直し、もう一度は見ない。往復を増やさないため。
 ```
 
 4. 同じファイルの「- レビューは、公式の code-review と、設計レビューの決まった3つの見る所だけでしている。」を、次の行に替える。
@@ -202,6 +206,18 @@ PC: Reo-Desktop
 - Opus 5.5 の medium は、LogiFee で SE が判断を誤り続けた設定。
 ```
 
+3. `claude/skills/task-team-lead/SKILL.md` の「- `claude-opus-5-5` の medium でなければ、利用者に1行で伝えている。(ADR 0059-1)」を、次の行に替える。
+
+```
+- `claude-opus-5-5` の high でなければ、利用者に1行で伝えている。(ADR 0069-3)
+```
+
+4. `claude/skills/task-team-lead/CLAUDE.md` の「- PL の仕事は、決まった枠の中で選ぶ仕事で、Opus 5.5 の medium で足りる。」を、次の行に替える。
+
+```
+- PL の仕事は、決まった枠の中で選ぶ中の仕事なので、Opus 5.5 の high にしている。
+```
+
 #### コミット
 
 - 3・4・5 は、どれも動きを変える変更なので、1つのコミットにしてよい。コミットメッセージの本文に、利用者が合意した設計から PG の解釈のずれで外れた実装が通るのを防ぐためだと1文で書く。
@@ -220,8 +236,9 @@ PC: Reo-Desktop
 | `grep -n "設計への指摘で戻ってきたら" claude/skills/task-team-se/SKILL.md` が1行を返し、`grep -n "設計レビューの指摘で戻ってきたら" claude/skills/task-team-se/SKILL.md` が何も返さない | 5つ目 |
 | `grep -n "ADR 0069-2" claude/skills/task-team-qa/SKILL.md` が見出し1行を返し、その見出しの下に「- 」で始まる行が7行ある | 6〜12個目 |
 | `grep -n "ADR 0069-3" claude/skills/task-team-se/SKILL.md` が「中と高は」の1行を返し、`grep -n "の medium、高は" claude/skills/task-team-se/SKILL.md` が何も返さない | 13個目 |
-| `git diff main -- claude/skills/task-team-pg/CLAUDE.md claude/skills/task-team-qa/CLAUDE.md claude/skills/task-team-se/CLAUDE.md` に、手順 3-3・4-3・4-4・5-2 の行がある | 14個目 |
-| `python -m unittest discover -s tests` が通る(SKILL.md の箇条書きが60字以内のテストを含む) | 15個目(ほかを壊していない) |
+| `grep -n "ADR 0069-3" claude/skills/task-team-lead/SKILL.md` が「の high でなければ」の1行を返し、`grep -n "の medium でなければ" claude/skills/task-team-lead/SKILL.md` が何も返さない | 14個目 |
+| `git diff main -- claude/skills/task-team-pg/CLAUDE.md claude/skills/task-team-qa/CLAUDE.md claude/skills/task-team-se/CLAUDE.md claude/skills/task-team-lead/CLAUDE.md` に、手順 3-3・4-3・4-4・5-2・5-4 の行がある | 15個目 |
+| `python -m unittest discover -s tests` が通る(SKILL.md の箇条書きが60字以内のテストを含む) | 16個目(ほかを壊していない) |
 
 ### サブタスクの前提
 
