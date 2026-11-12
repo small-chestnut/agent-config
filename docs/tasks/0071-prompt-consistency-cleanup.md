@@ -1,13 +1,13 @@
 # 0071-prompt-consistency-cleanup
 
-ステータス: 設計レビュー中
+ステータス: 設計レビュー済み
 PC: Reo-Desktop
 
 ## 進捗
 
 - 利用者待ち: なし
 - [x] 1. やり方を決める(完了条件: 設計の節に、直す11のファイルと足す3つのフック、消す・直す・移す行が文のまま書いてある。ADR 2件を提案で書いた)
-- [ ] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の設計への指摘が0件で、ADR 0071-1・0071-2 が採用)
+- [/] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の設計への指摘が0件で、ADR 0071-1・0071-2 が採用)
 - [ ] 3. チケットをコミットしたら自動で push する(依存: 2)(完了条件: `tests/test_push_after_ticket_commit.py` の11件が通り、skill `task-team-messaging` の SKILL.md に「push」が0件)
 - [ ] 4. 役割の skill と一緒に task-team-messaging が読まれる(依存: 2)(完了条件: `tests/test_add_messaging_skill_to_team_roles.py` の4件が通り、skill `task-team-se`・`task-team-pg`・`task-team-qa` の SKILL.md に「`task-team-messaging` を読んでいる」が0件)
 - [ ] 5. SE を起こす手順を短くする(依存: 2)(完了条件: `tests/test_remind_pin_after_starting_se.py` の3件が通り、skill `task-team-lead` の SKILL.md に「`set_pinned`」と「`set_session_effort` で high」が0件)
@@ -208,3 +208,11 @@ PC: Reo-Desktop
 ## 実装
 
 ## レビュー
+
+### 設計レビュー(QA、35ced4f)
+
+- 設計1: `push_after_ticket_commit.py` は入力の `cwd` で git を動かすが、`git -C <作業ツリー> commit` や `cd <作業ツリー> && git commit` で別の作業ツリーにコミットしたときの場所が決まっていない。skill `task-team-lead` の SKILL.md 111〜113行目のとおり PL が既定のブランチの作業ツリーで未着手のチケットをコミットすると、フックは cwd の HEAD を見て push せず、109行目から push の行も消えるので、受け入れ条件1が果たせない。
+- 設計2: テスト名の「コマンドは `cd x && git commit -m y`」で、git を x と入力の `cwd` のどちらで動かすかが二通りに読める。設計1と合わせて、どこの HEAD を見るかを設計の節に書く。
+- 設計3: ADR 0071-2 と、skill `task-team-lead` の CLAUDE.md の直し「PL は high なので、SE は high で起こせる。」は、PL が high でないときを決めていない。SKILL.md 75行目は PL が `claude-opus-5-5` の high でない場合を想定していて、そのとき `start_session` の effort は PL 以下しか選べず(道具の説明)、`set_session_effort` の行も消えるので、SE が high にならない(ADR 0067-1 に反する)。
+- 設計4: 「子セッションを閉じるときは、先に SE のピン留めを `set_pinned` で外している。(ADR 0057-2)」を消すのに、それを決めた ADR 0057-2(決めたこと「ピン留めを外してから閉じる」・理由4)を置き換える ADR が無い。チケットの「分かっていること」の最後の行のとおり、ADR 0071-1 に入れるか、0057-2 の一部を置き換える ADR が要る。
+- テスト一覧・ADR の番号・仕様の作り方には、指摘なし。Fable の印(ADR を消す・同じ決まりを3回変える)は無い。
