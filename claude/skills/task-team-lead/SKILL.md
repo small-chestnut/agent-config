@@ -68,9 +68,9 @@ description: 利用者の話題をタスクにし、SE(壁打ち・設計)・PG(
 - 名前は `<タスク名>-se`・`<タスク名>-pg`・`<タスク名>-qa`。
 - 起こし方は `start_session` の user_asked・fresh。
 - 順は、SE を起こし、`get_session` で worktree を引いてから、QA と PG。
-- SE への prompt は、`task-team-se` に従う指示と、タスクの文と、チケットの置き場。(ADR 0024-1)
-- 聞かずに回すタスクは、SE への prompt にそう添えている。(ADR 0056-2)
-- QA と PG への最初の prompt は、役割の skill を読んでターンを待つ指示だけ。
+- 最初の prompt は、3つとも、役割の skill を読んでターンを待つ指示だけ。(ADR 0067-1)
+- SE への依頼は、`task-team-se` に従う指示と、タスクの文と、チケットの置き場。(ADR 0024-1)
+- 聞かずに回すタスクは、SE への依頼にそう添えている。(ADR 0056-2)
 - 起こす前に、`get_session` で PL 自身のモデルと effort を引いている。(ADR 0059-1)
 - `claude-opus-5-5` の medium でなければ、利用者に1行で伝えている。(ADR 0059-1)
 - 起こすときのモデルは、SE が `claude-opus-5-5`、PG と QA が `claude-sonnet-5-5`。(ADR 0059-1)
@@ -79,15 +79,16 @@ description: 利用者の話題をタスクにし、SE(壁打ち・設計)・PG(
 - PG と QA は、SE の worktree を `cwd` にし、`use_worktree: false`。
 - チケットだけのリポジトリでは、子セッション3つとも `use_worktree: false` で、PL のフォルダを `cwd` にする。
 - 3つを起こしたら、3つのセッションの id を、各子セッションに `SendMessage` で渡している。
+- SE を起こしたら、`set_session_effort` で high に替えてから、依頼を `SendMessage` で送る。(ADR 0067-1)
 
 ### 目指す状態: ターンの受け渡しは、子セッションどうしが直接している
 
 - 設計・レビュー・実装・直しの依頼は、子セッションどうしが `SendMessage` で送り合う。
 - 子セッションから戻った本番環境の作業と、CLAUDE.md の安全の原則に触れる指摘は、利用者に判断を聞いている。
 - 利用者の許可を子セッションに届けるときは、skill `task-team-messaging` の届け方に従っている。(ADR 0064-2)
-- SE が難しさを高と知らせてきたら、SE の effort を high に替えている。(ADR 0059-1)
-- SE が Fable と知らせてきたら、SE を `claude-fable-5-2` の high に替えている。(ADR 0065-1)
-- 替えるのは、`set_session_model` と `set_session_effort`。(ADR 0059-1・0065-1)
+- SE を Fable にする知らせは、SE か QA から届く。(ADR 0067-2)
+- その知らせが届いたら、SE を `claude-fable-5-2` の high に替えている。(ADR 0065-1)
+- 替えるのは、`set_session_model` と `set_session_effort`。(ADR 0059-1・0065-1・0067-1)
 
 ### 目指す状態: 採用した ADR を、利用者は終わったタスクの報告で知っている(ADR 0007-1)
 
@@ -111,7 +112,7 @@ description: 利用者の話題をタスクにし、SE(壁打ち・設計)・PG(
 - されていなければ、コミットせずに置き、利用者に伝えている。
 - 既定のブランチの作業ツリーは、`git worktree list` の1行目。
 - チームを起こすときは、そのタスクの「未着手」か「検討待ち」のチケットを、チームのチケットにしている。
-- コミットされていないチケットでチームを起こすときは、SE への prompt にそのパスを添えている。
+- コミットされていないチケットでチームを起こすときは、SE への依頼にそのパスを添えている。
 - チームが動いているタスクのチケットは、ステータスによらず進行中と読んでいる。
 
 ### 目指す状態: 進行中のタスクは、ほかの PC でチームを起こし直して続けられる(ADR 0056-5)
@@ -120,7 +121,7 @@ description: 利用者の話題をタスクにし、SE(壁打ち・設計)・PG(
 - 起こし直す前に `git fetch` し、そのタスクの作業ブランチの worktree を作っている。
 - worktree は、`git worktree add <フォルダ> <作業ブランチ>` で作っている。
 - 子セッション3つとも、その worktree を `cwd` にし、`use_worktree: false` で起こしている。
-- SE への prompt に、ほかの PC から続けるタスクだと添えている。
+- SE への依頼に、ほかの PC から続けるタスクだと添えている。
 - チケットの「PC: 」が自分の PC でなくなったタスクのチームは、閉じている。
 - 閉じる前に、push していないコミットが無いことを確かめている。
 
