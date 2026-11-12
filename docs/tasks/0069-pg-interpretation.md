@@ -1,6 +1,6 @@
 # 0069-pg-interpretation
 
-ステータス: 実装中
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -8,9 +8,9 @@ PC: Reo-Desktop
 - 利用者待ち: なし
 - [x] 1. やり方を決める(完了条件: 設計の節に、直す8つのファイルと、足す・直す・消す行が文のまま書いてある。ADR 3件を提案で書いた)
 - [x] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の設計への指摘2件を、どれも設計の節と ADR で直し、ADR 0069-1〜0069-3 が採用になった)
-- [ ] 3. PG が、利用者に見える動きを左右する所を SE に聞く形にする(依存: 2)(完了条件: skill `task-team-pg` と `task-team-se` の SKILL.md に「ADR 0069-1」を含む行が合わせて3行あり、「設計の節を同じコミットで直している」が0行)
-- [ ] 4. QA が、合意した設計と実装を照らす形にする(依存: 2)(完了条件: skill `task-team-qa` の SKILL.md に「ADR 0069-2」を含む見出しが1つあり、その下に行が7行ある。skill `task-team-se` の SKILL.md に「ADR 0069-2」を含む行が1行ある)
-- [ ] 5. 難しさが中の仕事を Opus 5.5 の high で動かす形にする(依存: 2)(完了条件: skill `task-team-se` と `task-team-lead` の SKILL.md に「ADR 0069-3」を含む行が合わせて2行あり、skill `task-team-se` の SKILL.md の「の medium、高は」と、skill `task-team-lead` の SKILL.md の「の medium でなければ」が0行)
+- [x] 3. PG が、利用者に見える動きを左右する所を SE に聞く形にする(依存: 2)(完了条件: skill `task-team-pg` と `task-team-se` の SKILL.md に「ADR 0069-1」を含む行が合わせて3行あり、「設計の節を同じコミットで直している」が0行)
+- [x] 4. QA が、合意した設計と実装を照らす形にする(依存: 2)(完了条件: skill `task-team-qa` の SKILL.md に「ADR 0069-2」を含む見出しが1つあり、その下に行が7行ある。skill `task-team-se` の SKILL.md に「ADR 0069-2」を含む行が1行ある)
+- [x] 5. 難しさが中の仕事を Opus 5.5 の high で動かす形にする(依存: 2)(完了条件: skill `task-team-se` と `task-team-lead` の SKILL.md に「ADR 0069-3」を含む行が合わせて2行あり、skill `task-team-se` の SKILL.md の「の medium、高は」と、skill `task-team-lead` の SKILL.md の「の medium でなければ」が0行)
 - [ ] 6. できたものを見直す(依存: 3・4・5)(完了条件: レビューの節の実装の指摘が0件か、どれも直した)
 
 ## 難しさ
@@ -245,6 +245,10 @@ PC: Reo-Desktop
 - 3〜5. 足す行と替えた行は、どれも60字以内(最長は手順 4-4 の59字。check_rule_length の数え方)。
 
 ## 実装
+
+- 設計の手順 3〜5 のとおりに、4つの skill の SKILL.md と CLAUDE.md を直した。設計への問いは無い。
+- 確かめ: テスト一覧の grep 10件は、期待の件数どおり(足した行が1件、消した行が0件)。
+- `python -m unittest discover -s tests`: 91件、OK(SKILL.md の箇条書き60字以内のテストを含む)。lint のコマンドは CLAUDE.md に無い。
 
 ## レビュー
 
