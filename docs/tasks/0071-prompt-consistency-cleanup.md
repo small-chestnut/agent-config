@@ -1,6 +1,6 @@
 # 0071-prompt-consistency-cleanup
 
-ステータス: 実装レビュー中
+ステータス: 実装レビュー済み
 PC: Reo-Desktop
 
 ## 進捗
@@ -12,7 +12,7 @@ PC: Reo-Desktop
 - [x] 4. 役割の skill と一緒に task-team-messaging が読まれる(依存: 2)(完了条件: `tests/test_add_messaging_skill_to_team_roles.py` の4件が通り、skill `task-team-se`・`task-team-pg`・`task-team-qa` の SKILL.md に「`task-team-messaging` を読んでいる」が0件。4件が通り、3つの SKILL.md とも0件)
 - [x] 5. SE を起こす手順を短くする(依存: 2)(完了条件: `tests/test_remind_pin_after_starting_se.py` の3件が通り、skill `task-team-lead` の SKILL.md に「`set_pinned`」が0件で、「SE を high で起こせなければ」の行が1件。3件が通り、「`set_pinned`」は0件、その行は1件)
 - [x] 6. 全体の CLAUDE.md を 200 行以内にする(依存: 2)(完了条件: `claude/CLAUDE.md` が 200 行以内で、設計の節で消す・移す4行が0件。200 行で、4行とも0件)
-- [ ] 7. できたものを見直す(依存: 3・4・5・6)(完了条件: レビューの節の実装の指摘が0件)
+- [/] 7. できたものを見直す(依存: 3・4・5・6)(完了条件: レビューの節の実装の指摘が0件)
 
 ## 難しさ
 
@@ -235,3 +235,10 @@ PC: Reo-Desktop
 - 設計1・2: 「足すフック」の1に、HEAD を見る作業ツリーの決め方を書き、テスト一覧に `git -C` と `cd` の2件を足した。
 - 設計3: ADR 0071-2 に、PL が high でないときは起こしてから high に替えることを足した。skill `task-team-lead` の SKILL.md の `set_session_effort` の行は、消さずに、その場合だけの行に直す。CLAUDE.md の直しは「PL が high なら」にした。
 - 設計4: ADR 0057-2 の、閉じる前にピン留めを外す手順を、ADR 0071-3 で置き換えた。0057-2 は採用のまま。
+
+### 実装レビュー(QA、934f4c1)
+
+- 実装1: `push_after_ticket_commit.py` の `touches_ticket` は、`git diff-tree` が日本語のパスを `"\343...\210.md"` の形(core.quotePath の既定)で返すので、`.md` で終わると読めず、日本語の名前のチケットをコミットしても push しない(一時リポジトリで確かめた)。`-z` か `-c core.quotePath=false` で読み、日本語の名前のテストを足す。
+- 実装2: `docs/specs/push_after_ticket_commit.py.md` の ADR の節の 0056-5 の題が、ADR の題「進行中のチケットを節目ごとに push し、ほかの PC でチームを起こし直して続けられるようにする」になっていない。
+- 実装3: `docs/specs/remind_pin_after_starting_se.py.md` の ADR の節の 0057-2 の題が、ADR の題「PL は SE をピン留めし、PG と QA は畳んだ PL の下に置く」になっていない。
+- 設計の節との照らし合わせ・テスト一覧・プロンプトの直し・`user-settings.json` には、ほかの指摘なし。足したテスト 20 件は、QA の手元でも通った。
