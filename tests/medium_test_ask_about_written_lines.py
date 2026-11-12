@@ -1,7 +1,8 @@
 """claude/hooks/ask_about_written_lines.py が、この保存で足した行を並べて問い返すテスト。
 
 仕様は docs/specs/ask_about_written_lines.py.md。
-実行(この階層で): python -m unittest discover -s tests
+一時ファイル・git・ほかのプロセスを使うので中。
+実行(この階層で): python -m unittest discover -s tests -p "*test_*.py"
 """
 import json
 import os

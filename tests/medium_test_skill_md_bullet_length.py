@@ -1,7 +1,8 @@
 """claude/skills/*/SKILL.md の箇条書きの行が、すべて上限の字数以内であることを確かめるテスト。
 
 字数の数え方は claude/hooks/check_rule_length.py のものをそのまま使う。
-実行(この階層で): python -m unittest discover -s tests
+リポジトリのファイルを使うので中。
+実行(この階層で): python -m unittest discover -s tests -p "*test_*.py"
 """
 import importlib.util
 import unittest
