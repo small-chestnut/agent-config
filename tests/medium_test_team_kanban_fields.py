@@ -1,6 +1,7 @@
 """skill team-kanban が書くカードの項目が、かんばんのページの読む項目と同じことを確かめるテスト。
 
-実行(この階層で): python -m unittest discover -s tests
+リポジトリのファイルを使うので中。
+実行(この階層で): python -m unittest discover -s tests -p "*test_*.py"
 """
 import re
 import unittest

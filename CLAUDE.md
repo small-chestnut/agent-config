@@ -1,6 +1,8 @@
 このリポジトリの目的と構成は README.md にある。
 
-- テストは小だけで、リポジトリのルートで `python -m unittest discover -s tests`。中と大のテストは無い。
+- 中のテストは、ファイル名の頭に `medium_` を付ける。印の無いテストは小。(ADR 0072-1)
+- 小だけは、リポジトリのルートで `python -m unittest discover -s tests`。(ADR 0072-1)
+- 小と中は、`python -m unittest discover -s tests -p "*test_*.py"`。大のテストは無い。(ADR 0072-1)
 - 変えた所のテストだけは、`python -m unittest tests/<テストのファイル>.py`(いくつもなら空白で並べる)。
 - ADR の「対象」に書くモジュールの名前は、skill の名前か hooks のファイル名。いくつもに及ぶなら「全体」。
 - README の目的とのずれは、PL が、やるかを利用者に聞かずにタスクにして回す。

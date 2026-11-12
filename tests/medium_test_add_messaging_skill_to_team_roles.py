@@ -1,8 +1,8 @@
 """claude/hooks/add_messaging_skill_to_team_roles.py が、役割の skill の後に task-team-messaging を渡すテスト。
 
 仕様は docs/specs/add_messaging_skill_to_team_roles.py.md。
-一時フォルダに SKILL.md を置いて読む。1つのプロセスのメモリと一時ファイルだけなので小。
-実行(この階層で): python -m unittest discover -s tests
+一時フォルダに SKILL.md を置いて読む。一時ファイルを使うので中。
+実行(この階層で): python -m unittest discover -s tests -p "*test_*.py"
 """
 import importlib.util
 import tempfile

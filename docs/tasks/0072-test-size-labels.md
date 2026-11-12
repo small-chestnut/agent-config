@@ -1,6 +1,6 @@
 # 0072-test-size-labels
 
-ステータス: 実装中
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -8,10 +8,10 @@ PC: Reo-Desktop
 - 利用者待ち: なし
 - [x] 1. やり方を決める(完了条件: 設計の節に、中にする7つのファイルと移すクラス、CLAUDE.md の行が文のまま書いてあり、ADR 0072-1 を書いた。7つ・行3つ・ADR 1件)
 - [x] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の設計への指摘2件を、どれも設計の節で直し、ADR 0072-1 が採用になった)
-- [ ] 3. 中のテストに印を付ける(依存: 2)(完了条件: 小と中を流すコマンドで 112 件が通り、`tests/` の `medium_test_` で始まるファイルが7つ)
-- [ ] 4. 小だけを流すと、ファイルと git を使わないテストだけが流れる(依存: 3)(完了条件: 小だけを流すコマンドで 44 件が通り、`tests/test_*.py` にファイルとほかのプロセスを使う行が0件)
-- [ ] 5. CLAUDE.md と README に流し方を書く(依存: 3)(完了条件: リポジトリ直下の CLAUDE.md に、小だけ・小と中・大の流し方の行があり、「テストは小だけ」が0件)
-- [ ] 6. できたものを見直す(依存: 3・4・5)(完了条件: レビューの節の実装の指摘が0件)
+- [x] 3. 中のテストに印を付ける(依存: 2)(完了条件: 小と中を流すコマンドで 112 件が通り、`tests/` の `medium_test_` で始まるファイルが7つ。112 件・7つ)
+- [x] 4. 小だけを流すと、ファイルと git を使わないテストだけが流れる(依存: 3)(完了条件: 小だけを流すコマンドで 44 件が通り、`tests/test_*.py` にファイルとほかのプロセスを使う行が0件。44 件・0件)
+- [x] 5. CLAUDE.md と README に流し方を書く(依存: 3)(完了条件: リポジトリ直下の CLAUDE.md に、小だけ・小と中・大の流し方の行があり、「テストは小だけ」が0件。行3つ・0件)
+- [/] 6. できたものを見直す(依存: 3・4・5)(完了条件: レビューの節の実装の指摘が0件)
 
 ## 難しさ
 
@@ -102,6 +102,17 @@ grep -nE 'tempfile|subprocess|read_text|write_text|write_bytes|open\(|\.glob\(' 
 ```
 
 ## 実装
+
+- `git mv` で、`test_add_messaging_skill_to_team_roles.py`・`test_ask_about_written_lines.py`・`test_skill_md_bullet_length.py`・`test_team_kanban_fields.py` を `medium_test_…` に変えた(docstring に「…を使うので中。」の行を足し、実行の行を `-p "*test_*.py"` に直した)。
+- `test_check_rule_documents_changed_by_shell.py`・`test_check_rule_length.py`・`test_require_verify_before_stop.py` は、設計の表のクラスを `medium_test_…` へ元の順で移し、使わなくなった import と定数を小のファイルから消した。
+- リポジトリ直下の CLAUDE.md の2行目を3行に替え、README の `tests/` の行を直した。
+- 流した結果(リポジトリのルート):
+  - `python -m unittest discover -s tests`: 44 件 OK
+  - `python -m unittest discover -s tests -p "*test_*.py"`: 112 件 OK
+  - `python -m unittest tests/medium_test_<ファイル>.py` の件数: 4・13・25・13・11・1・1(表の中の件数のとおり)
+  - 小のファイルを探す grep: 0件
+  - 「テストは小だけ」: CLAUDE.md に0件
+- lint のコマンドは、このリポジトリに無い。
 
 ## レビュー
 

@@ -23,7 +23,7 @@ agent-config/
 │   ├── skills/<名前>/SKILL.md  # → 各 Claude 設定ディレクトリの skills/<名前>/SKILL.md(手順。呼ばれたときだけ読み込まれる)
 │   └── hooks/                 # → 各 Claude 設定ディレクトリの hooks/(settings.json の hooks が走らせるスクリプト)
 ├── .claude/skills/team-kanban-page/  # 全部のタスクの進み具合を見せるかんばん(Artifact)のページと、直す・作る手順
-├── tests/                     # hooks と skill のテスト(python -m unittest discover -s tests)
+├── tests/                     # hooks と skill のテスト。流し方はリポジトリ直下の CLAUDE.md
 ├── install.ps1                # Windows 用配置スクリプト
 └── install.sh                 # WSL2 / Linux / macOS 用(Codespaces dotfiles でも自動実行される)
 ```
