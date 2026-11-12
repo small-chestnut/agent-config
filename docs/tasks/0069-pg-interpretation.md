@@ -1,6 +1,6 @@
 # 0069-pg-interpretation
 
-ステータス: 実装レビュー中
+ステータス: 実装レビュー済み
 PC: Reo-Desktop
 
 ## 進捗
@@ -11,7 +11,7 @@ PC: Reo-Desktop
 - [x] 3. PG が、利用者に見える動きを左右する所を SE に聞く形にする(依存: 2)(完了条件: skill `task-team-pg` と `task-team-se` の SKILL.md に「ADR 0069-1」を含む行が合わせて3行あり、「設計の節を同じコミットで直している」が0行)
 - [x] 4. QA が、合意した設計と実装を照らす形にする(依存: 2)(完了条件: skill `task-team-qa` の SKILL.md に「ADR 0069-2」を含む見出しが1つあり、その下に行が7行ある。skill `task-team-se` の SKILL.md に「ADR 0069-2」を含む行が1行ある)
 - [x] 5. 難しさが中の仕事を Opus 5.5 の high で動かす形にする(依存: 2)(完了条件: skill `task-team-se` と `task-team-lead` の SKILL.md に「ADR 0069-3」を含む行が合わせて2行あり、skill `task-team-se` の SKILL.md の「の medium、高は」と、skill `task-team-lead` の SKILL.md の「の medium でなければ」が0行)
-- [ ] 6. できたものを見直す(依存: 3・4・5)(完了条件: レビューの節の実装の指摘が0件か、どれも直した)
+- [x] 6. できたものを見直す(依存: 3・4・5)(完了条件: レビューの節の実装の指摘が0件)
 
 ## 難しさ
 
@@ -259,3 +259,7 @@ PC: Reo-Desktop
 - [ADR 0069-3] 「判断の余地には SE と同じ思考量で、役割によらない」理由に対し、skill `task-team-lead` の CLAUDE.md 63行目「PL の仕事は、決まった枠の中で選ぶ仕事で、Opus 5.5 の medium で足りる」(中の定義と同じ文)と、SKILL.md 75行目が直されずに残る。PL も high にするか、PL を外す理由を ADR に足して直す。
 - code-review(low): 設計の節の手順とテスト一覧に、文の食い違いは無い。
 - ADR 0069-1 は指摘が無いので採用。0069-2・0069-3 は提案のまま返す。
+
+### 実装レビュー
+
+- 指摘なし(照らした設計の節は、サブタスク2が `[x]` になったコミット 211b17e のもの。その後の設計の節の変わりは無い。code-review(low) も指摘なし。テスト 91件 OK を QA でも確かめた)
