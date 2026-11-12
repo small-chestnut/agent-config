@@ -117,6 +117,8 @@ grep -nE 'tempfile|subprocess|read_text|write_text|write_bytes|open\(|\.glob\(' 
   - 小のファイルを探す grep: 0件
   - 「テストは小だけ」: CLAUDE.md に0件
 - lint のコマンドは、このリポジトリに無い。
+- レビューの3件目(README の設計の読み方)への直し: SE が設計の README の節に書いた行(`├── tests/                     # hooks と skill のテスト。流し方はリポジトリ直下の CLAUDE.md`)と、`README.md` の `tests/` の行を照らし、同じ(1行)であることを確かめた。実装がすでに設計のとおりだったので、README は変えていない。
+- 直した後に流した結果: `python -m unittest discover -s tests -p "*test_*.py"` が 112 件 OK。
 
 ## レビュー
 
