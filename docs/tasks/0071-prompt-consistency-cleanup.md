@@ -1,6 +1,6 @@
 # 0071-prompt-consistency-cleanup
 
-ステータス: 設計レビュー済み
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -8,10 +8,10 @@ PC: Reo-Desktop
 - 利用者待ち: なし
 - [x] 1. やり方を決める(完了条件: 設計の節に、直す11のファイルと足す3つのフック、消す・直す・移す行が文のまま書いてある。ADR 3件を書いた)
 - [/] 2. やり方を見直す(依存: 1)(完了条件: レビューの節の設計への指摘4件を、どれも設計の節と ADR で直し、ADR 0071-1・0071-2・0071-3 が採用になった)
-- [ ] 3. チケットをコミットしたら自動で push する(依存: 2)(完了条件: `tests/test_push_after_ticket_commit.py` の13件が通り、skill `task-team-messaging` の SKILL.md に「push」が0件)
-- [ ] 4. 役割の skill と一緒に task-team-messaging が読まれる(依存: 2)(完了条件: `tests/test_add_messaging_skill_to_team_roles.py` の4件が通り、skill `task-team-se`・`task-team-pg`・`task-team-qa` の SKILL.md に「`task-team-messaging` を読んでいる」が0件)
-- [ ] 5. SE を起こす手順を短くする(依存: 2)(完了条件: `tests/test_remind_pin_after_starting_se.py` の3件が通り、skill `task-team-lead` の SKILL.md に「`set_pinned`」が0件で、「SE を high で起こせなければ」の行が1件)
-- [ ] 6. 全体の CLAUDE.md を 200 行以内にする(依存: 2)(完了条件: `claude/CLAUDE.md` が 200 行以内で、設計の節で消す・移す4行が0件)
+- [x] 3. チケットをコミットしたら自動で push する(依存: 2)(完了条件: `tests/test_push_after_ticket_commit.py` の13件が通り、skill `task-team-messaging` の SKILL.md に「push」が0件。13件が通り、「push」は0件)
+- [x] 4. 役割の skill と一緒に task-team-messaging が読まれる(依存: 2)(完了条件: `tests/test_add_messaging_skill_to_team_roles.py` の4件が通り、skill `task-team-se`・`task-team-pg`・`task-team-qa` の SKILL.md に「`task-team-messaging` を読んでいる」が0件。4件が通り、3つの SKILL.md とも0件)
+- [x] 5. SE を起こす手順を短くする(依存: 2)(完了条件: `tests/test_remind_pin_after_starting_se.py` の3件が通り、skill `task-team-lead` の SKILL.md に「`set_pinned`」が0件で、「SE を high で起こせなければ」の行が1件。3件が通り、「`set_pinned`」は0件、その行は1件)
+- [x] 6. 全体の CLAUDE.md を 200 行以内にする(依存: 2)(完了条件: `claude/CLAUDE.md` が 200 行以内で、設計の節で消す・移す4行が0件。200 行で、4行とも0件)
 - [ ] 7. できたものを見直す(依存: 3・4・5・6)(完了条件: レビューの節の実装の指摘が0件)
 
 ## 難しさ
@@ -210,6 +210,15 @@ PC: Reo-Desktop
   - `claude/user-settings.json` を `python -c "import json; json.load(open(...))"` で読め、3つのフックのファイル名がそれぞれ1回ずつ出る。
 
 ## 実装
+
+- コミット: (このコミット)。ブランチ `claude/0071-prompt-consistency-cleanup-79841d`。
+- 足したフック3つ: `claude/hooks/push_after_ticket_commit.py`・`add_messaging_skill_to_team_roles.py`・`remind_pin_after_starting_se.py`。`claude/user-settings.json` の `PostToolUse` につないだ(3つとも各1回)。
+- 足した仕様3つ: `docs/specs/` の同名の `.py.md`。足したテスト: 13件・4件・3件(テスト一覧のとおり、どれも小)。
+- 消す・直す・移す行は、設計の節の文のとおりに直した(`claude/CLAUDE.md`・リポジトリ直下の `CLAUDE.md`・`module-layout`・`task-team-lead` の SKILL.md と CLAUDE.md・`task-team-messaging`・`task-team-se`・`task-team-pg`・`task-team-qa`・`.claude/rules/hooks.md`)。
+- 設計との違い1つ: `claude/skills/task-team-lead/CLAUDE.md` の直しは、1行が 65 字で上限 60 字を越えたので、「- 起こすときの effort は、PL の effort を越えられない。」と「- PL が high なら、SE は high で起こせる。」の2行にした。
+- 流したもの: `python -m unittest discover -s tests` が 111 件通った(lint のコマンドは無い)。
+- 受け入れ条件 7〜13 は grep で確かめた: `task-team-messaging` の「push」0件、3つの役割の「を読んでいる」0件、`task-team-lead` の `set_pinned` 0件・「SE を high で起こせなければ」1件、`claude/CLAUDE.md` 200 行で消す・移す4行0件、`module-layout` の移した行1件、リポジトリ直下の install の行1件。
+- 実際の git での通し(一時リポジトリに push)は、実行が許可されず、していない。git は偽物に差し替えたテストだけで確かめた。
 
 ## レビュー
 

@@ -48,3 +48,9 @@ paths:
 ### 目指す状態: 文字列のパターンで書けない履歴を消す push も、止まっている
 
 - その push は、`block_history_erasing_push.py` が止めている。
+
+### 目指す状態: 道具を使った直後に例外なくする作業を、Claude が覚えていなくても抜かさない(ADR 0071-1)
+
+- チケットの push は `push_after_ticket_commit.py`、`task-team-messaging` を読むのは `add_messaging_skill_to_team_roles.py` がしている。
+- アプリの道具をフックから呼べるかは分からないので、SE のピン留めは `remind_pin_after_starting_se.py` が知らせている。
+- 利用者は、必ずする作業をフックに移して、プロンプトの文量を浮かせたい。
