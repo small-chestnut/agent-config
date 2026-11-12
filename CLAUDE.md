@@ -8,3 +8,4 @@
 - PL でないセッションは、それらに気づいたら、直さずに PL に知らせる。(ADR 0046-3)
 - permissions・フック・サンドボックスを変えるタスクは、安全の原則のとおり利用者に頼まれてから回す。
 - `claude/` 直下と hooks のファイルの「なぜ」は、`.claude/rules/` に paths 付きで置く。(ADR 0020-1)
+- main にマージしたものは、`install.ps1 -Yes` か `install.sh --yes` で入れている。
