@@ -1,6 +1,6 @@
 # 0068-search-existing
 
-ステータス: 実装中
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -106,6 +106,11 @@ SE が新しい仕組みを設計する前に、同じことをする既にあ�
 確かめた結果:
 
 - テスト一覧の grep: 受け入れ条件の1〜6つ目は、書いてある行が1行ずつ当たった。`原因や呼び出し元がモジュールの中に無いときにしている` は 0 件。`仕様・skill・CLAUDE.md・コード` は skill で 0 件。
+- `python -m unittest discover -s tests`: 91 件が通った。
+
+手順6: `claude/skills/task-team-se/SKILL.md` の見出しの「新しい作り」を「新しい仕組み」に差し替え、コミットした。
+
+- `grep -n "新しい作りの前" claude/skills/task-team-se/SKILL.md` は 0 件、`新しい仕組みの前に既に` は見出しの 1 行。
 - `python -m unittest discover -s tests`: 91 件が通った。
 
 ## レビュー
