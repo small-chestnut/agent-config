@@ -211,7 +211,7 @@ PC: Reo-Desktop
 
 ## 実装
 
-- コミット: (このコミット)。ブランチ `claude/0071-prompt-consistency-cleanup-79841d`。
+- コミット: 2aa28b3。ブランチ `claude/0071-prompt-consistency-cleanup-79841d`。
 - 足したフック3つ: `claude/hooks/push_after_ticket_commit.py`・`add_messaging_skill_to_team_roles.py`・`remind_pin_after_starting_se.py`。`claude/user-settings.json` の `PostToolUse` につないだ(3つとも各1回)。
 - 足した仕様3つ: `docs/specs/` の同名の `.py.md`。足したテスト: 13件・4件・3件(テスト一覧のとおり、どれも小)。
 - 消す・直す・移す行は、設計の節の文のとおりに直した(`claude/CLAUDE.md`・リポジトリ直下の `CLAUDE.md`・`module-layout`・`task-team-lead` の SKILL.md と CLAUDE.md・`task-team-messaging`・`task-team-se`・`task-team-pg`・`task-team-qa`・`.claude/rules/hooks.md`)。
