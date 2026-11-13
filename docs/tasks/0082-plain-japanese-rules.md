@@ -1,6 +1,6 @@
 # 0082-plain-japanese-rules
 
-ステータス: 設計中
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
