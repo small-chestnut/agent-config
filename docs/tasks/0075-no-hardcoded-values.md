@@ -1,6 +1,6 @@
 # 0075-no-hardcoded-values
 
-ステータス: 設計レビュー済み
+ステータス: 実装中
 PC: oguri-sdt011_01
 
 ## 進捗
