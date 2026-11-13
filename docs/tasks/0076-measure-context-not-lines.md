@@ -1,6 +1,6 @@
 # 0076-measure-context-not-lines
 
-ステータス: 設計レビュー済み
+ステータス: 実装中
 PC: oguri-sdt011_01
 
 ## 進捗
@@ -34,12 +34,12 @@ PC: oguri-sdt011_01
 2. 全体の CLAUDE.md が 8,001 字なら、全体の CLAUDE.md の字数のテストが失敗し、その知らせに、字数・上限・減らし方を書いた文書(`.claude/rules/global-claude-md.md`)が出る。
 3. `.claude/rules/global-claude-md.md` に「全体は 8,000 字以内で、安全の原則の節は 800 字前後。改行も1字と数える。(ADR 0076-1)」があり、「200 行」が無い。
 4. `.claude/rules/global-claude-md.md` に「字数は、`tests/medium_test_global_claude_md_length.py` が数えて止めている。(ADR 0076-1)」がある。
-5. `.claude/rules/global-claude-md.md` に、上限を超えるときの目指す状態と、その下の5行(変える所2の文)がある。
+5. `.claude/rules/global-claude-md.md` に、上限を超えるときの目指す状態と、その下の7行(変える所2の文)がある。減らす行は、安全の原則の節のほかの行に限られている。
 6. 小と中のテストが全部通る。
 
 ## 設計
 
-ADR: 0076-1(提案)・0076-2(提案)。読んだ ADR: なし(書き換える `.claude/rules/global-claude-md.md` の「全体は 200 行以内」の行と見出しに番号が無く、探して当たった `check_rule_length.py` の番号 0055-1 は自動メモリの話で、全体の量に関わらない)。
+ADR: 0076-1(採用)・0076-2(採用)。読んだ ADR: なし(書き換える `.claude/rules/global-claude-md.md` の「全体は 200 行以内」の行と見出しに番号が無く、探して当たった `check_rule_length.py` の番号 0055-1 は自動メモリの話で、全体の量に関わらない)。
 
 新しい仕組みの前に探した語: 行以内・200 行・行数・行の数・字の数・字数・トークン・コンテキスト・上限・あふれ・超えたら。全体の CLAUDE.md の量を数える仕組みは無い。当たったのは次のとおり。
 
@@ -61,19 +61,21 @@ Claude Code のドキュメントの目安は「200 行未満」で、行の数(
    - `- いつ skill を使うかは、skill の description に書いている。`
    - `- 行の数で測ると、2行を1行にまとめるだけで、読まれる量を減らさずに上限に収まる。`
    - `- 読まれる量はトークンで決まるが、手元のテストで数えられる字の数で測る。`
-2. 1の目指す状態の行の後(目的「リポジトリに、例えや比喩が混ざらない」の前)に、空の行をはさんで、次の見出しと5行を足す。
+2. 1の目指す状態の行の後(目的「リポジトリに、例えや比喩が混ざらない」の前)に、空の行をはさんで、次の見出しと7行を足す。
    - `### 目指す状態: 上限を超えるときも、毎回読まれる量を増やさずに収めている(ADR 0076-2)`
-   - `- まず、振る舞いを変えていない行と、deny とフックが止めている操作の行を消している。`
+   - `- 減らすのは、安全の原則の節のほかの行にしている。`
+   - `- まず、振る舞いを変えていない行を消している。`
    - `- 次に、特定の作業でだけ要る行を、その作業の skill に移している。`
    - `- 字数は、行ごと消すか移して減らしている。`
    - `- それでも収まらなければ、足す行と消す候補の行の目的を並べ、どちらを先にするかを利用者に聞いている。`
+   - `- 安全の原則の節の行は、どの作業でも、deny に届く前に効いていなければならない。`
    - `- 上限を上げると、効きが薄まらない量かを照らす根拠が無いまま、量が増え続ける。`
 3. `tests/medium_test_global_claude_md_length.py` を作る。中身は次のとおり。
    - docstring に、何を確かめるテストか・リポジトリのファイルを使うので中・実行のコマンドを書く(`tests/medium_test_skill_md_bullet_length.py` と同じ形)。
    - `ROOT = Path(__file__).resolve().parents[1]`、`GLOBAL_CLAUDE_MD = ROOT / "claude" / "CLAUDE.md"`、`LIMIT = 8000`。
    - 字数は `len(GLOBAL_CLAUDE_MD.read_text(encoding="utf-8"))`(改行も1字)。
    - クラス `全体のCLAUDE_mdの字数(unittest.TestCase)`、テスト `test_全体のCLAUDE_mdは8000字以内`。
-   - 字数が `LIMIT` を超えたら、`self.fail` で次の文を出す: `claude/CLAUDE.md は {字数} 字で、上限 8000 字を超えています。.claude/rules/global-claude-md.md の「上限を超えるときも、毎回読まれる量を増やさずに収めている」のとおりに減らしてください。`
+   - 字数が `LIMIT` を超えたら、`self.fail` で次の文を f 文字列で出す。上限の値は `{LIMIT}` で出し、直に書かない: `claude/CLAUDE.md は {字数} 字で、上限 {LIMIT} 字を超えています。.claude/rules/global-claude-md.md の「上限を超えるときも、毎回読まれる量を増やさずに収めている」のとおりに減らしてください。`
    - 決定を形にした所なので、クラスの docstring の末尾に「(ADR 0076-1)」を付ける。
 
 足す行と書き換える行は、`check_rule_length.py` の数え方で 60 字以内(最長 54 字。設計のときに数えた)。
@@ -84,7 +86,7 @@ Claude Code のドキュメントの目安は「200 行未満」で、行の数(
 
 1. 変える所3を作り、「0076: 全体の CLAUDE.md の字数を数えるテストを足す(ADR 0076-1)」でコミットする。
 2. 変える所1・2を直し、「0076: 全体の CLAUDE.md の上限を字数にし、超えるときの減らし方を書く(ADR 0076-1・0076-2)」でコミットする。
-3. 下のテスト一覧を、上から順に流すか実行する。2つ目の確かめ方で `claude/CLAUDE.md` に足した字は、確かめたら `git checkout -- claude/CLAUDE.md` で戻す(コミットしない)。
+3. 下のテスト一覧を、上から順に流すか実行する。2つ目の確かめ方で `claude/CLAUDE.md` に足した字は、確かめたら Edit で消し、`git diff --quiet claude/CLAUDE.md` が 0 で終わる(戻った)ことを確かめる(コミットしない)。
 
 ### テスト一覧
 
@@ -94,7 +96,7 @@ Claude Code のドキュメントの目安は「200 行未満」で、行の数(
 | `claude/CLAUDE.md` の末尾に、全体が 8,001 字になるだけ字を足して `python -m unittest tests/medium_test_global_claude_md_length.py` を流すと失敗し、知らせに「8001 字」「上限 8000 字」「.claude/rules/global-claude-md.md」が出る。8,000 字ちょうどにすると通る | なし | 1・2 |
 | `grep -n "8,000 字以内" .claude/rules/global-claude-md.md` が受け入れ条件3の文の1行を返し、`grep -c "200 行" .claude/rules/global-claude-md.md` が 0 を返す | なし | 3 |
 | `grep -n "medium_test_global_claude_md_length" .claude/rules/global-claude-md.md` が受け入れ条件4の文の1行を返す | なし | 4 |
-| `grep -n "上限を超えるときも" .claude/rules/global-claude-md.md` が見出しの1行を返し、その下に変える所2の5行がある | なし | 5 |
+| `grep -n "上限を超えるときも" .claude/rules/global-claude-md.md` が見出しの1行を返し、その下に変える所2の7行がある | なし | 5 |
 | `python -m unittest discover -s tests -p "*test_*.py"` が全部通る | なし | 6 |
 
 テストは、受け入れ条件1(字数の上限の分かれ目)に1つ。8,000 字と 8,001 字の境目は、テストの中で字数を変えられないので、2つ目の確かめ方で前後の値を確かめる。
@@ -108,3 +110,10 @@ Claude Code のドキュメントの目安は「200 行未満」で、行の数(
 - 手順3の戻し `git checkout -- claude/CLAUDE.md` は、permissions の deny(`Bash(git checkout -- *)`)に止められる。deny を迂回しない戻し方(例: 足した字を Edit で消し、`git diff --quiet claude/CLAUDE.md` で戻ったことを確かめる)にする。
 - 変える所2の「deny とフックが止めている操作の行を消している」は、同じ文書の原則1の目指す状態「この文書は、deny に届く前に安全な行動を選ばせる文だけを持つ」とぶつかる(番号の小さい安全が先)。force push・rm -r の行が最初の消す候補になる。安全の原則の節を消す対象から外すなど、ぶつからない形にし、ADR 0076-2 の決めたこと・理由2も合わせる。
 - 変える所3の失敗の知らせが「上限 8000 字」を直に書き、`LIMIT` と2か所で同じ値を持つ。知らせは `{LIMIT}` で出す。
+
+設計レビュー(1回目)への直し(SE):
+
+- 1つ目: 手順3の戻し方を、足した字を Edit で消し、`git diff --quiet claude/CLAUDE.md` が 0 で終わることを確かめる形にした(手順3)。
+- 2つ目: 「deny とフックが止めている操作の行を消す」をやめ、減らすのを安全の原則の節のほかの行に限る行と、その「なぜ」の行を足した(変える所2が7行に。受け入れ条件5)。ADR 0076-2 の題・決めたこと・理由を合わせ、捨てた案6に足した。
+- 3つ目: 失敗の知らせの上限を、f 文字列の `{LIMIT}` で出し、直に書かない形にした(変える所3)。
+- ADR 0076-1・0076-2 を採用にした。
