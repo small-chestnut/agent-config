@@ -74,6 +74,8 @@ PC: Reo-Desktop
 - イ: 例えの語で、ものや状態を指した語(ADR 0079-2)。
 - ウ: 何を指すかが書いていない語と、何が何をするかが読み取れない文。
 
+直し方: 直した後の文には、具体的な語や例を並べず、意味が1つに決まった IT の用語か、辞書どおりの意味の語で、指すものの種類を書く。なぜ: 具体的な語や例を並べた規則は、並べた語にしか効かず、漏れを塞ぐたびに行が増え、規則が際限なく増える(利用者)。
+
 直さない語: 命題・原則・目的・目指す状態・規則の5つの段の名前(利用者が合意した形。skill `prompt-structure`)。「既定のブランチ」(GitHub Docs の日本語版が使う default branch の訳語で、言い換えではない。https://docs.github.com/ja/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/changing-the-default-branch)。「線を引く」の「引く」。
 
 ### 表1: 全体の CLAUDE.md(`claude/CLAUDE.md`)
