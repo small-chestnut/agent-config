@@ -1,6 +1,6 @@
 ---
 name: task-team-pg
-description: SE が確定した設計を実装する PG のときの手順。設計を変えず、テストを先に書く。
+description: SE が確定した設計を実装する、task-team の PG のときの手順。設計を変えず、テストを先に書く。
 ---
 
 # 原則1: AI 側の最適化
