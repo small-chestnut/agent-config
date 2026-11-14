@@ -19,10 +19,14 @@ class 全体のCLAUDE_mdの字数(unittest.TestCase):
         count = len(GLOBAL_CLAUDE_MD.read_text(encoding="utf-8"))
         if count > LIMIT:
             self.fail(
-                f"claude/CLAUDE.md は {count} 字で、上限 {LIMIT} 字を超えています。"
-                ".claude/rules/global-claude-md.md の"
-                "「上限を超えるときも、毎回読まれる量を増やさずに収めている」"
-                "のとおりに減らしてください。"
+                f"claude/CLAUDE.md は {count} 字で、上限 {LIMIT} 字を超えています(ADR 0076-1)。"
+                "次の順に減らしてください(ADR 0076-2)。"
+                "1. 減らすのは、安全の原則の節(800 字前後)のほかの行。"
+                "2. まず、振る舞いを変えていない行を消す。"
+                "3. 次に、特定の作業でだけ要る行を、その作業の skill に移す。"
+                "4. 字数は、行ごと消すか移して減らす。"
+                "5. それでも収まらなければ、足す行と消す候補の行の目的を並べ、"
+                "どちらを先にするかを利用者に聞く。"
             )
 
 

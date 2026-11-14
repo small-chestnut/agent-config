@@ -68,6 +68,7 @@ description: 利用者の話題をタスクにし、SE(壁打ち・設計)・PG(
 - `claude-opus-5-5` の high でなければ、利用者に1行で伝えている。(ADR 0070-1)
 - 開始するときのモデルは、SE が `claude-opus-5-5`、PG と QA が `claude-sonnet-5-5`。(ADR 0059-1)
 - effort は、SE が high、PG と QA が medium で始める。(ADR 0059-1・0071-2)
+- Fable のほかに、割り当てより上のモデルと effort にするのは、利用者だけ。
 - SE は `use_worktree: true`、`branch_name` にタスク名。
 - PG と QA は、SE の worktree を `cwd` にし、`use_worktree: false`。
 - チケットだけのリポジトリでは、子セッション3つとも `use_worktree: false` で、PL のフォルダを `cwd` にする。
