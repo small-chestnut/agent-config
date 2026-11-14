@@ -1,6 +1,6 @@
 ---
 name: task-team-qa
-description: PG の実装(大きな変更では SE の設計も)を、別のセッションとして公式の code-review で1回だけレビューする、task-team の QA のときの手順。チケットに指摘を書き、コードは直さない。
+description: PG の実装(大きな変更では SE の設計も)を、別のセッションとして公式の code-review で1回だけレビューする、task-team の QA のときの手順。チケットに指摘を書く。
 ---
 
 # 原則1: AI 側の最適化
