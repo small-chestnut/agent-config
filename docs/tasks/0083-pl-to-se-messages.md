@@ -1,4 +1,4 @@
-ステータス: 設計レビュー済み
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -8,7 +8,7 @@ PC: Reo-Desktop
 - [x] 2. やり方を見直す(依存: 1)(完了条件: レビューの節に設計レビューの結果が3件ある)
 - [x] 3. 共通の skill を作り、知らせ方の規則を移す(依存: 2)(完了条件: `claude/skills/task-team/SKILL.md` の表が13行で、`claude/skills/task-team-messaging/` は0件)
 - [x] 4. 役割の skill から、表と同じ受け持ちを言う行を消す(依存: 3)(完了条件: 消えた行が4行)
-- [ ] 5. 役割の skill を読むと、フックが共通の skill を渡す(依存: 3)(完了条件: テスト一覧のテスト4件が通る)
+- [x] 5. 役割の skill を読むと、フックが共通の skill を渡す(依存: 3)(完了条件: テスト一覧のテスト4件が通る。確かめた結果: 4件が通った)
 - [ ] 6. できたものを見直す(依存: 4・5)(完了条件: レビューの節に実装レビューの結果が1件以上ある)
 - [ ] 7. インストール先から古い skill とフックを消す(依存: 6)(完了条件: 設計の「マージの後」の古いファイルが0件)
 
@@ -137,6 +137,15 @@ ADR はどれも、状態の行のほかは書き換えない。古い ADR に�
 | 11 | 既にあるテスト `tests/medium_test_skill_md_bullet_length.py` が通る |
 
 ## 実装
+
+- フックを `git mv` で `claude/hooks/add_team_skill_to_team_roles.py` にし、設計の「フックの直し」のとおり直した(`ROLE_SKILLS` に `task-team-lead` を足し、`MESSAGING`→`TEAM`、`messaging_message`→`team_message`)。
+- `claude/user-settings.json` の `PostToolUse` の `Skill` のフックのパスを `add_team_skill_to_team_roles.py` にした。
+- テストを `git mv` で `tests/medium_test_add_team_skill_to_team_roles.py` にし、テスト一覧の4件にした。
+- 実行した結果:
+  - `python -m unittest tests/medium_test_add_team_skill_to_team_roles.py`: 4件が通った。
+  - `python -m unittest discover -s tests -p "*test_*.py"`(小と中の全部): 113件が通った(`medium_test_skill_md_bullet_length.py` を含む)。
+  - `git grep -n -e task-team-messaging -e add_messaging_skill_to_team_roles -- . ':!docs/adr' ':!docs/tasks'`: 0件。
+- lint のコマンドは、このリポジトリの CLAUDE.md に無い。
 
 ## レビュー
 
