@@ -1,8 +1,8 @@
 # 0083-1 役割の受け持ちと全役割が守る規則は共通の skill `task-team` に置き、役割の skill にはその役割でだけ要る規則を置く
 
-状態: 提案
+状態: 採用
 日付: 2026-11-14
-対象: task-team・task-team-lead・task-team-se・task-team-pg・task-team-qa・task-team-messaging・add_team_skill_to_team_roles.py
+対象: 全体
 
 ## 決めたこと
 
