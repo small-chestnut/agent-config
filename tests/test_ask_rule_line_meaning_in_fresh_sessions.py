@@ -31,8 +31,11 @@ class 記録するセッション:
         self.calls = []
         self.results = results
 
-    def __call__(self, args, cwd, env):
-        self.calls.append({"args": list(args), "cwd": cwd, "env": dict(env), "cwd_existed": os.path.isdir(cwd)})
+    def __call__(self, args, cwd, env, input_text):
+        self.calls.append({
+            "args": list(args), "cwd": cwd, "env": dict(env), "input_text": input_text,
+            "cwd_existed": os.path.isdir(cwd),
+        })
         if self.results is not None:
             return self.results[len(self.calls) - 1]
         return 0, f"答え本文{len(self.calls)}"
@@ -88,18 +91,27 @@ class 規則の1行を3つのセッションに読ませる(unittest.TestCase):
             self.assertEqual(option_value(args, "--tools"), "")
             self.assertIn("--no-session-persistence", args)
 
-    def test_標準入力を閉じて起動する(self):
+    def test_読ませる文は引数でなく標準入力で渡す(self):
+        session = 記録するセッション()
+        run_main([RULE], session)
+        for call in session.calls:
+            self.assertTrue(call["input_text"].endswith(RULE))
+            self.assertNotIn(RULE, " ".join(call["args"]))
+            self.assertNotIn("1. 何をする決まりか", " ".join(call["args"]))
+        text = "読ませる文\n& 100%"
         completed = subprocess.CompletedProcess(["claude"], 0, stdout="答え", stderr="")
         with mock.patch.object(ask.subprocess, "run", return_value=completed) as run:
-            code, output = ask.run_session([CLAUDE, "-p", "x"], "/tmp/empty", {"A": "1"})
+            code, output = ask.run_session([CLAUDE, "-p"], "/tmp/empty", {"A": "1"}, text)
         self.assertEqual((code, output), (0, "答え"))
-        self.assertIs(run.call_args.kwargs["stdin"], subprocess.DEVNULL)
+        self.assertEqual(run.call_args.kwargs["input"], text)
+        self.assertEqual(run.call_args.kwargs["encoding"], "utf-8")
+        self.assertNotIn("stdin", run.call_args.kwargs)
         self.assertEqual(run.call_args.kwargs["cwd"], "/tmp/empty")
 
     def test_読ませる文は4つの問いと規則の1行だけ(self):
         session = 記録するセッション()
         run_main([RULE], session)
-        prompt = option_value(session.calls[0]["args"], "-p")
+        prompt = session.calls[0]["input_text"]
         self.assertEqual(prompt, ask.QUESTION + "\n\n" + RULE)
         for question in ("1. 何をする決まりか", "2. 守っている例", "3. 破っている例", "4. 意味が1つに決まらない所"):
             self.assertIn(question, prompt)

@@ -19,18 +19,18 @@ QUESTION = (
 )
 
 
-def run_session(args, cwd, env):
-    """claude を、標準入力を閉じて起動し、(終了コード, 出力) を返す。"""
+def run_session(args, cwd, env, input_text):
+    """claude を起動して input_text を標準入力に UTF-8 で渡して閉じ、(終了コード, 出力) を返す。"""
     done = subprocess.run(
-        args, cwd=cwd, env=env, stdin=subprocess.DEVNULL,
+        args, cwd=cwd, env=env, input=input_text,
         capture_output=True, text=True, encoding="utf-8", errors="replace",
     )
     return done.returncode, (done.stdout or "") + (done.stderr if done.returncode else "")
 
 
-def session_args(claude, rule_line, model):
+def session_args(claude, model):
     return [
-        claude, "-p", QUESTION + "\n\n" + rule_line,
+        claude, "-p",
         "--model", model,
         "--setting-sources", "",
         "--disable-slash-commands",
@@ -52,12 +52,13 @@ def main(argv, run_session=run_session, find_claude=shutil.which):
 
     env = dict(os.environ)
     env["CLAUDE_CODE_DISABLE_CLAUDE_MDS"] = "1"
-    args = session_args(claude, options.rule_line, options.model)
+    args = session_args(claude, options.model)
+    input_text = QUESTION + "\n\n" + options.rule_line
 
     folders = [tempfile.TemporaryDirectory() for _ in range(SESSIONS)]
     try:
         with ThreadPoolExecutor(max_workers=SESSIONS) as pool:
-            results = list(pool.map(lambda f: run_session(args, f.name, env), folders))
+            results = list(pool.map(lambda f: run_session(args, f.name, env, input_text), folders))
     finally:
         for folder in folders:
             folder.cleanup()

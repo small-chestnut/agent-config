@@ -1,6 +1,6 @@
 # 0087-rule-line-check-and-spec-domain
 
-ステータス: 設計レビュー済み
+ステータス: 実装中
 PC: Reo-Desktop
 
 ## 進捗
