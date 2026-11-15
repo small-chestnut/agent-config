@@ -40,6 +40,9 @@ def session_args(claude, model):
 
 
 def main(argv, run_session=run_session, find_claude=shutil.which):
+    # Windows で出力をパイプにすると標準出力が cp932 になり、答えの字で落ちるので、UTF-8 で出す。
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("rule_line")
     parser.add_argument("--model", default=DEFAULT_MODEL)

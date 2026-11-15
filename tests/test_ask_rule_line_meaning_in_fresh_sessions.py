@@ -48,6 +48,16 @@ def run_main(argv, session, find_claude=lambda name: CLAUDE):
     return code, out.getvalue()
 
 
+def run_main_to_cp932_pipe(argv, session):
+    """標準出力が cp932 のパイプ(Windows で出力をパイプにしたとき)のまま main を呼び、出た bytes を返す。"""
+    raw = io.BytesIO()
+    pipe = io.TextIOWrapper(raw, encoding="cp932", write_through=True)
+    with contextlib.redirect_stdout(pipe):
+        code = ask.main(argv, run_session=session, find_claude=lambda name: CLAUDE)
+        pipe.flush()
+    return code, raw.getvalue()
+
+
 def option_value(args, name):
     return args[args.index(name) + 1]
 
@@ -63,6 +73,10 @@ class 規則の1行を3つのセッションに読ませる(unittest.TestCase):
         for n, text in enumerate(["一つ目の答え", "二つ目の答え", "三つ目の答え"], start=1):
             heading = out.index(f"## 答え{n}")
             self.assertEqual(out[heading:].split("\n", 1)[1].split("## 答え")[0].strip(), text)
+        # 標準出力が cp932 のパイプ(Windows で出力をパイプにしたとき)でも、cp932 に無い字を落とさない
+        answer = "答え — ✅ 例"
+        _, written = run_main_to_cp932_pipe([RULE], 記録するセッション([(0, answer)] * 3))
+        self.assertEqual(written.decode("utf-8").count(answer), 3)
 
     def test_セッションごとに別の新しい空のフォルダから起動する(self):
         session = 記録するセッション()

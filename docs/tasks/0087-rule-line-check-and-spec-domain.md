@@ -287,3 +287,9 @@ ode_modules\@anthropic-ai\claude-codein\claude.exe`)に直接渡すと、改行
 
 - Windows で出力がパイプのとき標準出力が cp932 になり、答えに cp932 に無い字(「—」・絵文字など)があると `print` が UnicodeEncodeError で落ち、3つの答えが出ない(R2-6)。QA が、答えを「答え — ✅ 例」にした `run_session` で `main` を呼び、パイプに出して再現した。
 - Nit: 「K1 の意図」の R1-2 の行に、ADR 0087-5 が置き換えた「違いは仕様に写さずに」が残っている。
+
+#### 実装レビューの直し(PG)
+
+- 1件目: スクリプトの `main` の最初で、`sys.stdout.reconfigure(encoding="utf-8")` を呼ぶ(`reconfigure` が無い標準出力は、そのまま)。先に T1 に、標準出力を cp932 のパイプにして答えを「答え — ✅ 例」にする確かめを足し、落ちる(UnicodeEncodeError)ことを見てから直した。テストの数は 11 のまま(T1 の中に足した)。
+- Nit: 直さない。「K1 の意図」の R1-2 の行は設計の節にあり、直すかは SE が決める(実装の節に、その句を除いて見たことを書いてある)。
+- テスト(`python -m unittest discover -s tests -p "*test_*.py"`): 124件、すべて通る(直した後)。
