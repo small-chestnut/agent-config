@@ -75,13 +75,17 @@ foreach ($dir in $claudeDirs) {
 }
 
 # Skills: one folder per skill, SKILL.md inside. The body is loaded only when the
-# skill is invoked, so procedures live here instead of bloating CLAUDE.md. Installed
+# skill is invoked, so procedures live here instead of bloating CLAUDE.md. Every file
+# directly inside a skill folder is installed, not only SKILL.md (ADR 0087-4). Installed
 # into every config dir, like CLAUDE.md.
 Write-Host "Installing Claude Code skills..."
 Get-ChildItem "$repo\claude\skills" -Directory | ForEach-Object {
     $skill = $_
-    foreach ($dir in $claudeDirs) {
-        Install-ConfigFile "$($skill.FullName)\SKILL.md" "$dir\skills\$($skill.Name)\SKILL.md"
+    Get-ChildItem $skill.FullName -File | ForEach-Object {
+        $file = $_
+        foreach ($dir in $claudeDirs) {
+            Install-ConfigFile $file.FullName "$dir\skills\$($skill.Name)\$($file.Name)"
+        }
     }
 }
 
