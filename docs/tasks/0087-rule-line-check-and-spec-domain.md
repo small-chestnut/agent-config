@@ -97,7 +97,7 @@ PC: Reo-Desktop
   - `claude -p` は、引数の空の文字列(`--setting-sources ""`・`--tools ""`)を、リストの要素 `""` で渡す(シェルを通さない)。
   - 冒頭の docstring に、仕様のパスと ADR 0087-1 を書く。
 - `tests/test_ask_rule_line_meaning_in_fresh_sessions.py`(新しく作る): テスト一覧の T1〜T11。スクリプトは `importlib` でパスから読む(`tests/test_check_rule_length.py` と同じ形)。
-- `install.ps1`・`install.sh`(直す): skill のフォルダの直下のファイルを、みな置く(R2-17)。`install.sh` は SKILL.md の無いフォルダを飛ばす今の動きを残す。
+- `install.ps1`・`install.sh`(直す): skill のフォルダの直下のファイルを、みな置く(R2-17)。`install.sh` は SKILL.md の無いフォルダを飛ばす今の動きを残す。どちらも、skill を置くループの上のコメントを、直下のファイルをみな置くことを言う英文に直し、その末尾に `(ADR 0087-4)` を付ける(ADR の番号をコードに付ける1か所)。
 - `docs/specs/install.md`・`docs/specs/ask_rule_line_meaning_in_fresh_sessions.py.md`: 設計のコミットで作った。
 - `claude/skills/prompt-structure/SKILL.md`(直す): 原則1 の目的「利用者が、全部を見張らなくても、プロンプトを思いどおりに保てるようにする」の、目指す状態「規則は、状態だけでは AI が守れなかった所にだけある」の節の後に、次の4行を足す(R2-3〜R2-5・R3-2):
 
@@ -204,3 +204,8 @@ K1 の意図(設計で書いたもの。PG はこのまま使う):
 
 - 「置くファイル」の `install.ps1`・`install.sh` の行に、ADR 0087-4 の番号をコードに付ける指定が無い(ADR 0006-1・0010-2)。
 - Nit: 仕様 `ask_rule_line_meaning_in_fresh_sessions.py.md` の「ADR」の節に、スクリプトの動きを決めていない 0087-4 がある。
+
+#### 設計レビューの直し(SE)
+
+- 1件目: 「置くファイル」の `install.ps1`・`install.sh` の行に、skill を置くループの上のコメントの末尾へ `(ADR 0087-4)` を付ける指定を足した。
+- Nit: 直した。仕様 `ask_rule_line_meaning_in_fresh_sessions.py.md` の「ADR」の節から 0087-4 を外した(0087-4 は `docs/specs/install.md` に並んでいる)。
