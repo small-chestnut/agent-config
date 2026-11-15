@@ -1,6 +1,6 @@
 # 0087-rule-line-check-and-spec-domain
 
-ステータス: 設計への問い待ち
+ステータス: 設計レビュー済み
 PC: Reo-Desktop
 
 ## 進捗
@@ -48,7 +48,7 @@ PC: Reo-Desktop
 - 受け入れ条件 R2-8: セッションは、環境変数 `CLAUDE_CODE_DISABLE_CLAUDE_MDS=1` を付けて起動し、どの CLAUDE.md も読まない。
 - 受け入れ条件 R2-9: スクリプトは、サインイン情報を写さず、環境変数 `HOME`・`USERPROFILE` を変えない。
 - 受け入れ条件 R2-10: セッションは、`--setting-sources ""`・`--disable-slash-commands`・`--tools ""`・`--no-session-persistence` を付けて起動し、設定・skill・道具を使わず、記録を残さない。
-- 受け入れ条件 R2-11: セッションの標準入力は閉じる。
+- 受け入れ条件 R2-11: 読ませる文は、引数でなく標準入力に UTF-8 で渡し、渡し終えたら標準入力を閉じる。
 - 受け入れ条件 R2-12: 読ませる文は、決まった4つの問い(何をする決まりか・守っている例・破っている例・意味が1つに決まらない所)と、渡した規則の1行だけ。
 - 受け入れ条件 R2-13: モデルは、`--model` で指定しなければ `claude-opus-5-5`。
 - 受け入れ条件 R2-14: 3つのセッションのどれかが 0 でない終了コードで終わったら、そのセッションの出力を添えて、終了コード 1 で終わる。
@@ -84,7 +84,7 @@ PC: Reo-Desktop
 
 - `claude/skills/prompt-structure/ask_rule_line_meaning_in_fresh_sessions.py`(新しく作る): 仕様 `docs/specs/ask_rule_line_meaning_in_fresh_sessions.py.md` のとおり(R2-6〜R2-16)。
   - 使い方: `python ask_rule_line_meaning_in_fresh_sessions.py "<規則の1行>" [--model <モデル>]`。
-  - 公開する関数: `main(argv, run_session=<subprocess.run を使う関数>, find_claude=shutil.which) -> int`。テストは `run_session` と `find_claude` を差し替える(外部のプロセスを業務の規則から分ける)。`run_session(args, cwd, env)` は `(終了コード, 出力)` を返す。
+  - 公開する関数: `main(argv, run_session=<subprocess.run を使う関数>, find_claude=shutil.which) -> int`。テストは `run_session` と `find_claude` を差し替える(外部のプロセスを業務の規則から分ける)。`run_session(args, cwd, env, input_text)` は、`input_text` を標準入力に UTF-8 で渡して閉じ、`(終了コード, 出力)` を返す。`args` に読ませる文は入れない(設計への問い(PG)の答え)。
   - 読ませる文は、定数 `QUESTION` に置き、規則の1行を最後に足す:
 
     ```
@@ -137,7 +137,7 @@ PC: Reo-Desktop
 | T2 test_セッションごとに別の新しい空のフォルダから起動する | 小 | R2-7 |
 | T3 test_CLAUDE.mdを読まない環境変数を付けて起動しHOMEとUSERPROFILEは変えない | 小 | R2-2・R2-8・R2-9 |
 | T4 test_設定とskillと道具を使わず記録を残さない指定で起動する | 小 | R2-10 |
-| T5 test_標準入力を閉じて起動する | 小 | R2-11 |
+| T5 test_読ませる文は引数でなく標準入力で渡す | 小 | R2-11 |
 | T6 test_読ませる文は4つの問いと規則の1行だけ | 小 | R2-12 |
 | T7 test_モデルを指定しなければOpusで起動する | 小 | R2-13 |
 | T8 test_指定したモデルで起動する | 小 | R2-13 |
@@ -207,6 +207,14 @@ ode_modules\@anthropic-ai\claude-codein\claude.exe`)に直接渡すと、改行
   - B: 読ませる文の改行を、空白などに置き換えて1行にする(R2-12 の「読ませる文」の字が変わる。`.cmd` を通る `&`・`%`・`"` などの文字は、そのまま)。
   - C: A か B のうち、決めた方のテスト(一覧に無い)を足す。
 - 手を止めた所: スクリプト(T1〜T11 は通る)は 556e288 に入れた。K1・サブタスク 4 の SKILL.md への4行の足し込みは、この問いの答えが出るまで進めない(足し込みは作業ツリーにあり、コミットしていない)。
+
+#### 設計への問い(PG)への答え(SE)
+
+- A・B のどちらでもなく、読ませる文を引数でなく標準入力で渡す形にした。根本の原因は、読ませる文を `claude.CMD` の引数にして cmd.exe に通したことで、標準入力なら cmd.exe の引数の解釈を通らない。npm の入れ方にも、読ませる文の字(改行・`&`・`%`・`"`)にも依らない。
+- 確かめ: SE が `shutil.which("claude")` の返す `claude.CMD` に、引数に読ませる文を入れず、改行と `みかん & 100% "引用"` を含む文を標準入力で渡した。答えは、改行の後ろの文をそのまま写した(終了コード 0)。
+- 直した所: 仕様の「セッションの標準入力は閉じる。」と受け入れ条件 R2-11 を「読ませる文は、引数でなく標準入力に UTF-8 で渡し、渡し終えたら標準入力を閉じる。」に、「置くファイル」の `run_session` を `run_session(args, cwd, env, input_text)` に、テスト一覧の T5 を「test_読ませる文は引数でなく標準入力で渡す」に直した。
+- C: 足すテストは無い。T5 と T6 を、読ませる文が `input_text` にあり `args` に無いことを確かめる形に直せば足りる。
+- 標準入力に読ませる文だけを渡して閉じるので、ADR 0087-1 の、ほかの入力を読み込ませない決めは変わらない。
 
 ## 実装
 
