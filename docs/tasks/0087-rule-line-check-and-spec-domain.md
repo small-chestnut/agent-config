@@ -1,6 +1,6 @@
 # 0087-rule-line-check-and-spec-domain
 
-ステータス: 設計レビュー中
+ステータス: 設計レビュー済み
 PC: Reo-Desktop
 
 ## 進捗
@@ -199,3 +199,8 @@ K1 の意図(設計で書いたもの。PG はこのまま使う):
 ## 実装
 
 ## レビュー
+
+### 設計レビュー
+
+- 「置くファイル」の `install.ps1`・`install.sh` の行に、ADR 0087-4 の番号をコードに付ける指定が無い(ADR 0006-1・0010-2)。
+- Nit: 仕様 `ask_rule_line_meaning_in_fresh_sessions.py.md` の「ADR」の節に、スクリプトの動きを決めていない 0087-4 がある。
