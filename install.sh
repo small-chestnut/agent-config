@@ -57,13 +57,17 @@ for dir in "${claude_dirs[@]}"; do
 done
 
 # Skills: one folder per skill, SKILL.md inside. The body is loaded only when the
-# skill is invoked, so procedures live here instead of bloating CLAUDE.md. Installed
+# skill is invoked, so procedures live here instead of bloating CLAUDE.md. Every file
+# directly inside a skill folder is installed, not only SKILL.md (ADR 0087-4). Installed
 # into every config dir, like CLAUDE.md.
 echo "Installing Claude Code skills..."
 for d in "$repo"/claude/skills/*/; do
   [ -f "${d}SKILL.md" ] || continue
-  for dir in "${claude_dirs[@]}"; do
-    install_file "${d}SKILL.md" "$dir/skills/$(basename "$d")/SKILL.md"
+  for f in "$d"*; do
+    [ -f "$f" ] || continue
+    for dir in "${claude_dirs[@]}"; do
+      install_file "$f" "$dir/skills/$(basename "$d")/$(basename "$f")"
+    done
   done
 done
 
