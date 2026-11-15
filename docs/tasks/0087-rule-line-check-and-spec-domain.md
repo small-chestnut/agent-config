@@ -1,6 +1,6 @@
 # 0087-rule-line-check-and-spec-domain
 
-ステータス: 実装レビュー中
+ステータス: 実装レビュー済み
 PC: Reo-Desktop
 
 ## 進捗
@@ -282,3 +282,8 @@ ode_modules\@anthropic-ai\claude-codein\claude.exe`)に直接渡すと、改行
 #### 設計レビュー(ADR 0087-5)の直しの確かめ(QA)
 
 - 指摘なし(c340bf8 で直った)。ADR 0087-5 を採用にした。
+
+### 実装レビュー
+
+- Windows で出力がパイプのとき標準出力が cp932 になり、答えに cp932 に無い字(「—」・絵文字など)があると `print` が UnicodeEncodeError で落ち、3つの答えが出ない(R2-6)。QA が、答えを「答え — ✅ 例」にした `run_session` で `main` を呼び、パイプに出して再現した。
+- Nit: 「K1 の意図」の R1-2 の行に、ADR 0087-5 が置き換えた「違いは仕様に写さずに」が残っている。
