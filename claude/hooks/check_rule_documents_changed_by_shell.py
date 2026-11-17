@@ -1,13 +1,13 @@
-"""Bash・PowerShell のコマンドで書き換えたプロンプトにも、字数の数えと `ask_about_written_lines.py` と同じ問いを掛ける(Claude Code の PreToolUse と PostToolUse のフック)。
+"""Bash・PowerShell のコマンドで書き換えたプロンプトにも、`ask_about_written_lines.py` と同じ問いを掛ける(Claude Code の PreToolUse と PostToolUse のフック)。
 
-check_rule_length.py と ask_about_written_lines.py は Edit・Write・MultiEdit にだけ掛かるため、
-シェルから書いた行はどちらも通らない。そこでコマンドの前後でプロンプトを見比べる。
+ask_about_written_lines.py は Edit・Write・MultiEdit にだけ掛かるため、
+シェルから書いた行は通らない。そこでコマンドの前後でプロンプトを見比べる。
   before(PreToolUse):  プロンプトの中身のスナップショットを一時ファイルに取る
-  after(PostToolUse):  スナップショットと今のプロンプトの中身を比べ、このコマンドで足された行を数え、問う
+  after(PostToolUse):  スナップショットと今のプロンプトの中身を比べ、このコマンドで足された行を問う
   record(PreToolUse の Edit・Write・MultiEdit):  書こうとしている行を、書きかけの記録に取る(ADR 0041-1)
   confirm(PostToolUse の Edit・Write・MultiEdit):  書けた呼び出しの記録を、書けた記録にする。after は書けた記録の行を除く
 見るリポジトリは、フックの cwd と、コマンドに書かれた絶対パス(C:/…・C:\\…・/c/…・~/…)が入っているもの。
-プロンプトの決め方・字数の数え方は check_rule_length.py と同じ。知らせがあれば stderr に並べて exit 2。
+プロンプトの決め方は rule_document_added_lines.py と同じ。問う行があれば stderr に並べて exit 2。
 取り込む git コマンド(git merge など)では、HEAD かインデックスと同じ行とコンフリクトマーカーの行は問わない。
 """
 import hashlib
@@ -21,7 +21,7 @@ from difflib import SequenceMatcher
 from pathlib import Path
 
 from ask_about_written_lines import questions_for
-from check_rule_length import LIMIT, PROJECT_LIST, git, is_rule_document, read_patterns, too_long
+from rule_document_added_lines import PROJECT_LIST, git, is_rule_document, read_patterns
 
 SNAPSHOT_DIR = Path(tempfile.gettempdir()) / "claude-rule-document-snapshots"
 WRITTEN_DIR = SNAPSHOT_DIR / "written"
@@ -129,9 +129,9 @@ def asked_lines(text: str, new_lines: set[int]) -> list[tuple[int, str]]:
     return out
 
 
-def findings(before: dict[str, dict[str, str]], roots: list[Path], command: str) -> tuple[list[str], list[str]]:
-    """(上限を超えた行の知らせ, 問う行)。before は {リポジトリのルート: {ルートからのパス: 中身}}。"""
-    long_lines, asked = [], []
+def findings(before: dict[str, dict[str, str]], roots: list[Path], command: str) -> list[str]:
+    """問う行。before は {リポジトリのルート: {ルートからのパス: 中身}}。"""
+    asked = []
     for root in roots:
         old = before.get(str(root), {})
         for rel, text in rule_documents(root).items():
@@ -141,9 +141,8 @@ def findings(before: dict[str, dict[str, str]], roots: list[Path], command: str)
             if brings_other_commits(command):
                 new_lines -= imported_lines(text, git_versions(root, rel))
             new_lines -= lines_matching(text, written_lines(root / rel))
-            long_lines += [f"{rel}:{n}  {length}字  {body}" for n, length, body in too_long(text, new_lines)]
             asked += [f"{rel}:{n}  {body}" for n, body in asked_lines(text, new_lines)]
-    return long_lines, asked
+    return asked
 
 
 def lines_matching(text: str, bodies: set[str]) -> set[int]:
@@ -254,21 +253,15 @@ def after_command(event: dict) -> int:
     before = json.loads(path.read_text(encoding="utf-8"))
     os.remove(path)
     command = (event.get("tool_input") or {}).get("command") or ""
-    long_lines, asked = findings(before, [Path(r) for r in before], command)
-    if not long_lines and not asked:
+    asked = findings(before, [Path(r) for r in before], command)
+    if not asked:
         return 0
     sys.stderr.reconfigure(encoding="utf-8")
-    if long_lines:
-        print(f"このコマンドで足した決まりの1行が上限 {LIMIT} 字を超えています(`…` のコードは1字と数えます)。短くしてください:",
-              file=sys.stderr)
-        for f in long_lines:
-            print("  " + f, file=sys.stderr)
-    if asked:
-        print("このコマンドでプロンプトに足した行です。行ごとに次の問いを確かめ、当たる所を直してください:",
-              file=sys.stderr)
-        print(questions_for([f.split("  ", 1)[1] for f in asked]), file=sys.stderr)
-        for f in asked:
-            print("  " + f, file=sys.stderr)
+    print("このコマンドでプロンプトに足した行です。行ごとに次の問いを確かめ、当たる所を直してください:",
+          file=sys.stderr)
+    print(questions_for([f.split("  ", 1)[1] for f in asked]), file=sys.stderr)
+    for f in asked:
+        print("  " + f, file=sys.stderr)
     return 2
 
 

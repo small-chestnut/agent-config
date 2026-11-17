@@ -1,4 +1,4 @@
-"""claude/hooks/check_rule_documents_changed_by_shell.py が、シェルで書き換えたプロンプトを数え、問い返すテスト。
+"""claude/hooks/check_rule_documents_changed_by_shell.py が、シェルで書き換えたプロンプトの足した行を問い返すテスト。
 
 一時ファイル・git・ほかのプロセスを使うので中。
 実行(この階層で): python -m unittest discover -s tests -p "*test_*.py"
@@ -50,13 +50,14 @@ class コマンドの前後の動き(unittest.TestCase):
         return subprocess.run([sys.executable, str(SCRIPT), mode], input=json.dumps(self.event).encode("utf-8"),
                               capture_output=True)
 
-    def test_コマンドで長い決まりを足すと知らせと問いが返る(self):
+    def test_コマンドで決まりを足すと足した行と問いが返り字数は知らせない(self):
         self.assertEqual(self.run_hook("before").returncode, 0)
         self.doc.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")
         r = self.run_hook("after")
         self.assertEqual(r.returncode, 2)
         err = r.stderr.decode("utf-8")
-        self.assertIn("CLAUDE.md:2  61字", err)
+        self.assertIn("CLAUDE.md:2  ", err)
+        self.assertNotIn("上限", err)
         self.assertIn("消しても意味が変わらない語", err)
         self.assertNotIn("CLAUDE.md:1", err)
 
@@ -86,7 +87,7 @@ class コマンドの前後の動き(unittest.TestCase):
         self.run_hook("before")
         self.assertEqual(self.run_hook("after").returncode, 0)
 
-    def test_コマンドで作ったプロンプトも数える(self):
+    def test_コマンドで作ったプロンプトも問う(self):
         self.run_hook("before")
         skill = self.root / ".claude" / "skills" / "x" / "SKILL.md"
         skill.parent.mkdir(parents=True)
@@ -111,7 +112,7 @@ class コマンドの前後の動き(unittest.TestCase):
         self.event["tool_input"]["command"] = f'cd "{self.root.as_posix()}" && {command}'
 
     def other_branch_with_long_line(self):
-        """別のブランチに長い行を足してコミットし、元のブランチに戻る。"""
+        """別のブランチに行を足してコミットし、元のブランチに戻る。"""
         self.git("checkout", "-q", "-b", "other")
         self.doc.write_text(f"{LONG}\n{LONG}\n", encoding="utf-8")
         self.git("commit", "-qam", "other")

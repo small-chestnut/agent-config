@@ -3,7 +3,7 @@ name: task-team-model-assignment
 description: task-team の SE が、役割(SE・PG・QA)の仕事の難しさと、それに合うモデル・effort と、Fable にするかを決める手順。QA が Fable に替える条件を確かめるときにも読む。
 ---
 
-# 原則1: AI 側の最適化
+# 原則1: AI 側の最適化 ― Claude が、どのリポジトリでも最善の性能を出せる
 
 ## 目的: AI の費用対効果を最適化する
 
@@ -21,7 +21,6 @@ description: task-team の SE が、役割(SE・PG・QA)の仕事の難しさと
 - 低は `claude-sonnet-5-5` の high。(ADR 0070-2)
 - 高は `claude-opus-5-5` の high。(ADR 0070-1)
 - 設計を書き終えたら、頼む前に、PG と QA のモデルと effort を替えている。
-- 替えるのは、`set_session_model` と `set_session_effort`。
 
 ### 目指す状態: Opus で仕上がらない仕事は、Fable で進んでいる(ADR 0065-1)
 
