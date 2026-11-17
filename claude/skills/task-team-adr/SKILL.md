@@ -3,7 +3,7 @@ name: task-team-adr
 description: task-team の SE が、ADR を書く・直すときの形と、古い ADR を置き換えるときの書き方。
 ---
 
-# 原則1: AI 側の最適化
+# 原則1: AI 側の最適化 ― Claude が、どのリポジトリでも最善の性能を出せる
 
 ## 目的: PG が設計を読むだけで実装でき、QA が要件を読むだけで確かめられる
 

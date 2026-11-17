@@ -3,7 +3,7 @@ name: task-team-model-assignment
 description: task-team の SE が、役割(SE・PG・QA)の仕事の難しさと、それに合うモデル・effort と、Fable にするかを決める手順。QA が Fable に替える条件を確かめるときにも読む。
 ---
 
-# 原則1: AI 側の最適化
+# 原則1: AI 側の最適化 ― Claude が、どのリポジトリでも最善の性能を出せる
 
 ## 目的: AI の費用対効果を最適化する
 
