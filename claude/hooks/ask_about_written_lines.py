@@ -1,6 +1,6 @@
 """プロンプトと自動メモリを保存したときに、この保存で足した行を並べ、2つ(消しても意味が変わらない語・具体例や出来事の並び)と、段の見出しがあれば段の導き方を問う(Claude Code の PostToolUse フック)。
 
-プロンプトと自動メモリ、足された行の取り方は check_rule_length.py と同じ。
+プロンプトと自動メモリの決め方、足された行の取り方は rule_document_added_lines.py にある。
 問う行は、足された行のうち、この保存で書いた文字列(Edit・MultiEdit の new_string、Write の content)を含む行。
 空の行とコードブロックの中は除く。問う行があれば stderr に並べて exit 2(Claude に返る)。
 """
@@ -9,7 +9,7 @@ import re
 import sys
 from pathlib import Path
 
-from check_rule_length import read_rule_document, written_text
+from rule_document_added_lines import read_rule_document, written_text
 
 # 問いの文は、ここの1か所にだけ置く(check_rule_documents_changed_by_shell.py も import して使う)。(ADR 0055-2)
 QUESTIONS = (
