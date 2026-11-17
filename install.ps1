@@ -89,6 +89,16 @@ Get-ChildItem "$repo\claude\skills" -Directory | ForEach-Object {
     }
 }
 
+# Rules: path-scoped rules, loaded only when Claude reads a file matching their "paths"
+# (ADR 0090-1). Rules needed only for some files live here instead of CLAUDE.md.
+Write-Host "Installing Claude Code rules..."
+Get-ChildItem "$repo\claude\rules" -File -Filter *.md | ForEach-Object {
+    $rule = $_
+    foreach ($dir in $claudeDirs) {
+        Install-ConfigFile $rule.FullName "$dir\rules\$($rule.Name)"
+    }
+}
+
 # Hooks: scripts that settings.json runs on tool events (see "hooks" in user-settings.json).
 # Installed into every config dir; the hook command finds them via CLAUDE_CONFIG_DIR.
 Write-Host "Installing Claude Code hooks..."

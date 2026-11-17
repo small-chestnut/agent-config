@@ -71,6 +71,16 @@ for d in "$repo"/claude/skills/*/; do
   done
 done
 
+# Rules: path-scoped rules, loaded only when Claude reads a file matching their "paths"
+# (ADR 0090-1). Rules needed only for some files live here instead of CLAUDE.md.
+echo "Installing Claude Code rules..."
+for f in "$repo"/claude/rules/*.md; do
+  [ -f "$f" ] || continue
+  for dir in "${claude_dirs[@]}"; do
+    install_file "$f" "$dir/rules/$(basename "$f")"
+  done
+done
+
 # Hooks: scripts that settings.json runs on tool events (see "hooks" in user-settings.json).
 # Installed into every config dir; the hook command finds them via CLAUDE_CONFIG_DIR.
 echo "Installing Claude Code hooks..."
