@@ -90,7 +90,7 @@ Get-ChildItem "$repo\claude\skills" -Directory | ForEach-Object {
 }
 
 # Rules: path-scoped rules, loaded only when Claude reads a file matching their "paths"
-# (ADR 0090-1). Rules needed only for some files live here instead of CLAUDE.md.
+# (ADR 0090-2). Rules needed only for some files live here instead of CLAUDE.md.
 Write-Host "Installing Claude Code rules..."
 Get-ChildItem "$repo\claude\rules" -File -Filter *.md | ForEach-Object {
     $rule = $_

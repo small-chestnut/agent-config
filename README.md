@@ -10,9 +10,10 @@
 
 なぜ: AI の出力は、人が読み切れる量を越えてきている。AI 駆動開発の速さを決めるのは、人が AI の出力の概要を早く正確につかめるかなので、AI の調整と並んで、利用者が AI の出力をつかむときの認知負荷(頭にかかる負担)を下げることを大事にする。
 
-そのために、Claude Code の設定として、次の3つを置く。
+そのために、Claude Code の設定として、次の4つを置く。
 
 - 全プロジェクト共通の指示(`CLAUDE.md`)
+- 特定のファイルを扱うときの指示(`rules/`。`paths` に合うファイルを読んだときだけ読み込まれる)
 - 作業ごとの手順(skill。呼ばれたときだけ読み込まれる)
 - 意図しない破壊的操作を、設定で機械的に止める安全設定(deny ルール・hooks・サンドボックス)
 
@@ -24,6 +25,7 @@ agent-config/
 │   ├── user-settings.json     # → 各 Claude 設定ディレクトリの settings.json(マシン保護層)
 │   ├── project-settings.json  # → 各リポジトリの .claude/settings.json にコピーしてコミット
 │   ├── CLAUDE.md              # → 各 Claude 設定ディレクトリの CLAUDE.md(プロンプト層・全プロジェクト共通)
+│   ├── rules/<名前>.md        # → 各 Claude 設定ディレクトリの rules/<名前>.md(paths に合うファイルを読んだときだけ読み込まれる規則)
 │   ├── skills/<名前>/SKILL.md  # → 各 Claude 設定ディレクトリの skills/<名前>/SKILL.md(手順。呼ばれたときだけ読み込まれる)
 │   └── hooks/                 # → 各 Claude 設定ディレクトリの hooks/(settings.json の hooks が走らせるスクリプト)
 ├── .claude/skills/team-kanban-page/  # 全部のタスクの進み具合を見せるかんばん(Artifact)のページと、直す・作る手順

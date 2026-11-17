@@ -72,7 +72,7 @@ for d in "$repo"/claude/skills/*/; do
 done
 
 # Rules: path-scoped rules, loaded only when Claude reads a file matching their "paths"
-# (ADR 0090-1). Rules needed only for some files live here instead of CLAUDE.md.
+# (ADR 0090-2). Rules needed only for some files live here instead of CLAUDE.md.
 echo "Installing Claude Code rules..."
 for f in "$repo"/claude/rules/*.md; do
   [ -f "$f" ] || continue
