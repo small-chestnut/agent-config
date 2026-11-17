@@ -9,15 +9,15 @@ description: かんばん(Artifact「チームかんばん」)のページを直
 
 ### 目指す状態: ページのソースは、このフォルダの `index.html` 1つ(ADR 0056-4)
 
-- ページを直すときは、`index.html` を直してから、かんばんに書いている。
+- ページを直すときは、`index.html` を直してから、かんばんに書く。
 - かんばんに書くのは、`files/index.html` の `text` に、`index.html` の中身。
-- 書いた後、かんばんの `data/users/me` の `check` が `passed` かを見ている。
-- ページが読む項目を変えたら、skill `team-kanban` の項目の行も直している。
+- 書いた後、かんばんの `data/users/me` の `check` が `passed` かを見る。
+- ページが読む項目を変えたら、skill `team-kanban` の項目の行も直す。
 
 ### 目指す状態: かんばんは、アカウントに1枚だけ
 
-- 作る前に、Artifact の一覧に「チームかんばん」が無いことを確かめている。
-- 作るときは、Artifact の型「Data」から、名前を「チームかんばん」にしている。
+- 作る前に、Artifact の一覧に「チームかんばん」が無いことを確かめる。
+- 作るときは、Artifact の型「Data」から、名前を「チームかんばん」にする。
 - `dash/meta` は、`title` が「チームかんばん」、`lang` が `ja`。
-- カードのデータは、中身が `[]` の JSON のファイルをアップロードし、`datasets/cards` から指している。
+- カードのデータは、中身が `[]` の JSON のファイルをアップロードし、`datasets/cards` から指す。
 - `datasets/cards` の `source` は、`kind` が `file`、`format` が `json`。
