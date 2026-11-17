@@ -1,14 +1,14 @@
 # 0088-overinstruction
 
-ステータス: 設計レビュー済み
+ステータス: 設計レビュー中
 PC: oguri-sdt011_01
 
 ## 進捗
 
 - 利用者待ち: なし
-- [x] 1. やり方を決める(完了条件: 設計の節に、消す 99 行と見出し1つと、足す1行がある)
+- [x] 1. やり方を決める(完了条件: 設計の節に、消す 96 行と見出し1つと、直す2行と、足す1行がある)
 - [x] 2. やり方を見直す(依存: 1)(完了条件: 「レビュー」の節に、設計レビューの指摘が4件ある。直さないと通せないものが2件、Nit が2件)
-- [ ] 3. 規則の文書から行を消し、根拠の行を足す(依存: 2)(完了条件: 9つの文書から 99 行と見出し1つが消え、1行が足されている)
+- [ ] 3. 規則の文書から行を消し、根拠の行を足す(依存: 2)(完了条件: 9つの文書から 96 行と見出し1つが消え、2行が直り、1行が足されている)
 - [ ] 4. できたものを見直す(依存: 3)(完了条件: 「レビュー」の節に実装レビューの結果がある)
 
 ## 難しさ
@@ -43,7 +43,7 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 
 - 要件: 全体の CLAUDE.md・すべての skill・このリポジトリの CLAUDE.md の規則の行を、R1 の根拠で見直し、根拠を言えない行を消す。どの行を消すかは SE が決める。
 - なぜ: 利用者の言葉「規則全体を見直す　消す範囲は任せる　あなたの裁量でやってよい」。
-- 受け入れ条件 R2-1: 設計の「消す行」に並べた 99 行と見出し1つが、全体の CLAUDE.md と skill に無い。
+- 受け入れ条件 R2-1: 設計の「消す行」に並べた 96 行と見出し1つが、全体の CLAUDE.md と skill に無い。
 - 受け入れ条件 R2-2: 小と中のテストが全部通る。
 
 ### R3 完了条件の形を決める規則を無くす
@@ -52,12 +52,13 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 - なぜ: LogiFee の取り込みで、SE がこの規則を、終わったかを確かめる物差しでなく、やることの中身として当てはめ、先方が誤りと答えた行を直す予定から外した。利用者の言葉「「完了条件は、画面に出る件数で書く」と書かずとも、元のモデルの精度を信頼してもいい気がするんよな」。
 - 受け入れ条件 R3-1: skill `task-team-se` に、完了条件を件数のような事実にする行と、利用者の画面に出るものにする見出しと行が無い。
 - 受け入れ条件 R3-2: skill `task-team` に、目指す状態「画面のあるシステムでは、済みを利用者と同じ画面で確かめている」がある。
+- 受け入れ条件 R3-3: skill `task-team-se` の進捗の形の行とチケットのテンプレートで、完了条件に書くものが「<事実>」でなく「<条件>」になっている。
 
 ### R4 規則を字面どおりに当てはめないよう求める規則を足さない
 
 - 要件: 直し方は、行を消すことにする。規則を字面どおりに当てはめないよう求める規則は足さない。
 - なぜ: 足す行そのものが、守らせる行を増やす。規則を目的に照らさせる規則は、置いても働かなかった(ADR 0084-2)。利用者は、決まりに例外をいちいち書き足すのは融通が利かない、という考え。
-- 受け入れ条件 R4-1: 全体の CLAUDE.md と skill に足した行は、R1-1 の1行だけ。
+- 受け入れ条件 R4-1: 全体の CLAUDE.md と skill に足した行は、R1-1 の1行と、R3-3 の直した2行だけ。
 
 ### 分けたタスク
 
@@ -88,18 +89,18 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 
 新しいファイルは、ADR 0088-1 だけ。直す文書は次の 10 個で、行番号は使わず、行の文で指す。
 
-| 文書 | 消す規則の行 | 足す行 | 要件 |
-|---|---|---|---|
-| `claude/CLAUDE.md` | 15 | 0 | R2 |
-| `claude/skills/task-team-se/SKILL.md` | 42(と見出し1つ) | 0 | R2・R3 |
-| `claude/skills/task-team/SKILL.md` | 5 | 0 | R2・R3 |
-| `claude/skills/task-team-lead/SKILL.md` | 14 | 0 | R2 |
-| `claude/skills/task-team-pg/SKILL.md` | 5 | 0 | R2 |
-| `claude/skills/task-team-qa/SKILL.md` | 9 | 0 | R2 |
-| `claude/skills/draw-figure/SKILL.md` | 3 | 0 | R2 |
-| `claude/skills/module-layout/SKILL.md` | 2 | 0 | R2 |
-| `claude/skills/team-kanban/SKILL.md` | 4 | 0 | R2 |
-| `claude/skills/prompt-structure/SKILL.md` | 0 | 1 | R1・R4 |
+| 文書 | 消す規則の行 | 直す行 | 足す行 | 要件 |
+|---|---|---|---|---|
+| `claude/CLAUDE.md` | 14 | 0 | 0 | R2 |
+| `claude/skills/task-team-se/SKILL.md` | 42(と見出し1つ) | 2 | 0 | R2・R3 |
+| `claude/skills/task-team/SKILL.md` | 4 | 0 | 0 | R2・R3 |
+| `claude/skills/task-team-lead/SKILL.md` | 14 | 0 | 0 | R2 |
+| `claude/skills/task-team-pg/SKILL.md` | 5 | 0 | 0 | R2 |
+| `claude/skills/task-team-qa/SKILL.md` | 9 | 0 | 0 | R2 |
+| `claude/skills/draw-figure/SKILL.md` | 3 | 0 | 0 | R2 |
+| `claude/skills/module-layout/SKILL.md` | 2 | 0 | 0 | R2 |
+| `claude/skills/team-kanban/SKILL.md` | 3 | 0 | 0 | R2 |
+| `claude/skills/prompt-structure/SKILL.md` | 0 | 0 | 1 | R1・R4 |
 
 見直して、消す行が無かった文書(R2): リポジトリ直下の `CLAUDE.md`、skill `explain-to-non-experts`・`notion-learning-log`・`notion-todo`・`restructure-modules`・`ui-mockup`・`team-kanban-page`。どの行も、3つの根拠のどれか(コマンドや ID などの事実・利用者が選んだ書き方や作り方)に当たる。
 
@@ -131,6 +132,7 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 2. `claude/skills/task-team-se/SKILL.md` では、見出し「### 目指す状態: 画面のあるシステムでは、完了条件が利用者の画面に出るもの(ADR 0035-4)」を、その下の2行と、見出しの次の空の行と、2行の次の空の行ごと消す。(R3-1)
 3. `claude/skills/prompt-structure/SKILL.md` の「- 足しても振る舞いが変わらなかった規則は消す。」の次の行に、「足す行」の1行を足す。(R1-1・R4-1)
 4. 行を消して下に規則の行が無くなった目指す状態の見出しは、そのまま残す(見出しだけの目指す状態になる)。(R2)
+5. `claude/skills/task-team-se/SKILL.md` の2行を、「直す行」の「前」から「後」に替える。(R3-3)
 
 #### 足す行
 
@@ -142,9 +144,29 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 - この行は、SE が `ask_rule_line_meaning_in_fresh_sessions.py` で3つのセッションに読ませた。3つとも「規則を書いてよい根拠をこの3つに限り、AI が言われなくてもすることは規則に書かない」と答え、意図と合った(ADR 0087-1)。PG は、読ませ直さない。(R1-1)
 - 字数は、`check_rule_length.py` の数え方で 60 字以内。(R1-1)
 
+#### 直す行
+
+`claude/skills/task-team-se/SKILL.md` のチケットのテンプレートの中の行(R3-3):
+
+```
+前: - [ ] 1. やり方を決める(完了条件: <事実>)
+後: - [ ] 1. やり方を決める(完了条件: <条件>)
+```
+
+`claude/skills/task-team-se/SKILL.md` の目指す状態「進捗の節から、サブタスクのつながりと今の状態が図に描ける(ADR 0035-1)」の下の行(R3-3):
+
+```
+前: - その下に、サブタスクを `- [ ] <番号>. <サブタスク>(依存: <番号>)(完了条件: <事実>)` の形で並べている。
+後: - 進捗の節には、サブタスクを `- [ ] <番号>. <サブタスク>(依存: <番号>)(完了条件: <条件>)` の形で並べている。
+```
+
+- 意図: 進捗の節で、サブタスクを、番号・名前・依存・完了条件を持つ1行の決まった形で並べさせる。完了条件に書く中身の種類(件数・事実)は決めない。(R3)
+- 「後」の規則の行は、SE が `ask_rule_line_meaning_in_fresh_sessions.py` で3つのセッションに読ませた。3つとも「進捗の節で、サブタスクを、番号・名前・依存先・完了条件を持つ1行の決まった形で並べる」と答え、完了条件の例に件数でない条件(「全テストが通る」など)を挙げ、意図と合った(ADR 0087-1)。PG は、読ませ直さない。(R3-3)
+- 「その下に」を「進捗の節には」に替えたのは、指す先だった行が今の skill に無く、3つのセッションがみな、何の下かが決まらないと答えたから。(R3-3)
+
 #### 消す行
 
-#### `claude/CLAUDE.md`
+`claude/CLAUDE.md`
 
 ```
 - 分けたときは、質問の欄で、続きを出すかを聞いている。
@@ -154,7 +176,6 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 - 案を出す前に、問題の根本原因を確かめている。
 - 主な案は、根本原因を取り除く恒久対応にしている。
 - モジュールの外は、import や型の参照をたどって行き着いたファイルだけを読んでいる。
-- 探すのは、仕様・skill・CLAUDE.md・コードで、grep でしている。(ADR 0068-1)
 - 画面やモジュールを足す変更では、`docs/概要.md` の一覧にも足している。
 - 終わったという報告には、テストと lint を実行した結果がある。
 - 自分で組み立てるのは、AI のように定石が固まっていない技術でだけ。
@@ -164,7 +185,7 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 - 書き換えた経緯は、そのコミットメッセージに「前の理由 → 新しい理由」の形で書いている。
 ```
 
-#### `claude/skills/task-team-se/SKILL.md`
+`claude/skills/task-team-se/SKILL.md`
 
 ```
 - 利用者が設計に進めると言ったら、壁打ちの途中でも設計を始めている。
@@ -212,17 +233,16 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 - Fable と決めた役割は、「難しさ」の節の理由に、当たった場合を書いている。
 ```
 
-#### `claude/skills/task-team/SKILL.md`
+`claude/skills/task-team/SKILL.md`
 
 ```
 - 「-」は、その作業に関わらない役割。
-- どの行にも A は1つだけあり、1つの役割に付く文字は1つだけ。
 - `[x]` にしたサブタスクは、完了条件の括弧の中を、その場で数えた事実に書き換えている。
 - プログラムが出す「処理しました」のような報告だけでは、`[x]` にしていない。
 - その許可を、利用者にもう一度求めていない。
 ```
 
-#### `claude/skills/task-team-lead/SKILL.md`
+`claude/skills/task-team-lead/SKILL.md`
 
 ```
 - 2つ以上に当たりそうなら、候補を1行ずつ並べ、どれかを1回だけ聞いている。
@@ -241,7 +261,7 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 - 返ってきたリンクを、利用者に出すかんばんのリンクにしている。
 ```
 
-#### `claude/skills/task-team-pg/SKILL.md`
+`claude/skills/task-team-pg/SKILL.md`
 
 ```
 - ゴールは、チケットの冒頭の「ゴール」の節を1行にしている。
@@ -251,7 +271,7 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 - テストと lint は、対象リポジトリの CLAUDE.md のコマンドで実行している。
 ```
 
-#### `claude/skills/task-team-qa/SKILL.md`
+`claude/skills/task-team-qa/SKILL.md`
 
 ```
 - 当たった所は、どれも指摘に足している。
@@ -265,7 +285,7 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 - 設計と実装は同じセッションで見る。2回目の依頼は `SendMessage` で来る。
 ```
 
-#### `claude/skills/draw-figure/SKILL.md`
+`claude/skills/draw-figure/SKILL.md`
 
 ```
 - 会話の中に表示できない環境では、HTML ファイルに書き出し、開くためのパスを示している。
@@ -273,17 +293,16 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 - 1本道のサブタスクも、枝分かれするサブタスクも、同じ描き方にしている。
 ```
 
-#### `claude/skills/module-layout/SKILL.md`
+`claude/skills/module-layout/SKILL.md`
 
 ```
 - その業務の作業で開くファイルがモジュールのフォルダの外にあるときは、置き場所を見直している。
 - ほかのモジュールが使うものは、公開インターフェースで公開している。
 ```
 
-#### `claude/skills/team-kanban/SKILL.md`
+`claude/skills/team-kanban/SKILL.md`
 
 ```
-- カードは、チケット1つに1枚。
 - どの列に出すかは、かんばんのページが `status` から決めている。
 - 書き直す前に、今のデータのファイルを読んでいる。
 - 書き込みが断られたら、読み直してやり直している。
@@ -295,11 +314,12 @@ LogiFee の SE のフォークの知らせにあった、ほかの2つ(利用者
 
 | 確かめ方 | テストサイズ | 受け入れ条件 |
 |---|---|---|
-| 「消す行」の 99 行と見出し1つを、その文書で `grep -Fx` して、どれも当たらない | なし | R2-1・R3-1 |
-| `git diff main --numstat -- claude` の消した行の数が、CLAUDE.md 15・task-team-se 45・task-team 5・task-team-lead 14・task-team-pg 5・task-team-qa 9・draw-figure 3・module-layout 2・team-kanban 4 で、足した行は prompt-structure の1行だけ | なし | R2-1・R4-1 |
+| 「消す行」の 96 行と見出し1つを、その文書で `grep -Fx` して、どれも当たらない | なし | R2-1・R3-1 |
+| `git diff main --numstat -- claude` の消した行の数が、CLAUDE.md 14・task-team-se 47・task-team 4・task-team-lead 14・task-team-pg 5・task-team-qa 9・draw-figure 3・module-layout 2・team-kanban 3 で、足した行は prompt-structure の1行と task-team-se の2行だけ | なし | R2-1・R4-1 |
+| `claude/skills/task-team-se/SKILL.md` で「直す行」の「後」の2行を `grep -Fx` して当たり、`grep -F "<事実>"` が当たらない | なし | R3-3 |
 | `claude/skills/prompt-structure/SKILL.md` で「足す行」の1行を `grep -Fx` して当たる | なし | R1-1 |
 | `claude/skills/task-team/SKILL.md` で「### 目指す状態: 画面のあるシステムでは、済みを利用者と同じ画面で確かめている(ADR 0035-4)」を `grep -Fx` して当たる | なし | R3-2 |
-| `python -m unittest discover -s tests -p "*test_*.py"` が通る(リポジトリの写しに消す行を当てたときは、124 個が通った) | なし | R2-2 |
+| `python -m unittest discover -s tests -p "*test_*.py"` が通る(リポジトリの写しに、消す行・直す行・足す行を当てたときは、124 個が通った) | なし | R2-2 |
 
 ### サブタスクの前提
 
