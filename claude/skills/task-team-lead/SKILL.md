@@ -72,7 +72,6 @@ description: 利用者の話題をタスクにし、SE(壁打ち・設計)・PG(
 
 - SE を Fable にする知らせは、SE か QA から届く。(ADR 0067-2)
 - その知らせが届いたら、SE を `claude-fable-5-2` の high に替えている。(ADR 0065-1)
-- 替えるのは、`set_session_model` と `set_session_effort`。(ADR 0059-1・0065-1・0067-1)
 
 ### 目指す状態: 採用した ADR を、利用者は終わったタスクの報告で知っている(ADR 0007-1)
 
