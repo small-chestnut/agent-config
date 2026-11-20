@@ -96,7 +96,8 @@
       "mcp__comfyui__list_api_nodes",
       "mcp__comfyui__list_packs",
       "mcp__comfyui__search_custom_nodes",
-      "mcp__comfyui__calculate"
+      "mcp__comfyui__calculate",
+      "mcp__ccd_sidebar__set_pinned"
     ]
   },
   "hooks": {
