@@ -22,6 +22,7 @@
 
 1. 利用者の理由: テストが作業のたびに増え続けると困る。過剰なテストはパフォーマンスを落とす。基準は、あるべき形から決める。
 2. 今の基準が入った 2026-10-31 から 2026-11-24 までに、gemini(`退避/` を除く Python)は、テスト以外の行が 27,916 から 27,817 で変わらず、テストの行が 982 から 11,406 になった。
-3. 定石: テストは一番大事な所(業務の規則)に集め、価値が維持の手間を大きく上回るものだけを残す(Khorikov『Unit Testing Principles, Practices, and Patterns』1章、https://enterprisecraftsmanship.com/files/Unit-Testing-Chapter-1-Excerpt.pdf)。範囲と量は、リスク(起きる見込み × 起きたときの害)で決める(ISTQB CTFL v4.0.1 5.2、https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf)。どちらも 2026-11-24 に読んだ。
-4. 計算か判断は見込みに、気づかずに使い続けるか元に戻せないは害に当たる。定石の「価値が手間を上回る」を、AI が見分けられる条件にしたもので、条件そのものは定石に書かれていない。
-5. 同じ処理を通る値は、1つの組で代表させられる(同値分割。ISTQB CTFL v4.0.1 4.2.1)。
+3. 定石: テストは一番大事な所(業務の規則)に集め、価値が手間を大きく上回るものだけを残す(Khorikov『Unit Testing Principles, Practices, and Patterns』1章、https://enterprisecraftsmanship.com/files/Unit-Testing-Chapter-1-Excerpt.pdf)。範囲と量は、リスク(起きる見込み × 起きたときの害)で決める(ISTQB CTFL v4.0.1 5.2、https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf)。どちらも 2026-11-24 に読んだ。
+4. 手間は、維持の手間(コードを変えるたびに直す・毎回実行する・誤った失敗に対応する・読む)だけでなく、書く・レビューする時間も含む。作った後にすぐ消すテストも、書いてレビューした分は手間になる。
+5. 計算か判断は見込みに、気づかずに使い続けるか元に戻せないは害に当たる。定石の「価値が手間を上回る」を、AI が見分けられる条件にしたもので、条件そのものは定石に書かれていない。
+6. 同じ処理を通る値は、1つの組で代表させられる(同値分割。ISTQB CTFL v4.0.1 4.2.1)。
