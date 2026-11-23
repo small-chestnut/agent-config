@@ -5,7 +5,7 @@ PC: Reo-Desktop
 
 ## 進捗
 
-- 利用者待ち: 残すテストを決める基準(Q1) [0091 SE](#local_8d704647-2cb9-42b2-b75d-5a95af04aff0)
+- 利用者待ち: この定石を基準にして設計に進めてよいか(Q1) [0091 SE](#local_8d704647-2cb9-42b2-b75d-5a95af04aff0)
 - [/] 1. やり方を決める(完了条件: 利用者が設計に進めると言う)
 
 ## 難しさ
@@ -39,17 +39,23 @@ task-team で開発しても、機能やデータを変えるたびにテスト�
 - 今の規則(skill `task-team-test-list`)は、テストの数を、受け入れ条件・分かれ目・境目の数から下限で決めている。「要らないテストが無い」の行も、この5つのどれかに当たるものを要るものとするので、規則どおりのテストは何件でも通る。どの行にも、壊れたときに困るかは出てこない。
 - 設計の受け入れ条件が、終わった後も残るテストになる(skill `task-team-pg` の「受け入れ条件ごとに、先に失敗するテストがある」)。作ったときに動くか確かめることと、後の変更で壊れないように残すことが、同じテストになっている。
 - gemini の 0094 のテスト一覧は、`--cosplay-add` を断る場合ごとに1件ずつある。
-- 定石:
-  - テストの範囲と量は、リスク(起きる見込み × 起きたときの害)で決める(リスクベースドテスト)。全部を確かめるのは不可能で、リスクを受け入れる選択もある(ISTQB CTFL v4.0.1 1.3・5.2.1・5.2.3・5.2.4、https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf)。
-  - 減らしてもまだ足りるなら、テストは多すぎる(Martin Fowler「TestCoverage」、https://martinfowler.com/bliki/TestCoverage.html)。
-  - 低い層で確かめてあるものを確かめる高い層のテストは消す。つまらないコードのテストは書かない(「The Practical Test Pyramid」、https://martinfowler.com/articles/practical-test-pyramid.html)。
+- 作るテストの定石:
+  - テストは、一番大事な所に集める。多くのシステムでは業務の規則(ドメインモデル)で、ほかは短くか間接に確かめる。値は込み入り方と業務での重さで分かれる(Khorikov『Unit Testing Principles, Practices, and Patterns』1章 1.4.2、https://enterprisecraftsmanship.com/files/Unit-Testing-Chapter-1-Excerpt.pdf を読んだ。4種類に分ける 7章は、要約 https://dzx.fr/blog/unit-testing-principles-practices-patterns/ で読んだ)。
+  - 作らない: 単純なコード、技術的な前提条件とすぐ失敗するエラーの道筋、内部の作り(同じ要約の 5.3)。
+  - 範囲と量は、リスク(起きる見込み × 起きたときの害)で決める(リスクベースドテスト。ISTQB CTFL v4.0.1 1.3・5.2、https://www.istqb.org/wp-content/uploads/2024/11/ISTQB_CTFL_Syllabus_v4.0.1.pdf)。
   - 振る舞い1つにテスト1つ。関係ない変更で落ちるテストは、維持の手間を増やす(Software Engineering at Google 12章、https://abseil.io/resources/swe-book/html/ch12.html)。
+- 消すテストの定石:
+  - テストは負債でもある。価値が維持の手間を大きく上回るテストだけを残し、ほかは消す。手間は、コードを直すたびに直す・毎回実行する・誤った失敗に対応する・読む、の時間(Khorikov 1章 1.2.1・1.4.3・まとめ)。
+  - 減らしてもまだ足りるなら、テストは多すぎる(Martin Fowler「TestCoverage」、https://martinfowler.com/bliki/TestCoverage.html)。
+  - 低い層で確かめてあるものを確かめる高い層のテストは消す(「The Practical Test Pyramid」、https://martinfowler.com/articles/practical-test-pyramid.html)。
+  - 見直すときは、まだ関係があるか・役に立つか・手間に見合うかを問う(SSW、https://www.ssw.com.au/rules/review-automated-tests)。
+- 今の規則に当てると: 定石と同じなのは、分かれ目と境目を確かめる所。定石に無いのは、受け入れ条件1つにテスト1つ以上と、重さを問わない分かれ目ごとのテスト。定石にあって今の規則に無いのは、大事な所に絞ることと、価値が手間を上回らないテストを消すこと。
 
 ### 分けたタスク
 
 ### 決まっていない問い
 
-- Q1: 残すテストを、壊れると、間違いに気づかないまま記録や金額に残る動きと、取り返しのつかない動きのテストだけにし、ほかは作ったときに動かして確かめるだけにするか(リスクベースドテスト)。
+- Q1: 作る・残す・消すテストを、上の定石(業務の規則に集め、価値が維持の手間を大きく上回るテストだけを残す)で決めるか。
 
 ## 設計
 
