@@ -1,7 +1,7 @@
 """claude/hooks/push_after_ticket_commit.py が、チケットのコミットの後に push するテスト。
 
 仕様は docs/specs/push_after_ticket_commit.py.md。
-git は関数の引数で差し替える(偽の git)ので、1つのプロセスのメモリだけで終わる小。
+git は関数の引数で差し替える(偽の git)ので、1つのプロセスのメモリだけで終わる small。
 実行(この階層で): python -m unittest discover -s tests
 """
 import importlib.util

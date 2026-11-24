@@ -1,6 +1,6 @@
 """claude/hooks/check_rule_documents_changed_by_shell.py が、シェルで書き換えたプロンプトの足した行を問い返すテスト。
 
-一時ファイル・git・ほかのプロセスを使うので中。
+一時ファイル・git・ほかのプロセスを使うので medium。
 実行(この階層で): python -m unittest discover -s tests -p "*test_*.py"
 """
 import hashlib

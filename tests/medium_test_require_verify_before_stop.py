@@ -1,6 +1,6 @@
 """claude/hooks/require_verify_before_stop.py が、作業ツリーが変わったのに検証コマンドが通っていないターンを止めるテスト。
 
-一時ファイル・git・ほかのプロセス・待ちを使うので中。
+一時ファイル・git・ほかのプロセス・待ちを使うので medium。
 実行(この階層で): python -m unittest discover -s tests -p "*test_*.py"
 """
 import importlib.util
