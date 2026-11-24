@@ -1,6 +1,6 @@
 # 0095-prompt-structure-review-criteria
 
-ステータス: 実装中
+ステータス: 設計への問い待ち
 PC: Reo-Desktop
 
 ## 進捗
@@ -8,7 +8,7 @@ PC: Reo-Desktop
 - 利用者待ち: なし
 - [x] 1. 段の数と、skill prompt-structure をどう直すかを決める(完了条件: 利用者が要件を進めると言っている)
 - [x] 2. 今ある文書の見出しの案を決める(依存: 1)(完了条件: 利用者が目的の文に合意している)
-- [ ] 3. skill prompt-structure とフックを4段にする(依存: 2)(完了条件: 受け入れ条件 R1-1 を満たす)
+- [/] 3. skill prompt-structure とフックを4段にする(依存: 2)(完了条件: 受け入れ条件 R1-1 を満たす)
 - [ ] 4. 全体の CLAUDE.md・rules・ほかの skill を4段に組み直す(依存: 3)(完了条件: 受け入れ条件 R3-1 を満たす)
 - [ ] 5. 組み直した決まりを採点する(依存: 4)(完了条件: 受け入れ条件 R2-1 を満たす)
 
@@ -91,8 +91,28 @@ PC: Reo-Desktop
 
 - 目的の文は、利用者が合意してから入れる(skill prompt-structure)。`headings.md` の見出しの文(設計レビューの直しを含む)と、R2-1 を「増えていない」にすることは、利用者が合意した(2026-11-24)。
 
+### 設計への問い
+
+- R2-1 の採点で、判断できない組の割合が前より増えた(38.8% → 41.8%)。増えたのは、原則のすぐ下に目的が来る組(原則→目的 90/126)。とくに、AI 側の原則「Claude が、どのリポジトリでも最善の性能を出せる」の下に、skill ごとの具体的な目的が並ぶ組が判断できない: task-team-se 22/23、task-team-lead 11/17(前は目的→目指す状態を含め 5/21)、module-layout 6/6(前 2/7)、task-team-repo-ticket-format 3/3、restructure-modules 3/3、task-team-adr 3/3。`headings.md` のとおりに直した結果で、PG は直す文を変えていない。目的を、原則とつながる文に変えるか(`headings.md` の見出しを直す)、R2-1 を今の割合で受けるかは、SE が決める。
 
 ## 実装
+
+- コミット: フック(`ask_about_written_lines.py`)とテスト2つ → skill prompt-structure → 全体の CLAUDE.md → rules → ほかの skill(1つずつ)。`headings.md` のとおりに直した。
+- 実行したテスト: `python -m unittest discover -s tests`(small。51件、成功)、`python -m unittest discover -s tests -p "*test_*.py"`(small と medium。118件、成功。字数のテストを含む)。large は無い。lint のコマンドは CLAUDE.md に無い。
+- `grep -rn "目指す状態" claude .claude README.md CLAUDE.md docs/specs`: 当たりは `docs/specs/ask_about_written_lines.py.md` 9行目の1つだけ(ADR 0095-1 の題名を書いた行)。ほかに無い。(R1-1・R3-1)
+- R2-1 の採点: `judge.py ... before=3be2495 after=work`(3回・多数決・前後を混ぜた)。結果の全部は共有フォルダの `0095-judge-result.json`。
+
+  | 組み方 | 段の種類 | 組 | 言い直し | 判断できない |
+  |---|---|---|---|---|
+  | 前 | 命題→原則 | 26 | 0 | 1 |
+  | 前 | 原則→目的 | 34 | 2 | 19 |
+  | 前 | 目的→目指す状態 | 125 | 1 | 53 |
+  | 前 | 見出し→規則 | 379 | 15 | 146 |
+  | 後 | 命題→原則 | 26 | 0 | 0 |
+  | 後 | 原則→目的 | 126 | 0 | 90 |
+  | 後 | 見出し→規則 | 379 | 14 | 132 |
+
+  判断できない組の割合(全部の段の合計): 前 219/564(38.8%)、後 222/531(41.8%)。**増えている**ので、R2-1 は満たせていない。見出し→規則の組は 146→132 に減ったが、原則→目的の組が、前の「原則→目的」と「目的→目指す状態」の合計 72/159(45%)から 90/126(71%)に増えた。詳しくは「設計への問い」。
 
 ## レビュー
 
