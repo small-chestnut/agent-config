@@ -1,6 +1,6 @@
 # 0098-2 段の見出しの書き方の文は skill `prompt-structure` に置き、フックはそれを指して問う
 
-状態: 提案
+状態: 採用
 日付: 2026-11-24
 対象: ask_about_written_lines.py・check_rule_documents_changed_by_shell.py・prompt-structure
 置き換える: 0061-1 の、導いたかをフックが問い返す所
