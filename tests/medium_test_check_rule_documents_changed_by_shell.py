@@ -73,7 +73,7 @@ class コマンドの前後の動き(unittest.TestCase):
         self.doc.write_text(f"{LONG}\n## 目的: 足した目的\n", encoding="utf-8")
         r = self.run_hook("after")
         self.assertEqual(r.returncode, 2)
-        self.assertIn("3. 原則・目的・目指す状態の見出しは、すぐ上の段(原則なら命題)から導いた文にし",
+        self.assertIn("3. 原則・目的の見出しは、すぐ上の段(原則なら命題)から導いた文にし",
                       r.stderr.decode("utf-8"))
 
     def test_コマンドで足した行はプロンプトに足した行と知らせる(self):
