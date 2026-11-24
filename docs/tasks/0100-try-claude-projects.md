@@ -1,17 +1,17 @@
 # 0100-try-claude-projects
 
-ステータス: 実装中
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
 
-- 利用者待ち: 環境を、残すか、元に戻せなくてもアーカイブするかの答え [0100-try-claude-projects PG](#local_07c2a662-7d4a-496b-80a8-6960daf87a31)
+- 利用者待ち: なし
 - [x] 1. 何を試して確かめるかを決める(完了条件: 利用者が、試す範囲を見て、設計に進めると言う)
 - [x] 2. 自分のアカウントでプロジェクトの画面を開けるかが分かる(依存: 1)(完了条件: 利用者のブラウザで、プロジェクトを作る画面が出るか、出ないと分かる)
 - [x] 3. 試したプロジェクトの Overview で、自分を待っているスレッドを見る(依存: 2)(完了条件: R2-1)
 - [x] 4. 決まりが届いたかの表を見る(依存: 3)(完了条件: R1-1・R2-2)
 - [x] 5. 統合を続けるかを決める(依存: 4)(完了条件: 利用者が表を見て、続けるかやめるかを答える)
-- [/] 6. 試したプロジェクトと環境が片付いている(依存: 5)(完了条件: R1-2)
+- [x] 6. 試したプロジェクトと環境が片付いている(依存: 5)(完了条件: R1-2)
 
 ## 難しさ
 
@@ -172,8 +172,9 @@ Claude の「プロジェクト」機能のクラウドのスレッドに、ク�
 - スレッドの出力は [result.md](0100-try-claude-projects/result.md)。番号 3・4・7 のコードブロックは、改行を除いた SHA-256 が画面の文と一致した。
 - 利用者は操作 A を済ませた。操作 B は無かった。
 - 手順 6 の確かめ: 判定の表の4行の根拠の文が、3つ目の節にそのままあることを、検索で確かめた。
-- 手順 9: プロジェクトはアーカイブし、プロジェクトの一覧に「アーカイブ済み」と出た。環境は、確認の画面に「この操作は元に戻せません」と出たのでキャンセルし、アーカイブしていない。
-- スクリーンショット(共有ノートのフォルダの `0100-trial/`): `environment-setup-script.jpg`・`project-environment.jpg`・`thread-output.jpg`・`overview-after-question.jpg`・`overview-user-screen.webp`(利用者の画面)・`overview-user-screen-after-answer.webp`(答えた後の利用者の画面)・`thread-after-answer.jpg`・`project-archived.jpg`・`environment-archive-confirm.jpg`
+- 手順 9: プロジェクトはアーカイブし、プロジェクトの一覧に「アーカイブ済み」と出た。環境は、確認の画面に「この操作は元に戻せません」と出たのでキャンセルした。元に戻せないことを伝えて聞くと、利用者は「残す」と答えたので、アーカイブせずに、次のタスクで使うために残した。環境の選択の一覧に `agent-config-trial` があり、新規セッションの環境の選択は「自動」のまま。
+- テスト: small と medium の全部を実行し、118 個が成功した(リポジトリに CI は無い)。コードは変えていない。lint のコマンドは CLAUDE.md に無いので、実行していない。
+- スクリーンショット(共有ノートのフォルダの `0100-trial/`): `environment-setup-script.jpg`・`project-environment.jpg`・`thread-output.jpg`・`overview-after-question.jpg`・`overview-user-screen.webp`(利用者の画面)・`overview-user-screen-after-answer.webp`(答えた後の利用者の画面)・`thread-after-answer.jpg`・`project-archived.jpg`・`environment-archive-confirm.jpg`・`environment-kept.jpg`
 
 ## レビュー
 
