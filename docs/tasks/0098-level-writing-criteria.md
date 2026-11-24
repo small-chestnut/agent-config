@@ -69,7 +69,7 @@ PC: Reo-Desktop
 - フックにあった文の「手段の言葉を入れない」は、肯定形の「手段の言葉を除いた文にする」に替えた(ADR 0027-1)。表の規則の行は、同じ理由で利用者の表の「/しないか」を除いた。
 - 前の文は「段」に優先順位まで毎回書くと読まれたので、主語を「各段に書くのは」にした。原則の段の優先順位は、番号が決める。
 
-`claude/hooks/ask_about_written_lines.py`(R1-3): `LAYER_QUESTION` を次の文に替え、上の注釈の ADR を「0061-1・0095-1・0098-2」にする。
+`claude/hooks/ask_about_written_lines.py`(R1-3): `LAYER_QUESTION` を次の文に替え、上の注釈の ADR を「0061-1・0095-1・0098-2」にする。冒頭の docstring の「段の導き方を問う」を「段の書き方に照らすことを問う」に替える。
 
 ```python
 LAYER_QUESTION = "  3. 原則・目的の見出しは、skill `prompt-structure` の段の書き方に照らし、合わない所を直す。"
