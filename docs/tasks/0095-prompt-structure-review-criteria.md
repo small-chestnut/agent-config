@@ -1,6 +1,6 @@
 # 0095-prompt-structure-review-criteria
 
-ステータス: 設計レビュー済み
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
