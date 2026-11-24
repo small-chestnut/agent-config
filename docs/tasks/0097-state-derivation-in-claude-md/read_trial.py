@@ -16,7 +16,7 @@ GLOBAL = (ROOT / "claude/CLAUDE.md").read_text(encoding="utf-8")
 RULES = (ROOT / "claude/rules/claude-md.md").read_text(encoding="utf-8")
 TEMPLATE = re.search(r"```markdown\n(.*?)```", RULES, re.S).group(1)
 SAMPLE = TEMPLATE.replace(
-    "<リポジトリを一言で説明する句>",
+    "<リポジトリが何のためにあるかを、一言で言う句>",
     "社員のPCはこのシステムだけで仕事が済み、AIが進め、人は確かめてうなずくだけで案件が終わる。",
 ) + """
 原則がぶつかったときは、番号の小さい方を先にする。
