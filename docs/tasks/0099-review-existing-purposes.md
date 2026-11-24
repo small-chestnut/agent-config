@@ -1,6 +1,6 @@
 # 0099-review-existing-purposes
 
-ステータス: 設計レビュー中
+ステータス: 設計レビュー済み
 PC: Reo-Desktop
 
 ## 進捗
@@ -89,3 +89,5 @@ code-review(low)の指摘は無い。`rebuild.py` を別のフォルダで実行
 - Nit: ADR 0099-1 の理由3は、変えるのを規則の 13 行と2行だけとするが、`rebuild.py` は `task-team-pg`・`task-team-qa`・`team-kanban` に「原則がぶつかったときは、…」の行も足す。
 - Nit: `task-team-pg` の「利用者に操作を頼むとき、ステータスを「利用者の操作待ち…」にする。」は、新しい目的では「自分が待たれていることを、…分かる」の方に合う。`task-team-pg` の「始めるとき、ステータスを「実装中」にする。」だけが利用者の目的に移り、`task-team-se`・`task-team-qa` の同じ種類の行は「次の役割が、…」に残っていて、そろっていない。
 - Nit: 受け入れ条件 R1-1 は `rebuild.py` の出力と比べるだけで、plan.txt が、利用者の合意した headings.md と同じことを確かめる受け入れ条件と手順が無い(QA が照らした今の plan.txt は同じ)。
+
+直しの確かめ: D1・D2 とも直った。残った指摘は無い。
