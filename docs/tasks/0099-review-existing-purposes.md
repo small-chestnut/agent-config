@@ -5,7 +5,7 @@ PC: Reo-Desktop
 
 ## 進捗
 
-- 利用者待ち: なし
+- 利用者待ち: 見出しの案(headings.md)で設計に進めてよいかを答える [0099-review-existing-purposes SE](#local_1d786681-2956-4368-b074-d56b7d1c533a)
 - [/] 1. 今ある目的を見直す範囲と、直し方を決める(完了条件: 利用者が、今の目的の採点結果を見て、どの目的をどう直すかを決める)
 
 ## 難しさ
@@ -27,6 +27,8 @@ agent-config の今ある目的を、0098 で skill `prompt-structure` に置い
 ### 分けたタスク
 
 ### 決まっていない問い
+
+- 見出しの案 [headings.md](0099-review-existing-purposes/headings.md)(目的 126 → 114。基準に合わない目的 60 → 4、すぐ上の目的から合うかを決められない規則 140/387 → 90/400、前の目指す状態とほぼ同じ文 74 → 20)で、設計に進めてよいか。採点の道具・案・結果は、リポジトリの外の notes の `0099-trial/`(plan.txt・new/・now.json・new3.json・loss3.txt)。
 
 ## 設計
 
