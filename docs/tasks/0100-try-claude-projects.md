@@ -1,11 +1,11 @@
 # 0100-try-claude-projects
 
-ステータス: 利用者の操作待ち(Overview を見て、スレッドに「はい」と答える)
+ステータス: 利用者の操作待ち(スレッドに「はい」と答える)
 PC: Reo-Desktop
 
 ## 進捗
 
-- 利用者待ち: 設計の操作 A(Overview を見て、スレッドに「はい」と答える) [0100-try-claude-projects PG](#local_07c2a662-7d4a-496b-80a8-6960daf87a31)
+- 利用者待ち: 設計の操作 A の残り(スレッドに「はい」と答える) [0100-try-claude-projects PG](#local_07c2a662-7d4a-496b-80a8-6960daf87a31)
 - [x] 1. 何を試して確かめるかを決める(完了条件: 利用者が、試す範囲を見て、設計に進めると言う)
 - [x] 2. 自分のアカウントでプロジェクトの画面を開けるかが分かる(依存: 1)(完了条件: 利用者のブラウザで、プロジェクトを作る画面が出るか、出ないと分かる)
 - [/] 3. 試したプロジェクトの Overview で、自分を待っているスレッドを見る(依存: 2)(完了条件: R2-1)
@@ -149,6 +149,6 @@ Claude の「プロジェクト」機能のクラウドのスレッドに、ク�
 - 手順 1〜5 をした。プロジェクトを作る画面は、利用者の Chrome に出た。環境とプロジェクトを `agent-config-trial` の名前で作り、プロジェクト設定で環境を選んだ。保存されたセットアップスクリプトと、送る前の入力欄の文は、SHA-256 でファイルと一致した。
 - 手順に無い操作: 環境を作ると、新規セッションの環境の選択が `agent-config-trial` に変わったので、元の「自動」に戻した。
 - スレッドの出力は [result.md](0100-try-claude-projects/result.md)。番号 3・4・7 のコードブロックは、改行を除いた SHA-256 が画面の文と一致した。
-- スクリーンショット(共有ノートのフォルダの `0100-trial/`): `environment-setup-script.jpg`・`project-environment.jpg`・`thread-output.jpg`・`overview-after-question.jpg`
+- スクリーンショット(共有ノートのフォルダの `0100-trial/`): `environment-setup-script.jpg`・`project-environment.jpg`・`thread-output.jpg`・`overview-after-question.jpg`・`overview-user-screen.webp`(利用者の画面)
 
 ## レビュー
