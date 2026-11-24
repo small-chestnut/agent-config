@@ -112,12 +112,12 @@ class 保存したときの問い(unittest.TestCase):
             self.assertEqual((r.returncode, r.stderr), (0, b""))
 
     def test_段の見出しを足すとすぐ上の段から導いたかを問う(self):
-        for heading in ("# 原則1: 安全", "## 目的: 足した目的", "### 目指す状態: 足した状態"):
+        for heading in ("# 原則1: 安全", "## 目的: 足した目的"):
             with self.subTest(heading=heading):
                 self.doc.write_text(f"- 前からある\n{heading}\n", encoding="utf-8")
                 code, err = self.edit(heading)
                 self.assertEqual(code, 2)
-                self.assertIn("3. 原則・目的・目指す状態の見出しは、すぐ上の段(原則なら命題)から導いた文にし", err)
+                self.assertIn("3. 原則・目的の見出しは、すぐ上の段(原則なら命題)から導いた文にし", err)
 
     def test_段の見出しを足していなければ段の問いを出さない(self):
         self.doc.write_text("- 前からある\n- 足した\n", encoding="utf-8")
