@@ -104,6 +104,7 @@ LAYER_QUESTION = "  3. 原則・目的の見出しは、skill `prompt-structure`
 - 設計の手順どおりに、テスト5つの文を先に直して失敗(4件)を確かめ、フックの `LAYER_QUESTION` と注釈の ADR、skill `prompt-structure` の足す文を直した。
 - 実行: `python -m unittest discover -s tests -p "*test_*.py"`(small と medium の全部。large は無い)118件 OK。lint のコマンドはこのリポジトリに無い。
 - R1-1: skill `prompt-structure` の目的「どの規則も、親の段を読めば、…」の下に、足す2行と表を置いた。
+- 実装レビューの I1: docstring の「段の導き方を問う」を「段の書き方に照らすことを問う」に直した。
 - R1-3: フックの段の問いは skill を指す文に替え、段の書き方の文は skill にだけある(フックに無い)。medium のテストが通る。
 - R1-2: `answer_levels_in_fresh_sessions.py` の答え5つは、5つとも命題=何のために存在するか・原則=何を大事にしてぶつかったら何を先にするか・目的=なぜ必要でどうなっていれば良いか・規則=そのために具体的に何をするか、の4つに合う(答え1・4・5は「導いて」「手段の言葉を除いて」を足しただけ)。答えの全文:
 
