@@ -1,7 +1,7 @@
 """全体の CLAUDE.md(claude/CLAUDE.md)の字数が、上限以内であることを確かめるテスト。
 
 字数は、改行も1字と数える(read_text が CRLF を LF にして読む)。
-リポジトリのファイルを使うので中。
+リポジトリのファイルを使うので medium。
 実行(この階層で): python -m unittest tests/medium_test_global_claude_md_length.py
 """
 import unittest

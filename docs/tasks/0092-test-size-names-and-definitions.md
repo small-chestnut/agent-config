@@ -1,6 +1,6 @@
 # 0092-test-size-names-and-definitions
 
-ステータス: 設計レビュー済み
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -8,7 +8,7 @@ PC: Reo-Desktop
 - 利用者待ち: なし
 - [x] 1. やり方を決める(完了条件: 利用者が要件 R1・R2 を進めると言っている)
 - [x] 2. 書き換える文が、要件とほかの決まりに合うかを確かめる(依存: 1)(完了条件: 設計レビューに、直さないと通せない指摘が残っていない)
-- [ ] 3. 規則とテストの呼び名と、分け方の置き場所を書き換える(依存: 2)(完了条件: R1 と R2 の受け入れ条件を確かめた結果が「実装」の節にある)
+- [x] 3. 規則とテストの呼び名と、分け方の置き場所を書き換える(依存: 2)(完了条件: R1 と R2 の受け入れ条件を確かめた結果が「実装」の節にある)
 - [ ] 4. 書き換えた文書を確かめる(依存: 3)(完了条件: 実装レビューに、直さないと通せない指摘が残っていない)
 
 ## 難しさ
@@ -108,6 +108,15 @@ PC: Reo-Desktop
 ### サブタスクの前提
 
 ## 実装
+
+設計の「置くファイルと名前・データ」の1〜7を、書かれた文のとおりに書き換えた(`claude/CLAUDE.md`・`claude/rules/test-size.md`・`claude/rules/claude-md.md`・`claude/skills/task-team-pg/SKILL.md`・`claude/skills/task-team-test-list/SKILL.md`・このリポジトリの `CLAUDE.md`・`tests/` の docstring 10ファイル)。
+
+- 実行したテスト: small と medium の全部(`python -m unittest discover -s tests -p "*test_*.py"`)。118件、すべて成功(全体の CLAUDE.md の字数のテストを含む)。lint のコマンドは、このリポジトリに無い。
+- R1-1: `claude/`・`CLAUDE.md`・`tests/` を `小|中|大` で検索し、当たった行を見た。テストサイズを指すものは無い(残るのは「番号の小さい方」「手間を大きく上回る」「コードブロックの中」などの別の意味)。
+- R2-1: 書き換え後の `claude/CLAUDE.md` の全文と、3つのテストのサイズを聞く文を、設計の `claude -p ...` に3回渡した。3回とも「localhost の DB につなげるテスト = medium、localhost で立てたサイトをブラウザで操作するテスト = large、1つのプロセスの中で関数の速さを測るテスト = large」と答えた。
+- R2-2: `claude/`・`CLAUDE.md`・`README.md`・`docs/specs/`・`tests/` を `Software Engineering at Google`・`プロセス`・`localhost`・`1台のマシン` で検索した(設計レビューの Nit のとおり範囲を広げた)。分け方は `claude/CLAUDE.md:88` の1行だけ。ほかの当たりは、`tests/` の docstring が各テストの大きさの理由を書いた文で、分け方の定義ではない。
+- フックの問い(行ごとの語の削除・具体例の置き換え)が、足した行と直した行に出た。設計が「→」の右の文を替えないと決めているので、文は替えていない。
+- 画面の変更は無い。
 
 ## レビュー
 

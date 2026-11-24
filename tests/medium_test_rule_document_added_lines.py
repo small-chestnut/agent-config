@@ -1,6 +1,6 @@
 """claude/hooks/rule_document_added_lines.py が、保存されたプロンプトと自動メモリから、足された行を取るテスト。
 
-一時ファイルと git を使うので中。
+一時ファイルと git を使うので medium。
 実行(この階層で): python -m unittest discover -s tests -p "*test_*.py"
 """
 import importlib.util

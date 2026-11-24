@@ -1,7 +1,7 @@
 """claude/hooks/block_history_erasing_push.py が、リモートの履歴を消す push を止めるテスト。
 
 仕様は docs/specs/block_history_erasing_push.py.md。
-フックの main() を同じプロセスの中で呼ぶ(標準入出力を差し替える)ので、小。
+フックの main() を同じプロセスの中で呼ぶ(標準入出力を差し替える)ので、small。
 実行(この階層で): python -m unittest discover -s tests
 """
 import importlib.util

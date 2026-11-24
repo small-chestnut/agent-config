@@ -1,7 +1,7 @@
 """claude/hooks/add_team_skill_to_team_roles.py が、役割の skill の後に task-team を渡すテスト。
 
 仕様は docs/specs/add_team_skill_to_team_roles.py.md。
-一時フォルダに SKILL.md を置いて読む。一時ファイルを使うので中。
+一時フォルダに SKILL.md を置いて読む。一時ファイルを使うので medium。
 実行(この階層で): python -m unittest discover -s tests -p "*test_*.py"
 """
 import importlib.util

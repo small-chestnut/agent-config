@@ -1,7 +1,7 @@
 """claude/hooks/remind_pin_after_starting_se.py が、SE を起こした後にピン留めを知らせるテスト。
 
 仕様は docs/specs/remind_pin_after_starting_se.py.md。
-入力の JSON を関数に渡すだけなので、1つのプロセスのメモリだけで終わる小。
+入力の JSON を関数に渡すだけなので、1つのプロセスのメモリだけで終わる small。
 実行(この階層で): python -m unittest discover -s tests
 """
 import importlib.util
