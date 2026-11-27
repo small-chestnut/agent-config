@@ -28,11 +28,16 @@ LogiFee の PL がチームを作るたびに、アプリの「このワーク�
 - なぜ: アプリは自分で作った worktree を信頼済みと記録するので、チームを作るたびに信頼の問いに答える手間が無くなる。
 - 受け入れ条件 R1-1: LogiFee で次にチームを作ったとき、SE・PG・QA のどれでも信頼の問いが出ない。
 
+### R2 アプリが使い回したフォルダをそのまま使う
+
+- 要件: アプリが SE の worktree に、ほかのタスクのフォルダを使い回しても、PL がそのまま使うことを、skill `task-team-lead` に書く。R1 は LogiFee の PL にも伝える。
+- なぜ: LogiFee の PL は、使い回されたフォルダを誤りと見て、worktree を自分で作るようになった。skill に書かなければ、同じことがまた起きたときに、また自分で作り出す。
+- 受け入れ条件 R2-1: skill `task-team-lead` を読んだ PL が、SE の worktree のフォルダの名前がほかのタスクのものでも、開始し直さず、そのフォルダで QA と PG を開始する。
+
 ### 分けたタスク
 
 ### 決まっていない問い
 
-- R1 を、LogiFee の PL に伝えるだけで済ませるか、アプリがほかのタスクのフォルダを使い回したときにどうするかも skill に書いて、また自分で作り出すのを防ぐか。
 - 調べて分かった事実は次のとおり。
   - アプリは、`start_session` の `use_worktree: true` で自分が作った worktree を、作ったときに信頼済みと記録する(`%APPDATA%\Claude\git-worktrees.json` の `autoTrusted: true`)。
   - LogiFee の PL は、2026-11-15 の 2921 から、skill `task-team-lead` の「SE は `use_worktree: true`」に従わず、`git worktree add` で worktree を自分で作り、3つとも `use_worktree: false` で開始している。この worktree はアプリの記録に無く、SE が最初に開くときに信頼を聞かれる。
