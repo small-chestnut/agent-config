@@ -1,0 +1,13 @@
+# block_new_branch_worktree.py
+
+## ADR
+
+- 0103-1 新しいタスクの worktree はアプリに作らせ、git で新しいブランチの worktree を作るのをフックで止める
+
+## 動き
+
+- Bash・PowerShell の `git worktree add` が、`-b`・`-B`(`-bname` のように続けて書いたものも)を含むか、`--detach`・`-d` が無くてフォルダだけを渡していれば、止めて、新しいタスクの worktree は `start_session` の `use_worktree: true` でアプリに作らせるよう返す。
+- フォルダと既にあるブランチかコミットを渡す `git worktree add` と、`--detach`・`-d` を含む `git worktree add` は通す。
+- `--reason` の次のトークンは値として読み、フォルダやブランチに数えない。
+- &&・||・;・|・改行でつないだコマンドは、1つずつ見て、1つでも止める形があれば止める。
+- `git worktree add` 以外のコマンドは、何も返さずに通す。

@@ -1,16 +1,20 @@
 # 0103-no-trust-prompt-on-team-start
 
-ステータス: 壁打ち中
+ステータス: 設計レビュー中
 PC: Reo-Desktop
 
 ## 進捗
 
-- 利用者待ち: skill に足す行の案を見て、設計に進めるかを決めてもらう([0103-no-trust-prompt-on-team-start SE](#local_da3e5b00-914c-4151-b69e-b9f25b16d46b))
-- [/] 1. やり方を決める(完了条件: 直し方を利用者が決め、要件の節に書いてある)
+- 利用者待ち: なし
+- [x] 1. やり方を決める(完了条件: 直し方を利用者が決め、要件の節に書いてある)
+- [ ] 2. Claude が新しいブランチの worktree を git で作ろうとすると止まる(依存: 1)(完了条件: テスト一覧のテストが通り、インストールした後のセッションで `git worktree add -b` を実行すると止まって、アプリに作らせるよう返る)
+- [ ] 3. LogiFee でチームを作っても信頼を聞かれない(依存: 2)(完了条件: 利用者が LogiFee でチームを作り、信頼の問いが出なかったと返す)
 
 ## 難しさ
 
-- SE: 中(原因はアプリの動きの調べで分かり、変える文は少ない見込み)
+- SE: 高(原因をアプリの記録から調べ、直し方を決める)
+- PG: 低(止める形と返す文は設計で決めてある)
+- QA: 高(ADR を提案した設計のレビューで、フックで止める範囲がほかの使い方を壊さないかを判断する)
 
 ## ゴール
 
@@ -22,23 +26,75 @@ LogiFee の PL がチームを作るたびに、アプリの「このワーク�
 
 ## 要件
 
-### R1 SE の worktree はアプリに作らせる
+### R1 新しいタスクの worktree はアプリに作らせる
 
-- 要件: LogiFee の PL は、skill `task-team-lead` の今の手順のとおり、SE を `use_worktree: true` で開始し、worktree をアプリに作らせる。`git worktree add` で自分で作るのをやめる。
+- 要件: 新しいタスクの worktree は、PL が `git worktree add` で作らず、`start_session` の `use_worktree: true` でアプリに作らせる。
 - なぜ: アプリは自分で作った worktree を信頼済みと記録するので、チームを作るたびに信頼の問いに答える手間が無くなる。
 - 受け入れ条件 R1-1: LogiFee で次にチームを作ったとき、SE・PG・QA のどれでも信頼の問いが出ない。
 
-### R2 アプリが使い回したフォルダをそのまま使う
+### R2 git で新しいブランチの worktree を作るのをフックで止める
 
-- 要件: アプリが SE の worktree に、ほかのタスクのフォルダを使い回しても、PL がそのまま使うことを、skill `task-team-lead` に書く。R1 は LogiFee の PL にも伝える。
-- なぜ: LogiFee の PL は、使い回されたフォルダを誤りと見て、worktree を自分で作るようになった。skill に書かなければ、同じことがまた起きたときに、また自分で作り出す。
-- 受け入れ条件 R2-1: skill `task-team-lead` を読んだ PL が、SE の worktree のフォルダの名前がほかのタスクのものでも、開始し直さず、そのフォルダで QA と PG を開始する。
+- 要件: Claude が `git worktree add` で新しいブランチの worktree を作ろうとしたら、フックで止め、アプリに作らせるよう返す。skill には何も足さない。
+- なぜ: アプリが作る流れをフックで固定すれば、PL が外れる先が無くなり、アプリがほかのタスクのフォルダを使い回したときの扱いを書く必要もない。利用者は「フックを作る」を選んだ(2026-11-27)。
+- 受け入れ条件 R2-1: 新しいブランチを作る形の `git worktree add` は実行されず、アプリに作らせるよう返る。
+- 受け入れ条件 R2-2: フォルダと既にあるブランチかコミットを渡す形(ほかの PC から続けるタスク)と、`--detach` の形の `git worktree add` は止まらない。
 
 ### 分けたタスク
 
 ### 決まっていない問い
 
-- 調べて分かった事実は次のとおり。
-  - アプリは、`start_session` の `use_worktree: true` で自分が作った worktree を、作ったときに信頼済みと記録する(`%APPDATA%\Claude\git-worktrees.json` の `autoTrusted: true`)。
-  - LogiFee の PL は、2026-11-15 の 2921 から、skill `task-team-lead` の「SE は `use_worktree: true`」に従わず、`git worktree add` で worktree を自分で作り、3つとも `use_worktree: false` で開始している。この worktree はアプリの記録に無く、SE が最初に開くときに信頼を聞かれる。
-  - 切り替えたきっかけ: 2921 の SE を `use_worktree: true` で開始したら、アプリが、12:48 にアーカイブした 2920 のチームの worktree(片付ける前のもの)のフォルダを使い回し、そこに 2921 のブランチ(develop の先端から)を作った。PL はこれを誤りと見て開始し直し、以後ずっと自分で作っている。
+## 設計
+
+### ADR
+
+- 0103-1 新しいタスクの worktree はアプリに作らせ、git で新しいブランチの worktree を作るのをフックで止める(提案)
+
+### 置くファイルと名前・データ
+
+- `claude/hooks/git_command_args.py`(新しく作る): Bash・PowerShell のコマンドを読む部分を、2つのフックで使えるようにまとめる。(R2)
+  - `SEPARATORS`: `block_history_erasing_push.py` から移す。
+  - `git_args(segment: str) -> list[str] | None`: 1つのコマンドが git なら、大域オプション(`-C`・`-c` は値も)を飛ばした、サブコマンドから後ろのトークン。そうでなければ None。`block_history_erasing_push.py` の `push_args` の前半を移したもの。
+- `claude/hooks/block_history_erasing_push.py`(直す): `SEPARATORS` と `git_args` を `git_command_args` から読む。動きは変えない。
+- `claude/hooks/block_new_branch_worktree.py`(新しく作る): PreToolUse フック。(R2・ADR 0103-1)
+  - docstring に「ADR 0103-1」を書く。
+  - 止める形(R2-1): `git_args` が `worktree add` で始まり、その後ろに、`-b`・`-B`(`-bname` のように続けて書いたものも)があるか、`--detach`・`-d` が無くて位置引数(`-` で始まらないトークン。`--reason` の次のトークンは値なので数えない)が1つだけのもの。
+  - 通す形(R2-2): 位置引数が2つで `-b`・`-B` が無いもの、`--detach`・`-d` があるもの、`worktree add` 以外のすべて。
+  - &&・||・;・|・改行でつないだコマンドは、1つずつ見て、1つでも止める形があれば止める。
+  - 止めるときは、stderr に次の文を書いて exit 2。「新しいブランチの worktree を git で作るのを止めました。新しいタスクの worktree は、start_session の use_worktree: true でアプリに作らせてください。アプリが作った worktree は信頼済みと記録され、開くときに信頼を聞かれません。」
+  - 入力の JSON が読めないときと、`tool_input.command` が無いときは、何も返さずに通す(`block_history_erasing_push.py` と同じ)。
+- `claude/user-settings.json`(直す): `hooks.PreToolUse` の matcher `Bash|PowerShell` の `hooks` に、`block_history_erasing_push.py` の次に1つ足す。command は、ほかと同じ形の `P=python3; python3 -c '' 2>/dev/null || P=python; "$P" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/block_new_branch_worktree.py"`。(R2)
+- `docs/specs/block_new_branch_worktree.py.md`(設計のコミットで作った): フックの外から見える動き。実装がこれと合うようにする。(R2)
+
+### 手順
+
+1. `git_command_args.py` を作り、`block_history_erasing_push.py` をそれを使う形に直して、`python -m unittest tests/test_block_history_erasing_push.py` が通ることを確かめ、このコミットだけで分ける(動きを変えないコミット)。(R2)
+2. テスト一覧のテストを先に書き、通らないことを確かめる。(R2-1・R2-2)
+3. `block_new_branch_worktree.py` を書き、`user-settings.json` に足す。(R2)
+4. `python -m unittest discover -s tests -p "*test_*.py"` が全部通ることを確かめる。(R2)
+5. PL が main にマージしてインストールした後、新しいセッションで `git worktree add -b` を実行すると止まり、上の文が返ることを確かめる(進捗 2 の完了条件)。(R2-1)
+6. 利用者が LogiFee で次にチームを作り、信頼を聞かれないかを確かめる(下の「利用者がする操作」)。(R1-1)
+
+### 利用者がする操作
+
+- 何を: インストールした後に、LogiFee の PL セッションで、いつものようにチームを作ってもらう。
+- ゴールにどうつながるか: 信頼の問いが出なくなったことを、実際の画面で確かめる(R1-1)。
+- なぜ利用者の手でか: 信頼の問いは利用者の画面にだけ出て、Claude からは出たかどうかが見えない。
+- 手順: LogiFee の PL セッションに、次のタスクのチームを作るよう頼む。LogiFee の PL が `git worktree add -b` で作ろうとすればフックで止まり、アプリに作らせるほうへ戻る。
+- 終わったら返すこと: SE・PG・QA のどれかで信頼の問いが出たか、出なかったか。
+- 元に戻せるか: 戻せる(チームを作るだけ)。
+
+### テスト一覧
+
+| テスト名 | テストサイズ | 受け入れ条件 |
+|---|---|---|
+| test_block_new_branch_worktree.py: 新しいブランチを作るworktree_addは止めてアプリに作らせるよう返す(`-b`・`-B`・`-bname`・フォルダだけ・`git -C <フォルダ> worktree add -b`・&& でつないだもの) | small | R2-1 |
+| test_block_new_branch_worktree.py: 既にあるブランチかdetachのworktree_addは通す(フォルダとブランチ・`--detach`・`-d`・`--reason` の値を数えないこと) | small | R2-2 |
+| test_block_new_branch_worktree.py: worktree_add以外のコマンドは通す(`git worktree list`・`git push`・`echo`) | small | R2-2 |
+
+- `test_block_history_erasing_push.py` は残す(手順1で動きを変えないことを確かめる)。
+
+### サブタスクの前提
+
+## 実装
+
+## レビュー
