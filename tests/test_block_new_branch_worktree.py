@@ -44,7 +44,11 @@ class 新しいブランチのworktree(unittest.TestCase):
                         "git worktree add -bfeature ../wt",
                         "git worktree add ../wt",
                         "git -C repo worktree add -b feature ../wt",
-                        "git fetch && git worktree add -b feature ../wt origin/main"):
+                        "git fetch && git worktree add -b feature ../wt origin/main",
+                        "git worktree add ../wt 2>&1",
+                        "git worktree add ../wt > log.txt",
+                        "git worktree add ../wt >log.txt",
+                        "git worktree add ../wt 2>&1 | Out-String"):
             for tool in ("Bash", "PowerShell"):
                 with self.subTest(command=command, tool=tool):
                     code, _, err = run_hook(tool, command)

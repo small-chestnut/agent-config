@@ -6,10 +6,12 @@ Bash・PowerShell のコマンドを &&・||・;・|・改行で区切り、git 
 止めたら stderr にアプリに作らせるよう書いて exit 2(コマンドは走らない)。
 """
 import json
+import re
 import sys
 
 from git_command_args import SEPARATORS, git_args
 
+REDIRECT = re.compile(r"^[0-9*&]?(>>?|<)")
 MESSAGE = ("新しいブランチの worktree を git で作るのを止めました。"
            "新しいタスクの worktree は、start_session の use_worktree: true でアプリに作らせ、"
            "アプリがほかのタスクのフォルダを使い回しても、そのまま使ってください。"
@@ -30,6 +32,9 @@ def makes_new_branch(args: list[str]) -> bool:
             detached = True
         elif a == "--reason":
             next(rest, None)
+        elif redirect := REDIRECT.match(a):
+            if redirect.end() == len(a):  # 出力先が離れている
+                next(rest, None)
         elif not a.startswith("-"):
             positionals += 1
     return not detached and positionals == 1
