@@ -6,30 +6,20 @@ Bash・PowerShell のコマンドを &&・||・;・|・改行で区切り、git 
 --force-with-lease は、どの位置にあっても利用者の確認に回す(permissionDecision: ask)。
 """
 import json
-import re
-import shlex
 import sys
-from pathlib import Path
 
-SEPARATORS = re.compile(r"&&|\|\||[;|\n]")
+from git_command_args import SEPARATORS, git_args
+
 ERASING_LONG_FLAGS = ("--force", "--delete", "--mirror", "--prune")
 LEASE = "--force-with-lease"
 
 
 def push_args(segment: str) -> list[str] | None:
     """1つのコマンドが git push なら、push の後ろの引数。そうでなければ None。"""
-    try:
-        tokens = shlex.split(segment)
-    except ValueError:
-        tokens = segment.split()
-    if not tokens or Path(tokens[0]).name not in ("git", "git.exe"):
+    args = git_args(segment)
+    if not args or args[0] != "push":
         return None
-    i = 1
-    while i < len(tokens) and tokens[i].startswith("-"):
-        i += 2 if tokens[i] in ("-C", "-c") else 1
-    if i >= len(tokens) or tokens[i] != "push":
-        return None
-    return tokens[i + 1:]
+    return args[1:]
 
 
 def erasing_arg(args: list[str]) -> str | None:
