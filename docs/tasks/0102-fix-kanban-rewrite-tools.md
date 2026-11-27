@@ -5,7 +5,7 @@ PC: Reo-Desktop
 
 ## 進捗
 
-- 利用者待ち: なし
+- 利用者待ち: gemini の PL にもう一度書き直させるかを決める [0102-fix-kanban-rewrite-tools SE](#local_3c6c0cc5-1203-4d40-b5a0-d20354d1fe36)
 - [/] 1. やり方を決める(完了条件: サブエージェントが今の道具で書き直せない段と、直し方を利用者が決めている)
 
 ## 難しさ
@@ -24,13 +24,15 @@ SE が確かめたこと(2026-11-27、Reo-Desktop): 読むだけを頼んだ `mo
 
 gemini の PL の答え(2026-11-27): 3回とも、task-team-lead のとおりの頼む文で、`subagent_type: "general-purpose"`・`model: "sonnet"`。同じ頼み方で 0109 のカードは前に書き直せた。1回目はチケットがまだ無かった。2・3回目はチケットがあり、「cards.json を読めず、アップロードする手段も無い」と返った。PL のセッションでは Artifact は読み込み済み、ArtifactData は deferred で、サブエージェントの側の道具は見えていない。PL 自身は `Artifact` の list を scope `files` で引き、cards.json が無いとしていた(cards.json は公開ファイルでなくアセットで、scope `assets` で出る)。
 
+再現(2026-11-27、Reo-Desktop、agent-config の SE のセッションから): task-team-lead のとおりの頼む文(`general-purpose`・`sonnet`、チケットは 0102)で、サブエージェントは書き直せた。`datasets/cards` は version 762 になり、新しい cards.json は 411 行で、前の 410 行は1行も変わらず、0102 の行が1行増えた。指していた前のファイルは消え、それより古い2つは残っている。gemini の PL での失敗は、ここでは再現しなかった。
+
 ## 要件
 
 ### 分けたタスク
 
 ### 決まっていない問い
 
-- gemini の PL のサブエージェントが読めなかったのは、SKILL.md が呼び方(アセットの id を `path` に渡す・`asset: true` で上げる)を書いていないからか、道具がそのセッションに無かったからか。再現させて決める。
+- gemini の PL のサブエージェントが読めなかったのは、SKILL.md が呼び方(アセットの id を `path` に渡す・`asset: true` で上げる)を書いていないからか、道具がそのセッション(2026-11-26 に始まった)に無かったからか。同じ頼む文がここでは通ったので、gemini の PL で今もう一度失敗するかで決める。
 
 ## 設計
 
