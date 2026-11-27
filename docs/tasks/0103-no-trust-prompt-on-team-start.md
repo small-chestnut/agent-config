@@ -22,11 +22,18 @@ LogiFee の PL がチームを作るたびに、アプリの「このワーク�
 
 ## 要件
 
+### R1 SE の worktree はアプリに作らせる
+
+- 要件: LogiFee の PL は、skill `task-team-lead` の今の手順のとおり、SE を `use_worktree: true` で開始し、worktree をアプリに作らせる。`git worktree add` で自分で作るのをやめる。
+- なぜ: アプリは自分で作った worktree を信頼済みと記録するので、チームを作るたびに信頼の問いに答える手間が無くなる。
+- 受け入れ条件 R1-1: LogiFee で次にチームを作ったとき、SE・PG・QA のどれでも信頼の問いが出ない。
+
 ### 分けたタスク
 
 ### 決まっていない問い
 
-- 直し方の向き。調べて分かった事実は次のとおり。
+- R1 を、LogiFee の PL に伝えるだけで済ませるか、アプリがほかのタスクのフォルダを使い回したときにどうするかも skill に書いて、また自分で作り出すのを防ぐか。
+- 調べて分かった事実は次のとおり。
   - アプリは、`start_session` の `use_worktree: true` で自分が作った worktree を、作ったときに信頼済みと記録する(`%APPDATA%\Claude\git-worktrees.json` の `autoTrusted: true`)。
   - LogiFee の PL は、2026-11-15 の 2921 から、skill `task-team-lead` の「SE は `use_worktree: true`」に従わず、`git worktree add` で worktree を自分で作り、3つとも `use_worktree: false` で開始している。この worktree はアプリの記録に無く、SE が最初に開くときに信頼を聞かれる。
   - 切り替えたきっかけ: 2921 の SE を `use_worktree: true` で開始したら、アプリが、12:48 にアーカイブした 2920 のチームの worktree(片付ける前のもの)のフォルダを使い回し、そこに 2921 のブランチ(develop の先端から)を作った。PL はこれを誤りと見て開始し直し、以後ずっと自分で作っている。
