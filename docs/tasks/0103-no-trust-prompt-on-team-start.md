@@ -1,6 +1,6 @@
 # 0103-no-trust-prompt-on-team-start
 
-ステータス: 実装中
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -105,6 +105,11 @@ LogiFee の PL がチームを作るたびに、アプリの「このワーク�
   - 答え(SE): PG の案にする。リダイレクトとその出力先は位置引数に数えない。置くファイルの止める形の行に、リダイレクトの見分け方を足し、テスト一覧の R2-1 のテストにリダイレクトを付けた形を足し、仕様に1行足した。リダイレクトを付けても新しいブランチを作るので、R2-1 のとおり止めるのが要件に合い、抜け道に認める理由が無い。
 
 ## 実装
+
+- 手順1〜4まで済み。手順1の、動きを変えないコミットは 42a9c0f。このコミットでは、`git_command_args` を同じフォルダから読めるように、`tests/test_block_history_erasing_push.py` に `sys.path` の1行を足した(テストの中身は変えていない)。
+- テスト: テスト一覧のテストは、フックより先に書いて失敗させた。設計への問いの後に足したリダイレクトの形も、直す前に失敗させた。`python -m unittest discover -s tests -p "*test_*.py"` は 122 件すべて成功(small と medium。large のテストは無い)。lint のコマンドは、このリポジトリに無い。
+- テストの外で確かめたこと: `claude/user-settings.json` に足した command を、`CLAUDE_CONFIG_DIR` をこのリポジトリの `claude/` にして実行した。`git worktree add -b x ../wt` と `git worktree add ../wt 2>&1` は exit 2、`git worktree add ../wt main 2>&1` と `git worktree add --detach ../wt` は exit 0。
+- まだ確かめていないこと: 手順5(インストールした後の新しいセッション。進捗 2 の完了条件)と手順6(R1-1)。
 
 ## レビュー
 
