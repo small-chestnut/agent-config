@@ -11,7 +11,9 @@ import sys
 import unittest
 from pathlib import Path
 
-SCRIPT = Path(__file__).resolve().parents[1] / "claude" / "hooks" / "block_history_erasing_push.py"
+HOOKS = Path(__file__).resolve().parents[1] / "claude" / "hooks"
+SCRIPT = HOOKS / "block_history_erasing_push.py"
+sys.path.insert(0, str(HOOKS))
 spec = importlib.util.spec_from_file_location("block_history_erasing_push", SCRIPT)
 bhep = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(bhep)
