@@ -1,6 +1,6 @@
 # 0103-1 新しいタスクの worktree はアプリに作らせ、git で新しいブランチの worktree を作るのをフックで止める
 
-状態: 提案
+状態: 採用
 日付: 2026-11-27
 対象: block_new_branch_worktree.py
 
