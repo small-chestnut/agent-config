@@ -34,10 +34,11 @@ LogiFee の PL がチームを作るたびに、アプリの「このワーク�
 
 ### R2 git で新しいブランチの worktree を作るのをフックで止める
 
-- 要件: Claude が `git worktree add` で新しいブランチの worktree を作ろうとしたら、フックで止め、アプリに作らせるよう返す。skill には何も足さない。
-- なぜ: アプリが作る流れをフックで固定すれば、PL が外れる先が無くなり、アプリがほかのタスクのフォルダを使い回したときの扱いを書く必要もない。利用者は「フックを作る」を選んだ(2026-11-27)。
+- 要件: Claude が `git worktree add` で新しいブランチの worktree を作ろうとしたら、フックで止め、アプリに作らせるよう返す。返す文で、アプリがほかのタスクのフォルダを使い回してもそのまま使うことと、ほかの PC から続けるタスクの作り方も伝える。skill には何も足さない。
+- なぜ: アプリが作る流れをフックで固定すれば、PL がいちばん外れやすい道がふさがる。`git branch` の後の `git worktree add` のような抜け道はフックで見分けられないので、外れた原因(使い回されたフォルダを誤りと見たこと)への扱いを、止めたときに返す文で伝える。skill ではなく返す文に書けば、ほかのリポジトリで読まれる文章が増えない。利用者は「フックを作る」を選んだ(2026-11-27)。
 - 受け入れ条件 R2-1: 新しいブランチを作る形の `git worktree add` は実行されず、アプリに作らせるよう返る。
-- 受け入れ条件 R2-2: フォルダと既にあるブランチかコミットを渡す形(ほかの PC から続けるタスク)と、`--detach` の形の `git worktree add` は止まらない。
+- 受け入れ条件 R2-2: フォルダと既にあるブランチかコミットを渡す形(ほかの PC から続けるタスクの、skill `task-team-lead` の作り方)と、`--detach` の形の `git worktree add` は止まらない。
+- 受け入れ条件 R2-3: 止めたときに返す文に、アプリがほかのタスクのフォルダを使い回してもそのまま使うことと、ほかの PC から続けるタスクは `git worktree add <フォルダ> <作業ブランチ>` で作ることが入っている。
 
 ### 分けたタスク
 
@@ -60,7 +61,7 @@ LogiFee の PL がチームを作るたびに、アプリの「このワーク�
   - 止める形(R2-1): `git_args` が `worktree add` で始まり、その後ろに、`-b`・`-B`(`-bname` のように続けて書いたものも)があるか、`--detach`・`-d` が無くて位置引数(`-` で始まらないトークン。`--reason` の次のトークンは値なので数えない)が1つだけのもの。
   - 通す形(R2-2): 位置引数が2つで `-b`・`-B` が無いもの、`--detach`・`-d` があるもの、`worktree add` 以外のすべて。
   - &&・||・;・|・改行でつないだコマンドは、1つずつ見て、1つでも止める形があれば止める。
-  - 止めるときは、stderr に次の文を書いて exit 2。「新しいブランチの worktree を git で作るのを止めました。新しいタスクの worktree は、start_session の use_worktree: true でアプリに作らせてください。アプリが作った worktree は信頼済みと記録され、開くときに信頼を聞かれません。」
+  - 止めるときは、stderr に次の文を書いて exit 2。(R2-1・R2-3)「新しいブランチの worktree を git で作るのを止めました。新しいタスクの worktree は、start_session の use_worktree: true でアプリに作らせ、アプリがほかのタスクのフォルダを使い回しても、そのまま使ってください。アプリが作った worktree は信頼済みと記録され、開くときに信頼を聞かれません。ほかの PC から続けるタスクは、git fetch の後に git worktree add <フォルダ> <作業ブランチ> で作ってください。」
   - 入力の JSON が読めないときと、`tool_input.command` が無いときは、何も返さずに通す(`block_history_erasing_push.py` と同じ)。
 - `claude/user-settings.json`(直す): `hooks.PreToolUse` の matcher `Bash|PowerShell` の `hooks` に、`block_history_erasing_push.py` の次に1つ足す。command は、ほかと同じ形の `P=python3; python3 -c '' 2>/dev/null || P=python; "$P" "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/block_new_branch_worktree.py"`。(R2)
 - `docs/specs/block_new_branch_worktree.py.md`(設計のコミットで作った): フックの外から見える動き。実装がこれと合うようにする。(R2)
@@ -88,6 +89,7 @@ LogiFee の PL がチームを作るたびに、アプリの「このワーク�
 | テスト名 | テストサイズ | 受け入れ条件 |
 |---|---|---|
 | test_block_new_branch_worktree.py: 新しいブランチを作るworktree_addは止めてアプリに作らせるよう返す(`-b`・`-B`・`-bname`・フォルダだけ・`git -C <フォルダ> worktree add -b`・&& でつないだもの) | small | R2-1 |
+| test_block_new_branch_worktree.py: 止めたときに返す文は使い回されたフォルダをそのまま使うこととほかのPCの作り方を伝える(`git worktree add -b <ブランチ> <フォルダ> origin/<ブランチ>` で止めたときも) | small | R2-3 |
 | test_block_new_branch_worktree.py: 既にあるブランチかdetachのworktree_addは通す(フォルダとブランチ・`--detach`・`-d`・`--reason` の値を数えないこと) | small | R2-2 |
 | test_block_new_branch_worktree.py: worktree_add以外のコマンドは通す(`git worktree list`・`git push`・`echo`) | small | R2-2 |
 
@@ -100,4 +102,6 @@ LogiFee の PL がチームを作るたびに、アプリの「このワーク�
 ## レビュー
 
 - 設計: 止める形が `-b` を含む `git worktree add` を全部止めるので、ほかの PC から続けるタスクの `git worktree add -b <ブランチ> <フォルダ> origin/<ブランチ>` も止まり、task-team-lead の「use_worktree: false で開始する」手順と食い違う「use_worktree: true でアプリに作らせる」が返る。R2-2 と ADR 0103-1 の理由3は、2つの位置引数で書いたときだけ成り立つ。返す文にほかの PC の作り方を足すか、通す形を広げるかを決め、テスト一覧に足す。
+  - 直した所(SE): 返す文に、ほかの PC から続けるタスクは `git fetch` の後に `git worktree add <フォルダ> <作業ブランチ>` で作ることを足した(R2-3)。通す形は広げない(止める形を簡単に保つ)。R2-2 に skill の作り方だと書き、ADR の理由3を直し、テスト一覧に R2-3 のテストを足した。
 - 設計: R2 のなぜと ADR 0103-1 の理由2は、フックで PL が外れる先が無くなるとするが、`git branch <名前>` の後の `git worktree add <フォルダ> <名前>` は通る。PL が外れた原因(アプリが使い回したフォルダを誤りと見たこと)には設計のどこも触れていないので、止められた PL がこの形に回れば信頼の問いが残る(R1-1)。返す文に、使い回されたフォルダでもそのまま使うことを足すか、ADR の理由をこの抜け道を認めた文に直す。
+  - 直した所(SE): 両方した。返す文に、アプリがほかのタスクのフォルダを使い回してもそのまま使うことを足し(R2-3)、R2 のなぜと ADR の理由2を、抜け道を認め、外れた原因への扱いを返す文で伝える文に直した。ADR の捨てた案に、抜け道も止める案を足した。
