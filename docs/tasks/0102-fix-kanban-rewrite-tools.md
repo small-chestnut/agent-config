@@ -5,7 +5,7 @@ PC: Reo-Desktop
 
 ## 進捗
 
-- 利用者待ち: なし
+- 利用者待ち: 直し方を決める [0102-fix-kanban-rewrite-tools SE](#local_3c6c0cc5-1203-4d40-b5a0-d20354d1fe36)
 - [/] 1. やり方を決める(完了条件: サブエージェントが今の道具で書き直せない段と、直し方を利用者が決めている)
 
 ## 難しさ
@@ -28,13 +28,15 @@ gemini の PL の答え(2026-11-27): 3回とも、task-team-lead のとおりの
 
 gemini の PL での4回目(2026-11-27、同じ頼む文): また「cards.json を読む手段と、アップロードする手段がこのセッションに無い」と返った(0111 のチケットは片付けた後で、無かった)。
 
+原因(2026-11-27、gemini の PL のサブエージェントに読むだけの調べをさせて分かった): gemini の PL のセッション(2026-11-26 に始まった)の Artifact の道具には、アセットを読む・上げる・消すパラメータが無く、`read` に id を渡すと「this session cannot read an artifact's asset store — pass a file's published path」と断られる。ArtifactData は ToolSearch で読み込めて、`datasets/cards` を読めた。Artifact の道具でアセットを扱えるかはセッションごとに違い、SKILL.md の書き方では直らない。
+
 ## 要件
 
 ### 分けたタスク
 
 ### 決まっていない問い
 
-- gemini の PL のサブエージェントが読めなかったのは、SKILL.md が呼び方(アセットの id を `path` に渡す・`asset: true` で上げる)を書いていないからか、道具がそのセッション(2026-11-26 に始まった)に無かったからか。同じ頼む文がここでは通ったので、gemini の PL で今もう一度失敗するかで決める。
+- 直し方: カードのデータを、アセットのファイルから、かんばんの保存先の「保存した行」(Data 型の `source: {kind: "store", path}`。カード1枚が1文書)に移し、書き直しを ArtifactData の書き込みだけにするか。暫定対応として、gemini の PL のセッションを新しく始め直すか。
 
 ## 設計
 
