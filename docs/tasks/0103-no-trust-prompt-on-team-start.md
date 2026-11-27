@@ -5,7 +5,7 @@ PC: Reo-Desktop
 
 ## 進捗
 
-- 利用者待ち: 原因の見立てと直し方の向きを確かめてもらう([0103-no-trust-prompt-on-team-start SE](#local_da3e5b00-914c-4151-b69e-b9f25b16d46b))
+- 利用者待ち: skill に足す行の案を見て、設計に進めるかを決めてもらう([0103-no-trust-prompt-on-team-start SE](#local_da3e5b00-914c-4151-b69e-b9f25b16d46b))
 - [/] 1. やり方を決める(完了条件: 直し方を利用者が決め、要件の節に書いてある)
 
 ## 難しさ
