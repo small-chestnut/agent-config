@@ -13,12 +13,14 @@ import subprocess
 import sys
 import time
 
-from git_command_args import SEPARATORS, git_args, git_folder, tokens_of
+from git_command_args import SEPARATORS, git_args, git_folder, git_options, tokens_of
 
 ERASING_LONG_FLAGS = ("--force", "--mirror", "--prune")
 DELETE_FLAGS = ("--delete", "-d")
 VALUE_FLAGS = ("-o", "--push-option", "--receive-pack", "--exec", "--repo")
-FOLDER_COMMANDS = ("cd", "set-location", "pushd", "push-location")
+FOLDER_COMMANDS = ("cd", "chdir", "set-location", "sl", "pushd", "push-location", "popd",
+                   "pop-location")
+REPO_OPTIONS = ("--git-dir", "--work-tree")
 LEASE = "--force-with-lease"
 TIME_LIMIT = 20
 HEADS = "refs/heads/"
@@ -178,13 +180,17 @@ def judge(command: str, cwd: str, git) -> tuple[str, str] | None:
                             f"履歴の書き換えを頼まれたときは {LEASE} を使ってください。")
         deleted = deleted_branches(args)
         if deleted:
+            if any(o.split("=")[0] in REPO_OPTIONS for o in git_options(segment)):
+                return "deny", ("リモートのブランチを消す push に --git-dir か --work-tree があり、"
+                                "確かめるリポジトリと push するリポジトリが別になりうるので止めました。")
             deletes.append((git_folder(segment, cwd), *deleted))
         lease = next((a for a in args if a.startswith(LEASE)), None)
         if lease and asked is None:
             asked = "ask", lease
     if deletes and moves_folder(segments):
         return "deny", ("リモートのブランチを消す push と同じコマンドにフォルダを移るコマンド"
-                        "(cd・Set-Location・pushd・Push-Location)があり、確かめるリポジトリと"
+                        "(cd・chdir・Set-Location・sl・pushd・Push-Location・popd・Pop-Location)"
+                        "があり、確かめるリポジトリと"
                         "push するリポジトリが別になりうるので止めました。")
     cache = {}
     for repo, remote, branches in deletes:

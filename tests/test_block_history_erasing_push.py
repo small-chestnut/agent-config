@@ -172,13 +172,27 @@ class リモートのブランチを消すpush(unittest.TestCase):
 
     def test_消すpushと同じコマンドにcdがあれば止める(self):
         for command in ("cd ../other && git push origin --delete a",
+                        "chdir ../other && git push origin --delete a",
                         "Set-Location ../other; git push origin :a",
+                        "sl ../other; git push origin :a",
                         "pushd ../other && git push -d origin a",
-                        "git push origin --delete a; Push-Location ../other"):
+                        "git push origin --delete a; Push-Location ../other",
+                        "popd && git push origin --delete a",
+                        "Pop-Location; git push origin :a"):
             with self.subTest(command=command):
                 code, _, err = run_hook("Bash", command, 偽のgit(merged={"a1"}))
                 self.assertEqual(code, 2)
                 self.assertIn("フォルダを移る", err)
+
+    def test_消すpushにgit_dirかwork_treeがあれば止める(self):
+        for command in ("git --git-dir=../other/.git push origin --delete a",
+                        "git --git-dir ../other/.git push origin :a",
+                        "git --work-tree=../other push -d origin a",
+                        "git --work-tree ../other push origin --delete a"):
+            with self.subTest(command=command):
+                code, _, err = run_hook("Bash", command, 偽のgit(merged={"a1"}))
+                self.assertEqual(code, 2)
+                self.assertIn("--git-dir", err)
 
     def test_いくつものブランチを消してもls_remoteはリモートごとに1回(self):
         git = 偽のgit(merged={"a1", "b1", "c1"})

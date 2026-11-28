@@ -4,6 +4,7 @@ import shlex
 from pathlib import Path
 
 SEPARATORS = re.compile(r"&&|\|\||[;|\n]")
+VALUE_OPTIONS = ("-C", "-c", "--git-dir", "--work-tree", "--namespace", "--config-env")
 
 
 def tokens_of(segment: str) -> list[str]:
@@ -21,8 +22,14 @@ def _git_tokens(segment: str) -> tuple[list[str], int] | None:
         return None
     i = 1
     while i < len(tokens) and tokens[i].startswith("-"):
-        i += 2 if tokens[i] in ("-C", "-c") else 1
+        i += 2 if tokens[i] in VALUE_OPTIONS else 1
     return tokens, i
+
+
+def git_options(segment: str) -> list[str]:
+    """1つのコマンドが git なら、サブコマンドの前の大域オプション(値も含む)。そうでなければ空。"""
+    found = _git_tokens(segment)
+    return [] if found is None else found[0][1:found[1]]
 
 
 def git_args(segment: str) -> list[str] | None:
@@ -40,7 +47,7 @@ def git_folder(segment: str, cwd: str) -> str:
     tokens, end = found
     i = 1
     while i < end:
-        if tokens[i] in ("-C", "-c"):
+        if tokens[i] in VALUE_OPTIONS:
             if tokens[i] == "-C" and i + 1 < len(tokens):
                 folder = folder / tokens[i + 1]
             i += 2
