@@ -1,6 +1,6 @@
 # 0105-slim-safety-rules
 
-ステータス: 実装中
+ステータス: 実装レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -8,7 +8,7 @@ PC: Reo-Desktop
 - 利用者待ち: Q6 の答え([0105 SE](#local_5ab46645-b609-4d64-b618-10abdcc85382))
 - [x] 1. やり方を決める(完了条件: 利用者が、安全の節の行を消す基準と確かめ方に合意し、設計に進めると言う)
 - [x] 2. 安全の節から本番の DB の行を消す(依存: 1)(完了条件: `claude/CLAUDE.md` の安全の節に本番の DB の行が無く、ほかの8行が残っている)
-- [/] 3. マージ済みの作業ブランチを、リモートから消せるようにする(依存: 1)(完了条件: small と medium のテストが全部通り、テスト一覧の R2 のテストがある)
+- [x] 3. マージ済みの作業ブランチを、リモートから消せるようにする(依存: 1)(完了条件: small と medium のテストが全部通り、テスト一覧の R2 のテストがある)
 - [ ] 4. 今リモートに残る、マージ済みの作業ブランチを消す(依存: 3)(完了条件: `git fetch --prune` の後の `git branch -r --merged origin/main` に、`origin/main` と `origin/HEAD` のほかが出ない)
 
 ## 難しさ
@@ -123,6 +123,15 @@ PC: Reo-Desktop
 - サブタスク4は PL がする。フックがマージ済みのブランチの削除を通すのは、インストールした後だから。
 
 ## 実装
+
+- サブタスク2(2d27c81): `claude/CLAUDE.md` から本番の DB の行を消し、`tests/medium_test_global_claude_md_length.py` の失敗の文から安全の節を外す1を消して番号を詰めた。「2つの ADR の番号の所に 0105-1 を足す」は、減らし方の順の出典の「(ADR 0076-2)」を「(ADR 0076-2・0105-1)」にした(0105-1 が置き換えるのは 0076-2 の減らし方の所なので)。上限の「(ADR 0090-6)」とクラスの docstring の「(ADR 0076-1・0090-6)」には足していない。
+- 手順2の確かめ: `claude/CLAUDE.md` の「DB 操作」と、`tests/medium_test_global_claude_md_length.py` の「安全の原則の節」を探して、どちらも何も出ない。
+- サブタスク3: テスト一覧の small 8件(直す1件を含む)と medium 3件(`tests/medium_test_block_history_erasing_push.py`)を先に書き、今のフックで失敗する(差し替える `make_git` が無いので errors 62、マージ済みの削除を止めるので failures 2)ことを確かめてから、フック・仕様・skill `task-team-lead` の1行を直した。
+  - `claude/hooks/git_command_args.py` に、コマンドを語に分ける `tokens_of` と、`-C` をたどって git が走るフォルダを返す `git_folder` を足した(`git_args` の動きは今どおり)。
+  - フックは、git を走らせる所を `Git` クラス(フック全体の締め切りを持ち、走らせるごとに残りの時間を上限に渡す)に分け、テストは `make_git` を偽物に差し替える。
+  - medium のテストは、利用者の git の設定に左右されないように、`GIT_CONFIG_GLOBAL` を空のファイルにし、`GIT_CONFIG_NOSYSTEM=1` で走らせる。
+- テスト: `python -m unittest discover -s tests -p "*test_*.py"`(small と medium の全部。large は無い)で 132 件。1回目に失敗1件が出たが、どのテストかを出す前に流れた。その後、全部を4回、フックの small と medium を8回走らせ、みな通った(再現しない)。
+- lint: このリポジトリに lint のコマンドは無い。
 
 ## レビュー
 
