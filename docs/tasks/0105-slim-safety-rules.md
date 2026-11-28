@@ -1,6 +1,6 @@
 # 0105-slim-safety-rules
 
-ステータス: 実装レビュー済み
+ステータス: 設計レビュー中
 PC: Reo-Desktop
 
 ## 進捗
@@ -8,7 +8,7 @@ PC: Reo-Desktop
 - 利用者待ち: なし
 - [x] 1. やり方を決める(完了条件: 利用者が、安全の節の行を消す基準と確かめ方に合意し、設計に進めると言う)
 - [x] 2. 安全の節から本番の DB の行を消す(依存: 1)(完了条件: `claude/CLAUDE.md` の安全の節に本番の DB の行が無く、ほかの8行が残っている)
-- [x] 3. マージ済みの作業ブランチを、リモートから消せるようにする(依存: 1)(完了条件: small と medium のテストが全部通り、テスト一覧の R2 のテストがある)
+- [/] 3. マージ済みの作業ブランチを、リモートから消せるようにする(依存: 1)(完了条件: small と medium のテストが全部通り、テスト一覧の R2 のテストがある)
 - [ ] 4. 今リモートに残る、マージ済みの作業ブランチを消す(依存: 3)(完了条件: `git fetch --prune` の後の `git branch -r --merged origin/main` に、`origin/main` と `origin/HEAD` のほかが出ない)
 - [ ] 5. このリポジトリの命題を「あるべきものを、あるべき量だけ持つ」にし、正否と要不要の原則を置く(依存: 1)(完了条件: リポジトリ直下の CLAUDE.md の1行目からの4行が、R3 の命題・命題(開発の進め方)・R3 の原則2つになっている)
 
@@ -20,7 +20,7 @@ PC: Reo-Desktop
 
 ## ゴール
 
-全体の CLAUDE.md の安全の原則の節から消しても動きが変わらない行を消し、main にマージ済みの作業ブランチをリモートからも消せるようにする。
+全体の CLAUDE.md の安全の原則の節の行を要不要と正否で見直し、main にマージ済みの作業ブランチをリモートからも消せるようにし、このリポジトリの命題を、読み込まれる文章が、あるべきものを、あるべき量だけ持つことにする。
 
 範囲外: R2 に関わらない permissions の deny とフック。
 
@@ -83,7 +83,7 @@ PC: Reo-Desktop
   - リモートのブランチを消す push(`--delete`・`-d`・`:<ブランチ>`)は、消すブランチがみな、リモートの今の先端(リモートごとに1回だけ走らせる `git ls-remote --heads <リモート>` の結果)を、手元のリモートの既定のブランチ(`refs/remotes/<リモート>/HEAD` が指すもの)が履歴に含むとき(`git merge-base --is-ancestor`)だけ通す。
   - 既定のブランチそのもの・リモートに無いブランチ・先端のコミットを手元に持たないブランチ・`refs/remotes/<リモート>/HEAD` が無いリモートを消す push は止める。
   - 同じ push に、ほかの消す引数(`--force`・`--mirror`・`--prune`・`+` で始まる refspec・`-d` 以外の f か d を含む短いフラグ)があれば止める。
-  - git は、コマンドに `-C <フォルダ>` があればそのフォルダ、無ければフックに渡る `cwd` で走らせる。消す push と同じコマンドに `cd`・`Set-Location`・`pushd`・`Push-Location` があれば、確かめるリポジトリと push するリポジトリが別になりうるので止める。
+  - git は、コマンドに `-C <フォルダ>` があればそのフォルダ、無ければフックに渡る `cwd` で走らせる。消す push と同じコマンドに `cd`・`chdir`・`Set-Location`・`sl`・`pushd`・`Push-Location`・`popd`・`Pop-Location` があるか、git に `--git-dir`・`--work-tree` があれば、確かめるリポジトリと push するリポジトリが別になりうるので止める。
   - 時間の上限は、フック全体で 20 秒にする。走らせる git ごとに、残りの時間を上限に渡す。git が失敗したか、残りの時間を使い切ったら止める。20 秒は、Claude Code のフックの既定の上限(資料により 60 秒か 600 秒)より短く、ブランチの数によらず上限に届く前に止まる。ブランチごとに走らせる `git merge-base --is-ancestor` は手元だけで済み、ネットワークに出るのはリモートごとの `git ls-remote` だけ。
   - 止める文には、マージ済みでないなど、止めた理由とブランチの名前を書く。
 - `claude/skills/task-team-lead/SKILL.md` の「マージ後、worktree は `git worktree remove`、作業ブランチは `git branch -d` で削除する。」を「マージ後、worktree は `git worktree remove`、作業ブランチは `git branch -d` と `git push <リモート> --delete <作業ブランチ>` で削除する。(ADR 0105-2)」にする(R2)
@@ -124,7 +124,8 @@ PC: Reo-Desktop
 | `test_既定のブランチを消すpushは止める` | small | R2-2 |
 | `test_消すpushにほかの消す引数が混ざれば止める` | small | R2-2 |
 | `test_マージ済みかを確かめられなければ止める`(git の失敗・時間切れ) | small | R2-2 |
-| `test_消すpushと同じコマンドにcdがあれば止める`(`cd`・`Set-Location`・`pushd`・`Push-Location`) | small | R2-2 |
+| `test_消すpushと同じコマンドにcdがあれば止める`(`cd`・`chdir`・`Set-Location`・`sl`・`pushd`・`Push-Location`・`popd`・`Pop-Location`) | small | R2-2 |
+| `test_消すpushにgit_dirかwork_treeがあれば止める` | small | R2-2 |
 | `test_いくつものブランチを消してもls_remoteはリモートごとに1回`(確かめの差し替えで、呼ばれた回数を数える) | small | R2-2 |
 | `medium_test_block_history_erasing_push.py` の `test_マージ済みのブランチはリモートから消せる`(手元に作った裸のリモートと clone で) | medium | R2-1 |
 | 同じファイルの `test_マージしていないブランチはリモートから消せない` | medium | R2-2 |
