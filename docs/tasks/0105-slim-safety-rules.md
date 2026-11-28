@@ -64,11 +64,12 @@ PC: Reo-Desktop
 - `claude/CLAUDE.md`: 安全の節の「破壊的な DB 操作(DROP / TRUNCATE / WHERE なし DELETE)は、ローカル・開発用の DB にだけする。」を消す(R1)
 - `tests/medium_test_global_claude_md_length.py`: 失敗の文から「1. 減らすのは、安全の原則の節(800 字前後)のほかの行。」を消し、番号を詰め、2つの ADR の番号の所に 0105-1 を足す(R1-3)
 - `claude/hooks/block_history_erasing_push.py`: マージ済みのブランチを消す push を通す(R2-1・R2-2)
-- `docs/specs/block_history_erasing_push.py.md`: 「ADR」の節を「- 0105-3」にし、下の動きを書き足す(R2-1・R2-2)
-  - リモートのブランチを消す push(`--delete`・`-d`・`:<ブランチ>`)は、消すブランチがみな、リモートの今の先端(`git ls-remote <リモート> refs/heads/<ブランチ>`)を、手元のリモートの既定のブランチ(`refs/remotes/<リモート>/HEAD` が指すもの)が履歴に含むとき(`git merge-base --is-ancestor`)だけ通す。
+- `docs/specs/block_history_erasing_push.py.md`: 「ADR」の節を「- 0105-3」にし、今の「--force・--delete・…を含めば、当たった引数を理由に書いて止める」行から、消す push の形(`--delete`・`-d`・`:` で始まる refspec)を外して、下の動きを書き足す(R2-1・R2-2)
+  - リモートのブランチを消す push(`--delete`・`-d`・`:<ブランチ>`)は、消すブランチがみな、リモートの今の先端(リモートごとに1回だけ走らせる `git ls-remote --heads <リモート>` の結果)を、手元のリモートの既定のブランチ(`refs/remotes/<リモート>/HEAD` が指すもの)が履歴に含むとき(`git merge-base --is-ancestor`)だけ通す。
   - 既定のブランチそのもの・リモートに無いブランチ・先端のコミットを手元に持たないブランチ・`refs/remotes/<リモート>/HEAD` が無いリモートを消す push は止める。
   - 同じ push に、ほかの消す引数(`--force`・`--mirror`・`--prune`・`+` で始まる refspec・`-d` 以外の f か d を含む短いフラグ)があれば止める。
-  - git は、コマンドに `-C <フォルダ>` があればそのフォルダ、無ければフックに渡る `cwd` で走らせる。git が失敗したか、20 秒で終わらなければ止める。
+  - git は、コマンドに `-C <フォルダ>` があればそのフォルダ、無ければフックに渡る `cwd` で走らせる。消す push と同じコマンドに `cd`・`Set-Location`・`pushd`・`Push-Location` があれば、確かめるリポジトリと push するリポジトリが別になりうるので止める。
+  - 時間の上限は、フック全体で 20 秒にする。走らせる git ごとに、残りの時間を上限に渡す。git が失敗したか、残りの時間を使い切ったら止める。20 秒は、Claude Code のフックの既定の上限(資料により 60 秒か 600 秒)より短く、ブランチの数によらず上限に届く前に止まる。ブランチごとに走らせる `git merge-base --is-ancestor` は手元だけで済み、ネットワークに出るのはリモートごとの `git ls-remote` だけ。
   - 止める文には、マージ済みでないなど、止めた理由とブランチの名前を書く。
 - `claude/skills/task-team-lead/SKILL.md` の「マージ後、worktree は `git worktree remove`、作業ブランチは `git branch -d` で削除する。」を「マージ後、worktree は `git worktree remove`、作業ブランチは `git branch -d` と `git push <リモート> --delete <作業ブランチ>` で削除する。(ADR 0105-2)」にする(R2)
 
@@ -103,6 +104,8 @@ PC: Reo-Desktop
 | `test_既定のブランチを消すpushは止める` | small | R2-2 |
 | `test_消すpushにほかの消す引数が混ざれば止める` | small | R2-2 |
 | `test_マージ済みかを確かめられなければ止める`(git の失敗・時間切れ) | small | R2-2 |
+| `test_消すpushと同じコマンドにcdがあれば止める`(`cd`・`Set-Location`・`pushd`・`Push-Location`) | small | R2-2 |
+| `test_いくつものブランチを消してもls_remoteはリモートごとに1回`(確かめの差し替えで、呼ばれた回数を数える) | small | R2-2 |
 | `medium_test_block_history_erasing_push.py` の `test_マージ済みのブランチはリモートから消せる`(手元に作った裸のリモートと clone で) | medium | R2-1 |
 | 同じファイルの `test_マージしていないブランチはリモートから消せない` | medium | R2-2 |
 | 同じファイルの `test_手元に無いコミットを持つブランチはリモートから消せない`(別の clone から push した先端) | medium | R2-2 |
